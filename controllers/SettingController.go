@@ -12,7 +12,6 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"programming-learning-platform/conf"
-	"programming-learning-platform/graphics"
 	"programming-learning-platform/models"
 	"programming-learning-platform/models/store"
 	"programming-learning-platform/utils"
@@ -22,7 +21,7 @@ type SettingController struct {
 	BaseController
 }
 
-// Index 基本信息
+// Index 个人设置
 func (this *SettingController) Index() {
 	if this.Ctx.Input.IsPost() {
 		email := strings.TrimSpace(this.GetString("email", ""))
@@ -61,7 +60,6 @@ func (this *SettingController) Index() {
 
 // Password 修改密码
 func (this *SettingController) Password() {
-
 	if this.Ctx.Input.IsPost() {
 		if this.Member.AuthMethod == conf.AuthMethodLDAP {
 			this.JsonResult(6009, "当前用户不支持修改密码")
@@ -105,13 +103,12 @@ func (this *SettingController) Password() {
 
 		this.JsonResult(0, "ok")
 	}
-
 	this.Data["SettingPwd"] = true
 	this.Data["SeoTitle"] = "修改密码 - " + this.Sitename
 	this.TplName = "setting/password.html"
 }
 
-// Star 收藏
+// Star 我的收藏
 func (this *SettingController) Star() {
 	page, _ := this.GetInt("page")
 	cid, _ := this.GetInt("cid")
@@ -137,7 +134,6 @@ func (this *SettingController) Star() {
 			}
 		}
 	}
-
 	this.Data["Books"] = books
 	this.Data["Sort"] = sort
 	this.Data["SettingStar"] = true
@@ -149,7 +145,6 @@ func (this *SettingController) Star() {
 
 // Qrcode 二维码
 func (this *SettingController) Qrcode() {
-
 	if this.Ctx.Input.IsPost() {
 		file, moreFile, err := this.GetFile("qrcode")
 		alipay := true
@@ -162,11 +157,9 @@ func (this *SettingController) Qrcode() {
 		}
 		defer file.Close()
 		ext := filepath.Ext(moreFile.Filename)
-
 		if !strings.EqualFold(ext, ".png") && !strings.EqualFold(ext, ".jpg") && !strings.EqualFold(ext, ".gif") && !strings.EqualFold(ext, ".jpeg") {
 			this.JsonResult(500, "不支持的图片格式")
 		}
-
 		savePath := fmt.Sprintf("uploads/qrcode/%v/%v%v", this.Member.MemberId, time.Now().Unix(), ext)
 		os.MkdirAll(filepath.Dir(savePath), 0777)
 		if err = this.SaveToFile("qrcode", savePath); err != nil {
@@ -226,19 +219,17 @@ func (this *SettingController) Qrcode() {
 
 // Upload 上传图片
 func (this *SettingController) Upload() {
-
 	file, moreFile, err := this.GetFile("image-file")
 	if err != nil {
 		logs.Error("", err.Error())
 		this.JsonResult(500, "读取文件异常")
 	}
 	defer file.Close()
-
-	ext := filepath.Ext(moreFile.Filename)
+	ext := filepath.Ext(moreFile.Filename) // 获取文件的拓展名
+	// 文件拓展名只能为.png/.jpg/.gif/.jpeg
 	if !strings.EqualFold(ext, ".png") && !strings.EqualFold(ext, ".jpg") && !strings.EqualFold(ext, ".gif") && !strings.EqualFold(ext, ".jpeg") {
 		this.JsonResult(500, "不支持的图片格式")
 	}
-
 	x1, _ := strconv.ParseFloat(this.GetString("x"), 10)
 	y1, _ := strconv.ParseFloat(this.GetString("y"), 10)
 	w1, _ := strconv.ParseFloat(this.GetString("width"), 10)
@@ -249,37 +240,26 @@ func (this *SettingController) Upload() {
 	width := int(w1)
 	height := int(h1)
 
-	// fmt.Println(x, x1, y, y1)
-
 	fileName := strconv.FormatInt(time.Now().UnixNano(), 16)
-
 	filePath := filepath.Join("uploads", time.Now().Format("2006/01"), fileName+ext)
-
 	path := filepath.Dir(filePath)
-
 	os.MkdirAll(path, os.ModePerm)
-
 	err = this.SaveToFile("image-file", filePath)
-
 	if err != nil {
 		logs.Error("", err)
 		this.JsonResult(500, "图片保存失败")
 	}
-
-	//剪切图片
-	subImg, err := graphics.ImageCopyFromFile(filePath, x, y, width, height)
-
+	// 剪切图片
+	subImg, err := utils.ImageCopyFromFile(filePath, x, y, width, height)
 	if err != nil {
 		logs.Error("ImageCopyFromFile => ", err)
 		this.JsonResult(6001, "头像剪切失败")
 	}
 	os.Remove(filePath)
 
-	filePath = filepath.Join("uploads", time.Now().Format("200601"), fileName+ext)
-
-	err = graphics.ImageResizeSaveFile(subImg, 120, 120, filePath)
-	err = graphics.SaveImage(filePath, subImg)
-
+	filePath = filepath.Join("uploads", time.Now().Format("2006/01"), fileName+ext)
+	utils.ImageResize(subImg, 120, 120)
+	err = utils.SaveImage(filePath, subImg)
 	if err != nil {
 		logs.Error("保存文件失败 => ", err.Error())
 		this.JsonResult(500, "保存文件失败")
@@ -289,7 +269,6 @@ func (this *SettingController) Upload() {
 	if strings.HasPrefix(url, "//") {
 		url = string(url[1:])
 	}
-
 	if member, err := models.NewMember().Find(this.Member.MemberId); err == nil {
 		avatar := member.Avatar
 		member.Avatar = url
@@ -317,6 +296,5 @@ func (this *SettingController) Upload() {
 			url = "/" + strings.TrimLeft(url, "./")
 		}
 	}
-
 	this.JsonResult(0, "ok", url)
 }

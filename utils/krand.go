@@ -12,7 +12,7 @@ const (
 	KC_RAND_KIND_ALL   = 3 // 数字、大小写字母
 )
 
-// 随机字符串
+// Krand 随机字符串
 func Krand(size int, kind int) []byte {
 	ikind, kinds, result := kind, [][]int{[]int{10, 48}, []int{26, 97}, []int{26, 65}}, make([]byte, size)
 	isAll := kind > KC_RAND_KIND_UPPER || kind < KC_RAND_KIND_NUM

@@ -6,6 +6,7 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
+// Dashboard 仪表盘
 type Dashboard struct {
 	BookNumber          int64 `json:"book_number"`
 	BookNumberToday     int64 `json:"book_number_today"`
@@ -18,10 +19,12 @@ type Dashboard struct {
 	AttachmentNumber    int64 `json:"attachment_number"`
 }
 
+// NewDashboard 创建仪表盘
 func NewDashboard() *Dashboard {
 	return &Dashboard{}
 }
 
+// Query 查询
 func (m *Dashboard) Query() *Dashboard {
 	var (
 		o       = orm.NewOrm()

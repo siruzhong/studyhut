@@ -39,60 +39,60 @@ func webRouter() {
 	beego.Router("/valid_email", &controllers.AccountController{}, "post:ValidEmail")
 	//beego.Router("/captcha", &controllers.AccountController{}, "*:Captcha")
 
-	// 管理
-	beego.Router("/manager", &controllers.ManagerController{}, "*:Index")
-	beego.Router("/manager/users", &controllers.ManagerController{}, "*:Users")
-	beego.Router("/manager/users/edit/:id", &controllers.ManagerController{}, "*:EditMember")
-	beego.Router("/manager/member/create", &controllers.ManagerController{}, "post:CreateMember")
-	beego.Router("/manager/member/delete", &controllers.ManagerController{}, "post:DeleteMember")
-	beego.Router("/manager/member/update-member-status", &controllers.ManagerController{}, "post:UpdateMemberStatus")
-	beego.Router("/manager/member/update-member-no-rank", &controllers.ManagerController{}, "post:UpdateMemberNoRank")
-	beego.Router("/manager/member/change-member-role", &controllers.ManagerController{}, "post:ChangeMemberRole")
-	beego.Router("/manager/books", &controllers.ManagerController{}, "*:Books")
-	beego.Router("/manager/books/edit/:key", &controllers.ManagerController{}, "*:EditBook")
-	beego.Router("/manager/books/delete", &controllers.ManagerController{}, "*:DeleteBook")
-	beego.Router("/manager/comments", &controllers.ManagerController{}, "*:Comments")
-	beego.Router("/manager/comments/delete", &controllers.ManagerController{}, "*:DeleteComment")
-	beego.Router("/manager/comments/clear", &controllers.ManagerController{}, "*:ClearComments")
-	beego.Router("/manager/comments/set", &controllers.ManagerController{}, "*:SetCommentStatus")
-	beego.Router("/manager/books/token", &controllers.ManagerController{}, "post:CreateToken")
-	beego.Router("/manager/setting", &controllers.ManagerController{}, "*:Setting")
-	beego.Router("/manager/books/transfer", &controllers.ManagerController{}, "post:Transfer")
-	beego.Router("/manager/books/sort", &controllers.ManagerController{}, "get:UpdateBookSort")
-	beego.Router("/manager/books/open", &controllers.ManagerController{}, "post:PrivatelyOwned")
-	beego.Router("/manager/attach/list", &controllers.ManagerController{}, "*:AttachList")
-	beego.Router("/manager/attach/detailed/:id", &controllers.ManagerController{}, "*:AttachDetailed")
-	beego.Router("/manager/attach/delete", &controllers.ManagerController{}, "*:AttachDelete")
-	beego.Router("/manager/seo", &controllers.ManagerController{}, "post,get:Seo")
-	beego.Router("/manager/ads", &controllers.ManagerController{}, "post,get:Ads")
-	beego.Router("/manager/update-ads", &controllers.ManagerController{}, "post,get:UpdateAds")
-	beego.Router("/manager/del-ads", &controllers.ManagerController{}, "get:DelAds")
-	beego.Router("/manager/category", &controllers.ManagerController{}, "post,get:Category")
-	beego.Router("/manager/update-cate", &controllers.ManagerController{}, "get:UpdateCate")
-	beego.Router("/manager/del-cate", &controllers.ManagerController{}, "get:DelCate")
-	beego.Router("/manager/icon-cate", &controllers.ManagerController{}, "post:UpdateCateIcon")
-	beego.Router("/manager/sitemap", &controllers.ManagerController{}, "get:Sitemap")       //更新站点地图
-	beego.Router("/manager/friendlink", &controllers.ManagerController{}, "get:FriendLink") //友链管理
-	beego.Router("/manager/add_friendlink", &controllers.ManagerController{}, "post:AddFriendlink")
-	beego.Router("/manager/update_friendlink", &controllers.ManagerController{}, "get:UpdateFriendlink")
-	beego.Router("/manager/rebuild-index", &controllers.ManagerController{}, "get:RebuildAllIndex")
-	beego.Router("/manager/del_friendlink", &controllers.ManagerController{}, "get:DelFriendlink")
-	beego.Router("/manager/banners", &controllers.ManagerController{}, "get:Banners")
-	beego.Router("/manager/banners/upload", &controllers.ManagerController{}, "post:UploadBanner")
-	beego.Router("/manager/banners/delete", &controllers.ManagerController{}, "get:DeleteBanner")
-	beego.Router("/manager/banners/update", &controllers.ManagerController{}, "get:UpdateBanner")
-	beego.Router("/manager/submit-book", &controllers.ManagerController{}, "get:SubmitBook")
-	beego.Router("/manager/submit-book/update", &controllers.ManagerController{}, "get:UpdateSubmitBook")
-	beego.Router("/manager/submit-book/delete", &controllers.ManagerController{}, "get:DeleteSubmitBook")
-	beego.Router("/manager/tags", &controllers.ManagerController{}, "get:Tags")
-	beego.Router("/manager/add-tags", &controllers.ManagerController{}, "post:AddTags")
-	beego.Router("/manager/del-tags", &controllers.ManagerController{}, "get:DelTags")
+	// 管理员用户管理后台
+	beego.Router("/manager", &controllers.ManagerController{}, "*:Index")                                              // 管理后台首页
+	beego.Router("/manager/users", &controllers.ManagerController{}, "*:Users")                                        // 用户列表
+	beego.Router("/manager/users/edit/:id", &controllers.ManagerController{}, "*:EditMember")                          // 修改用户信息
+	beego.Router("/manager/member/create", &controllers.ManagerController{}, "post:CreateMember")                      // 添加用户
+	beego.Router("/manager/member/delete", &controllers.ManagerController{}, "post:DeleteMember")                      // 删除用户
+	beego.Router("/manager/member/update-member-status", &controllers.ManagerController{}, "post:UpdateMemberStatus")  // 更新用户状态
+	beego.Router("/manager/member/update-member-no-rank", &controllers.ManagerController{}, "post:UpdateMemberNoRank") // 更新用户是否排榜
+	beego.Router("/manager/member/change-member-role", &controllers.ManagerController{}, "post:ChangeMemberRole")      // 更新用户角色
+	beego.Router("/manager/books", &controllers.ManagerController{}, "*:Books")                                        // 书籍列表
+	beego.Router("/manager/books/edit/:key", &controllers.ManagerController{}, "*:EditBook")                           // 书籍设置
+	beego.Router("/manager/books/delete", &controllers.ManagerController{}, "*:DeleteBook")                            // 删除书籍
+	beego.Router("/manager/books/transfer", &controllers.ManagerController{}, "post:Transfer")                         // 转让书籍
+	beego.Router("/manager/books/sort", &controllers.ManagerController{}, "get:UpdateBookSort")                        // 更新书籍排序
+	beego.Router("/manager/books/open", &controllers.ManagerController{}, "post:PrivatelyOwned")                       // 设置书籍私有状态
+	beego.Router("/manager/books/token", &controllers.ManagerController{}, "post:CreateToken")                         // 创建令牌
+	beego.Router("/manager/comments", &controllers.ManagerController{}, "*:Comments")                                  // 评论列表
+	beego.Router("/manager/comments/delete", &controllers.ManagerController{}, "*:DeleteComment")                      // 删除评论
+	beego.Router("/manager/comments/clear", &controllers.ManagerController{}, "*:ClearComments")                       // 清除当前用户评论
+	beego.Router("/manager/comments/set", &controllers.ManagerController{}, "*:SetCommentStatus")                      // 设置评论状态
+	beego.Router("/manager/setting", &controllers.ManagerController{}, "*:Setting")                                    // 配置管理
+	beego.Router("/manager/attach/list", &controllers.ManagerController{}, "*:AttachList")                             // 附件列表
+	beego.Router("/manager/attach/detailed/:id", &controllers.ManagerController{}, "*:AttachDetailed")                 // 附件详情
+	beego.Router("/manager/attach/delete", &controllers.ManagerController{}, "*:AttachDelete")                         // 删除附件
+	beego.Router("/manager/tags", &controllers.ManagerController{}, "get:Tags")                                        // 标签列表
+	beego.Router("/manager/add-tags", &controllers.ManagerController{}, "post:AddTags")                                // 添加标签
+	beego.Router("/manager/del-tags", &controllers.ManagerController{}, "get:DelTags")                                 // 删除标签
+	beego.Router("/manager/seo", &controllers.ManagerController{}, "post,get:Seo")                                     // seo管理
+	beego.Router("/manager/ads", &controllers.ManagerController{}, "post,get:Ads")                                     // 广告管理
+	beego.Router("/manager/update-ads", &controllers.ManagerController{}, "post,get:UpdateAds")                        // 修改广告信息
+	beego.Router("/manager/del-ads", &controllers.ManagerController{}, "get:DelAds")                                   // 删除广告
+	beego.Router("/manager/category", &controllers.ManagerController{}, "post,get:Category")                           // 分类列表
+	beego.Router("/manager/update-cate", &controllers.ManagerController{}, "get:UpdateCate")                           // 更新分类
+	beego.Router("/manager/del-cate", &controllers.ManagerController{}, "get:DelCate")                                 // 删除分类
+	beego.Router("/manager/icon-cate", &controllers.ManagerController{}, "post:UpdateCateIcon")                        // 更新分类的图标
+	beego.Router("/manager/sitemap", &controllers.ManagerController{}, "get:Sitemap")                                  // 更新站点地图
+	beego.Router("/manager/friendlink", &controllers.ManagerController{}, "get:FriendLink")                            // 友链管理
+	beego.Router("/manager/add_friendlink", &controllers.ManagerController{}, "post:AddFriendLink")                    // 添加友链
+	beego.Router("/manager/update_friendlink", &controllers.ManagerController{}, "get:UpdateFriendLink")               // 更新友链
+	beego.Router("/manager/del_friendlink", &controllers.ManagerController{}, "get:DelFriendLink")                     // 删除友链
+	beego.Router("/manager/rebuild-index", &controllers.ManagerController{}, "get:RebuildAllIndex")                    // 重建全量索引
+	beego.Router("/manager/banners", &controllers.ManagerController{}, "get:Banners")                                  // 横幅管理
+	beego.Router("/manager/banners/upload", &controllers.ManagerController{}, "post:UploadBanner")                     // 上传横幅
+	beego.Router("/manager/banners/delete", &controllers.ManagerController{}, "get:DeleteBanner")                      // 删除横幅
+	beego.Router("/manager/banners/update", &controllers.ManagerController{}, "get:UpdateBanner")                      // 更新横幅
+	beego.Router("/manager/submit-book", &controllers.ManagerController{}, "get:SubmitBook")                           // 收录管理
+	beego.Router("/manager/submit-book/update", &controllers.ManagerController{}, "get:UpdateSubmitBook")              // 更新收录书籍
+	beego.Router("/manager/submit-book/delete", &controllers.ManagerController{}, "get:DeleteSubmitBook")              // 删除收录书籍
 
 	// 设置
-	beego.Router("/setting", &controllers.SettingController{}, "*:Index")
-	beego.Router("/setting/password", &controllers.SettingController{}, "*:Password")
-	beego.Router("/setting/upload", &controllers.SettingController{}, "*:Upload")
-	beego.Router("/setting/star", &controllers.SettingController{}, "*:Star")
+	beego.Router("/setting", &controllers.SettingController{}, "*:Index")             // 个人设置
+	beego.Router("/setting/password", &controllers.SettingController{}, "*:Password") // 修改密码
+	beego.Router("/setting/upload", &controllers.SettingController{}, "*:Upload")     // 上传图片
+	beego.Router("/setting/star", &controllers.SettingController{}, "*:Star")         // 我的收藏
 	beego.Router("/setting/qrcode", &controllers.SettingController{}, "*:Qrcode")
 
 	// 书籍

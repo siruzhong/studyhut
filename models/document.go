@@ -23,7 +23,7 @@ import (
 	"programming-learning-platform/utils"
 )
 
-// Document struct.
+// Document 文档
 type Document struct {
 	DocumentId   int           `orm:"pk;auto;column(document_id)" json:"doc_id"`
 	DocumentName string        `orm:"column(document_name);size(500)" json:"doc_name"`
@@ -42,19 +42,12 @@ type Document struct {
 	Markdown     string        `orm:"-" json:"markdown"`
 }
 
-// 多字段唯一键
-//func (m *Document) TableUnique() [][]string {
-//	return [][]string{
-//		[]string{"BookId", "Identify"},
-//	}
-//}
-
-// TableName 获取对应数据库表名.
+// TableName 获取对应数据库表名
 func (m *Document) TableName() string {
 	return "documents"
 }
 
-// TableEngine 获取数据使用的引擎.
+// TableEngine 获取数据使用的引擎
 func (m *Document) TableEngine() string {
 	return "INNODB"
 }
@@ -63,13 +56,14 @@ func (m *Document) TableNameWithPrefix() string {
 	return conf.GetDatabasePrefix() + m.TableName()
 }
 
+// NewDocument 创建文档
 func NewDocument() *Document {
 	return &Document{
 		Version: time.Now().Unix(),
 	}
 }
 
-//根据文档ID查询指定文档.
+// Find 根据文档ID查询指定文档
 func (m *Document) Find(id int) (doc *Document, err error) {
 	if id <= 0 {
 		return m, ErrInvalidParameter
@@ -85,14 +79,14 @@ func (m *Document) Find(id int) (doc *Document, err error) {
 	return m, nil
 }
 
-//插入和更新文档.
-//存在文档id或者文档标识，则表示更新文档内容
+// InsertOrUpdate 插入和更新文档
+// 存在文档id或者文档标识，则表示更新文档内容
 func (m *Document) InsertOrUpdate(cols ...string) (id int64, err error) {
 	o := orm.NewOrm()
 	id = int64(m.DocumentId)
 
 	m.DocumentName = strings.TrimSpace(m.DocumentName)
-	if m.DocumentId > 0 { //文档id存在，则更新
+	if m.DocumentId > 0 { // 文档id存在，则更新
 		_, err = o.Update(m, cols...)
 		return
 	}
@@ -112,14 +106,14 @@ func (m *Document) InsertOrUpdate(cols ...string) (id int64, err error) {
 	return
 }
 
-//根据指定字段查询一条文档.
+// FindByFieldFirst 根据指定字段查询一条文档
 func (m *Document) FindByFieldFirst(field string, v interface{}) (*Document, error) {
 	o := orm.NewOrm()
 	err := o.QueryTable(m.TableNameWithPrefix()).Filter(field, v).One(m)
 	return m, err
 }
 
-//根据指定字段查询一条文档.
+// FindByBookIdAndDocIdentify 根据指定字段查询一条文档
 func (m *Document) FindByBookIdAndDocIdentify(BookId, Identify interface{}) (*Document, error) {
 	q := orm.NewOrm().QueryTable(m.TableNameWithPrefix()).Filter("BookId", BookId)
 	err := q.Filter("Identify", Identify).One(m)
@@ -129,7 +123,7 @@ func (m *Document) FindByBookIdAndDocIdentify(BookId, Identify interface{}) (*Do
 	return m, err
 }
 
-//递归删除一个文档.
+// RecursiveDocument 递归删除一个文档
 func (m *Document) RecursiveDocument(docId int) error {
 
 	o := orm.NewOrm()
@@ -159,7 +153,7 @@ func (m *Document) RecursiveDocument(docId int) error {
 	return nil
 }
 
-//发布文档内容为HTML
+// ReleaseContent 发布文档内容为HTML
 func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 	// 加锁
 	utils.BooksRelease.Set(bookId)
@@ -307,7 +301,7 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 	client.RebuildAllIndex(bookId)
 }
 
-//离线文档生成
+// GenerateBook 离线文档生成
 func (m *Document) GenerateBook(book *Book, baseUrl string) {
 	//将书籍id加入进去，表示正在生成离线文档
 	utils.BooksGenerate.Set(book.BookId)
@@ -522,7 +516,7 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 	}
 }
 
-//根据书籍ID查询文档列表(含文档内容).
+// FindListByBookId 根据书籍ID查询文档列表(含文档内容).
 func (m *Document) FindListByBookId(bookId int, withoutContent ...bool) (docs []*Document, err error) {
 	q := orm.NewOrm().QueryTable(m.TableNameWithPrefix()).Filter("book_id", bookId).OrderBy("order_sort")
 	if len(withoutContent) > 0 && withoutContent[0] {
@@ -535,7 +529,7 @@ func (m *Document) FindListByBookId(bookId int, withoutContent ...bool) (docs []
 	return
 }
 
-//根据书籍ID查询文档一级目录.
+// GetMenuTop 根据书籍ID查询文档一级目录.
 func (m *Document) GetMenuTop(bookId int) (docs []*Document, err error) {
 	var docsAll []*Document
 	o := orm.NewOrm()

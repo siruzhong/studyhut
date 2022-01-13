@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	html1 "html/template"
+	"html/template"
 	"image"
 	"io/ioutil"
 	"net/http"
@@ -38,19 +38,14 @@ import (
 
 // 存储类型(更多存储类型有待扩展)
 const (
-	StoreLocal  = "local"
-	StoreOss    = "oss"
-	VirtualRoot = "virtualroot"
-	unknown     = "unknown"
+	StoreLocal = "local"
+	StoreOss   = "oss"
 )
 
 // 分词器
 var (
-	Version     string = "unknown"
-	GitHash     string = "unknown"
-	BuildAt     string = "unknown"
-	BasePath, _        = filepath.Abs(filepath.Dir(os.Args[0]))
-	StoreType          = beego.AppConfig.String("store_type") //存储类型
+	Version     = "unknown"
+	StoreType   = beego.AppConfig.String("store_type") //存储类型
 	langs       sync.Map
 	httpTimeout = time.Duration(beego.AppConfig.DefaultInt("http_timeout", 30)) * time.Second
 	transfer    = strings.TrimRight(strings.TrimSpace(beego.AppConfig.String("http_transfer")), "/") + "/"
@@ -60,23 +55,6 @@ func init() {
 	langs.Store("zh", "中文")
 	langs.Store("en", "英文")
 	langs.Store("other", "其他")
-}
-
-func PrintInfo() {
-	fmt.Println("Service: ", "BookStack")
-	if Version != unknown {
-		fmt.Println("Version: ", Version)
-	}
-	if BuildAt != unknown {
-		fmt.Println("BuildAt: ", BuildAt)
-	}
-	if GitHash != unknown {
-		fmt.Println("GitHash: ", GitHash)
-	}
-}
-
-func InitVirtualRoot() {
-	os.MkdirAll(VirtualRoot, os.ModePerm)
 }
 
 func GetLang(lang string) string {
@@ -315,12 +293,11 @@ func cropScreenshot(selector, jsonFile, pngFile string) (images map[string]map[i
 	return
 }
 
-// 图片缩放居中裁剪
-//图片缩放居中裁剪
-//@param        file        图片文件
-//@param        width       图片宽度
-//@param        height      图片高度
-//@return       err         错误
+// CropImage 图片缩放居中裁剪
+// @param        file        图片文件
+// @param        width       图片宽度
+// @param        height      图片高度
+// @return       err         错误
 func CropImage(file string, width, height int) (err error) {
 	var img image.Image
 	img, err = imaging.Open(file)
@@ -604,7 +581,7 @@ func Substr(s string, length int) string {
 // currentPage:每页显示记录数
 // urlPrefix:url链接前缀
 // urlParams:url键值对参数
-func NewPaginations(rollPage, totalRows, listRows, currentPage int, urlPrefix string, urlSuffix string, urlParams ...interface{}) html1.HTML {
+func NewPaginations(rollPage, totalRows, listRows, currentPage int, urlPrefix string, urlSuffix string, urlParams ...interface{}) template.HTML {
 	var (
 		htmlPage, path string
 		pages          []int
@@ -705,7 +682,7 @@ func NewPaginations(rollPage, totalRows, listRows, currentPage int, urlPrefix st
 		htmlPage += fmt.Sprintf(`<li><a class="num" href="`+path+`?page=%v%v">»</a></li><li><a class="num" href="`+path+`?page=%v%v">..%d</a></li>`, currentPage+1, urlSuffix, totalPage, urlSuffix, totalPage)
 	}
 
-	return html1.HTML(`<ul class="pagination">` + htmlPage + `</ul>`)
+	return template.HTML(`<ul class="pagination">` + htmlPage + `</ul>`)
 }
 
 // InMap 判断数据是否在map中
@@ -1036,14 +1013,13 @@ func SplitMarkdown(segSharp, markdown string) (markdowns []string) {
 // ExecCommand 执行cmd命令操作
 func ExecCommand(name string, args []string, timeout ...time.Duration) (out string, err error) {
 	var (
-		stderr, stdout bytes.Buffer
-		expire         = 30 * time.Minute
+		stderr,
+		stdout bytes.Buffer
+		expire = 30 * time.Minute
 	)
-
 	if len(timeout) > 0 {
 		expire = timeout[0]
 	}
-
 	cmd := exec.Command(name, args...)
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr

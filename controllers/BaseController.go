@@ -566,6 +566,7 @@ func (this *BaseController) SignToday() {
 	this.JsonResult(0, fmt.Sprintf("恭喜您，签到成功,奖励阅读时长 %v 秒", reward))
 }
 
+// forbidGeneralRole 判断用户角色是否为读者
 func (this *BaseController) forbidGeneralRole() bool {
 	// 如果只有作者和管理员才能写作的话，那么已创建了书籍的普通用户无法将书籍转为公开或者是私密分享
 	if this.Member.Role == conf.MemberGeneralRole && models.GetOptionValue("ALL_CAN_WRITE_BOOK", "true") != "true" {

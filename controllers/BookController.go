@@ -24,7 +24,6 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/russross/blackfriday"
 	"programming-learning-platform/conf"
-	"programming-learning-platform/graphics"
 	"programming-learning-platform/models"
 	"programming-learning-platform/models/store"
 	"programming-learning-platform/utils"
@@ -406,7 +405,7 @@ func (this *BookController) UploadCover() {
 	}
 
 	//剪切图片
-	subImg, err := graphics.ImageCopyFromFile(filePath, x, y, width, height)
+	subImg, err := utils.ImageCopyFromFile(filePath, x, y, width, height)
 	if err != nil {
 		logs.Error("graphics.ImageCopyFromFile => ", err)
 		this.JsonResult(500, "图片剪切")
@@ -414,8 +413,8 @@ func (this *BookController) UploadCover() {
 
 	filePath = strings.ReplaceAll(filepath.Join("uploads", time.Now().Format("200601"), fileName+ext), "\\", "/")
 
-	//生成缩略图并保存到磁盘
-	err = graphics.ImageResizeSaveFile(subImg, 175, 230, filePath)
+	// 生成缩略图并保存到磁盘
+	err = utils.ImageResizeSaveFile(subImg, 175, 230, filePath)
 	if err != nil {
 		logs.Error("ImageResizeSaveFile => ", err.Error())
 		this.JsonResult(500, "保存图片失败")

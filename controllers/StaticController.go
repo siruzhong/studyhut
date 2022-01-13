@@ -65,8 +65,8 @@ func (this *StaticController) StaticFile() {
 	}
 
 	file = strings.ReplaceAll(strings.TrimLeft(file, "./"), "\\", "/")
-	path := filepath.Join(utils.VirtualRoot, file)
-	http.ServeFile(this.Ctx.ResponseWriter, this.Ctx.Request, path)
+	//path := filepath.Join(utils.VirtualRoot, file)
+	http.ServeFile(this.Ctx.ResponseWriter, this.Ctx.Request, file)
 }
 
 // ProjectsFile 书籍静态文件

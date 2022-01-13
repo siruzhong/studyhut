@@ -226,6 +226,7 @@ func (m *Member) Update(cols ...string) error {
 	return nil
 }
 
+// Find 根据id查找用户
 func (m *Member) Find(id int, cols ...string) (*Member, error) {
 	o := orm.NewOrm()
 	m.MemberId = id

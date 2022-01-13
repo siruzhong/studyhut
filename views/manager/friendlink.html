@@ -50,16 +50,16 @@
                             {{range .Links}}
                                 <tr>
                                     <td>
-                                        <input type="text" data-url="{{urlfor "ManagerController.UpdateFriendlink"}}?id={{.Id}}" class="form-control change-update" name="title" value="{{.Title}}">
+                                        <input type="text" data-url="{{urlfor "ManagerController.UpdateFriendLink"}}?id={{.Id}}" class="form-control change-update" name="title" value="{{.Title}}">
                                     </td>
                                     <td>
-                                        <input type="text" data-url="{{urlfor "ManagerController.UpdateFriendlink"}}?id={{.Id}}" class="form-control change-update" name="link" value="{{.Link}}">
+                                        <input type="text" data-url="{{urlfor "ManagerController.UpdateFriendLink"}}?id={{.Id}}" class="form-control change-update" name="link" value="{{.Link}}">
                                     </td>
                                     <td>
-                                        <input type="text" data-url="{{urlfor "ManagerController.UpdateFriendlink"}}?id={{.Id}}" class="form-control change-update" name="remark" value="{{.Remark}}">
+                                        <input type="text" data-url="{{urlfor "ManagerController.UpdateFriendLink"}}?id={{.Id}}" class="form-control change-update" name="remark" value="{{.Remark}}">
                                     </td>
                                     <td>
-                                        <input type="number" data-url="{{urlfor "ManagerController.UpdateFriendlink"}}?id={{.Id}}" class="form-control change-update" name="sort" value="{{.Sort}}">
+                                        <input type="number" data-url="{{urlfor "ManagerController.UpdateFriendLink"}}?id={{.Id}}" class="form-control change-update" name="sort" value="{{.Sort}}">
                                     </td>
                                     <td>
                                         {{if .Status}}
@@ -70,11 +70,11 @@
                                     </td>
                                     <td>
                                         {{if .Status}}
-                                            <a href="{{urlfor "ManagerController.UpdateFriendlink"}}?id={{.Id}}&field=status&value=0" class="ajax-get">关闭</a>
+                                            <a href="{{urlfor "ManagerController.UpdateFriendLink"}}?id={{.Id}}&field=status&value=0" class="ajax-get">关闭</a>
                                         {{else}}
-                                            <a href="{{urlfor "ManagerController.UpdateFriendlink"}}?id={{.Id}}&field=status&value=1" class="ajax-get">启用</a>
+                                            <a href="{{urlfor "ManagerController.UpdateFriendLink"}}?id={{.Id}}&field=status&value=1" class="ajax-get">启用</a>
                                         {{end}}
-                                        <a href="{{urlfor "ManagerController.DelFriendlink"}}?id={{.Id}}" class="text-danger confirm ajax-get">删除</a>
+                                        <a href="{{urlfor "ManagerController.DelFriendLink"}}?id={{.Id}}" class="text-danger confirm ajax-get">删除</a>
                                     </td>
                                 </tr>
                             {{end}}
@@ -90,7 +90,7 @@
 <div class="modal fade" id="FlModal" tabindex="-1" role="dialog" aria-labelledby="FlModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="{{urlfor "ManagerController.AddFriendlink"}}" class="ajax-form" method="post">
+            <form action="{{urlfor "ManagerController.AddFriendLink"}}" class="ajax-form" method="post">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     <h4 class="modal-title" id="FlModalLabel">新增友链</h4>

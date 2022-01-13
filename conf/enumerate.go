@@ -17,10 +17,10 @@ const (
 	PageSize = 10 // 默认分页条数
 	RollPage = 4  // 展示分页的个数
 
-	MemberSuperRole   = 0 // 用户权限——超级管理员
-	MemberAdminRole   = 1 // 用户权限——普通管理员
-	MemberGeneralRole = 2 // 用户权限——读者
-	MemberEditorRole  = 3 // 用户权限——作者（可以创建书籍）
+	MemberSuperRole   = 0 // 用户角色——超级管理员
+	MemberAdminRole   = 1 // 用户角色——普通管理员
+	MemberGeneralRole = 2 // 用户角色——读者
+	MemberEditorRole  = 3 // 用户角色——作者（可以创建书籍）
 
 	BookFounder  = 0 // 用户角色——创始人
 	BookAdmin    = 1 // 用户角色——管理者

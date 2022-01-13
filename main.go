@@ -2,14 +2,12 @@ package main
 
 import (
 	"fmt"
-	"os"
-
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/kardianos/service"
+	"os"
 	"programming-learning-platform/commands"
 	"programming-learning-platform/commands/daemon"
 	_ "programming-learning-platform/routers"
-	"programming-learning-platform/utils"
 )
 
 func main() {
@@ -22,17 +20,18 @@ func main() {
 			daemon.Restart()
 		}
 	}
+	// 注册orm命令行工具
 	commands.RegisterCommand()
 
+	// 创建后台程序
 	d := daemon.NewDaemon()
 
+	// 创建服务
 	s, err := service.New(d, d.Config())
-
 	if err != nil {
 		fmt.Println("Create service error => ", err)
 		os.Exit(1)
 	}
-	utils.PrintInfo()
-	utils.InitVirtualRoot()
+
 	s.Run()
 }
