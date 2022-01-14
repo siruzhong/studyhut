@@ -1,17 +1,13 @@
 package store
 
 import (
-	"io"
-	"strings"
-
-	"os"
-
-	"fmt"
-
 	"bytes"
-	"io/ioutil"
-
 	"compress/gzip"
+	"fmt"
+	"io"
+	"io/ioutil"
+	"os"
+	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
@@ -19,7 +15,6 @@ import (
 )
 
 var ModelStoreOss = NewOss()
-var ModelStoreLocal = new(Local)
 
 // Oss OSS配置【这个不再作为数据库表，直接在oss.conf文件中进行配置】
 type Oss struct {
