@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"programming-learning-platform/utils/store"
 	"strconv"
 	"strings"
 	"time"
@@ -13,7 +14,6 @@ import (
 	"github.com/astaxie/beego/orm"
 	"programming-learning-platform/conf"
 	"programming-learning-platform/models"
-	"programming-learning-platform/models/store"
 	"programming-learning-platform/utils"
 )
 

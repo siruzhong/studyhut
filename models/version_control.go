@@ -5,11 +5,11 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"programming-learning-platform/utils/store"
 	"strings"
 	"time"
 
 	"github.com/astaxie/beego"
-	"programming-learning-platform/models/store"
 	"programming-learning-platform/utils"
 )
 

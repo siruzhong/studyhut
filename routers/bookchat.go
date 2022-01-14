@@ -3,9 +3,8 @@ package routers
 import (
 	"strings"
 
-	"github.com/astaxie/beego/plugins/cors"
-
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/plugins/cors"
 	"programming-learning-platform/controllers/api"
 )
 

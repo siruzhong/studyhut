@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"programming-learning-platform/utils/store"
 	"regexp"
 	"strconv"
 	"strings"
@@ -25,7 +26,6 @@ import (
 	"github.com/russross/blackfriday"
 	"programming-learning-platform/conf"
 	"programming-learning-platform/models"
-	"programming-learning-platform/models/store"
 	"programming-learning-platform/utils"
 	"programming-learning-platform/utils/html2md"
 )
@@ -57,6 +57,7 @@ func (this *BookController) Replace() {
 	this.JsonResult(0, "替换成功")
 }
 
+// Index 书籍管理
 func (this *BookController) Index() {
 	this.Data["SettingBook"] = true
 	this.TplName = "book/index.html"
@@ -289,7 +290,7 @@ func (this *BookController) PrivatelyOwned() {
 		this.JsonResult(6002, "权限不足")
 	}
 
-	if _, err = orm.NewOrm().QueryTable("md_books").Filter("book_id", bookResult.BookId).Update(orm.Params{
+	if _, err = orm.NewOrm().QueryTable("books").Filter("book_id", bookResult.BookId).Update(orm.Params{
 		"privately_owned": state,
 	}); err != nil {
 		logs.Error("PrivatelyOwned => ", err)
@@ -794,7 +795,7 @@ func (this *BookController) SaveSort() {
 		this.JsonResult(6003, "数据错误")
 	}
 
-	qs := orm.NewOrm().QueryTable("md_documents").Filter("book_id", bookId)
+	qs := orm.NewOrm().QueryTable("documents").Filter("book_id", bookId)
 	now := time.Now()
 	for _, item := range docs {
 		qs.Filter("document_id", item.Id).Update(orm.Params{
@@ -850,7 +851,7 @@ func (this *BookController) DownloadProject() {
 	if book.BookId == 0 {
 		this.JsonResult(1, "导入失败，只有书籍创建人才有权限导入书籍")
 	}
-	//GitHub书籍链接
+	// GitHub书籍链接
 	link := this.GetString("link")
 	if strings.ToLower(filepath.Ext(link)) != ".zip" {
 		this.JsonResult(1, "只支持拉取zip压缩的markdown书籍")
@@ -871,7 +872,6 @@ func (this *BookController) GitPull() {
 	//1、接受上传上来的zip文件，并存放到store/temp目录下
 	//2、解压zip到当前目录，然后移除非图片文件
 	//3、将文件夹移动到uploads目录下
-
 	identify := this.GetString("identify")
 
 	if !models.NewBook().HasProjectAccess(identify, this.Member.MemberId, conf.BookEditor) {

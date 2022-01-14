@@ -7,10 +7,8 @@ import (
 
 func webRouter() {
 	// 基本
-	beego.Router("/follow/:uid", &controllers.BaseController{}, "get:SetFollow") //关注或取消关注
 	beego.Router("/crawl", &controllers.BaseController{}, "post:Crawl")
-	beego.Router("/user/sign", &controllers.BaseController{}, "get:SignToday")
-	beego.Router("/sitemap.html", &controllers.BaseController{}, "get:Sitemap")
+	beego.Router("/sitemap.html", &controllers.BaseController{}, "get:Sitemap") // 站点地图
 
 	// 静态文件
 	beego.Router("/app", &controllers.StaticController{}, "get:APP")
@@ -18,28 +16,74 @@ func webRouter() {
 	beego.Router("/uploads/*", &controllers.StaticController{}, "get:Uploads")
 	beego.Router("/*", &controllers.StaticController{}, "get:StaticFile")
 
-	// 目录
+	// 登陆注册页
+	beego.Router("/login", &controllers.AccountController{}, "*:Login")                // 用户普通登陆
+	beego.Router("/login/:oauth", &controllers.AccountController{}, "*:Oauth")         // 用户第三方登陆鉴权
+	beego.Router("/logout", &controllers.AccountController{}, "*:Logout")              // 用户退出登陆
+	beego.Router("/bind", &controllers.AccountController{}, "post:Bind")               // 用户注册
+	beego.Router("/note", &controllers.AccountController{}, "get,post:Note")           //
+	beego.Router("/find_password", &controllers.AccountController{}, "*:FindPassword") // 找回密码
+	beego.Router("/valid_email", &controllers.AccountController{}, "post:ValidEmail")  //
+
+	// 首页
 	beego.Router("/", &controllers.CateController{}, "get:Index")
 	beego.Router("/cate", &controllers.CateController{}, "get:List")
-
-	//beego.Router("/", &controllers.HomeController{}, "*:Index")
+	// 发现页
 	beego.Router("/explore", &controllers.HomeController{}, "*:Index")
+	// 榜单页
+	beego.Router("/rank", &controllers.RankController{}, "get:Index")
+	// 标签页
+	beego.Router("/label", &controllers.LabelController{}, "get:List")
+	beego.Router("/label/:key", &controllers.LabelController{}, "get:Index")
+	// 收录页
+	beego.Router("/submit", &controllers.SubmitController{}, "get:Index") // 收录页
+	beego.Router("/submit", &controllers.SubmitController{}, "post:Post") // 提交收录
+	// 书籍搜索
+	beego.Router("/search", &controllers.SearchController{}, "get:Search")        // 搜索页
+	beego.Router("/search/result", &controllers.SearchController{}, "get:Result") // 搜索结果
 
-	// 提交
-	beego.Router("/submit", &controllers.SubmitController{}, "get:Index")
-	beego.Router("/submit", &controllers.SubmitController{}, "post:Post")
+	// 个人主页
+	beego.Router("/user/:username", &controllers.UserController{}, "get:Index")                 // 个人首页
+	beego.Router("/user/:username/collection", &controllers.UserController{}, "get:Collection") // 个人收藏
+	beego.Router("/user/:username/follow", &controllers.UserController{}, "get:Follow")         // 个人关注
+	beego.Router("/user/:username/fans", &controllers.UserController{}, "get:Fans")             // 个人粉丝
+	beego.Router("/user/sign", &controllers.BaseController{}, "get:SignToday")                  // 每日签到
+	beego.Router("/follow/:uid", &controllers.BaseController{}, "get:SetFollow")                // 关注或取消关注
 
-	// 账户
-	beego.Router("/login", &controllers.AccountController{}, "*:Login")
-	beego.Router("/login/:oauth", &controllers.AccountController{}, "*:Oauth")
-	beego.Router("/logout", &controllers.AccountController{}, "*:Logout")
-	beego.Router("/bind", &controllers.AccountController{}, "post:Bind")
-	beego.Router("/note", &controllers.AccountController{}, "get,post:Note")
-	beego.Router("/find_password", &controllers.AccountController{}, "*:FindPassword")
-	beego.Router("/valid_email", &controllers.AccountController{}, "post:ValidEmail")
-	//beego.Router("/captcha", &controllers.AccountController{}, "*:Captcha")
+	// 个人设置
+	beego.Router("/setting", &controllers.SettingController{}, "*:Index")             // 个人设置
+	beego.Router("/setting/password", &controllers.SettingController{}, "*:Password") // 修改密码
+	beego.Router("/setting/upload", &controllers.SettingController{}, "*:Upload")     // 上传图片
+	beego.Router("/setting/star", &controllers.SettingController{}, "*:Star")         // 我的收藏
+	beego.Router("/setting/qrcode", &controllers.SettingController{}, "*:Qrcode")
 
-	// 管理员用户管理后台
+	// 我的书籍
+	beego.Router("/book", &controllers.BookController{}, "*:Index")                              // 书籍列表
+	beego.Router("/book/create", &controllers.BookController{}, "post:Create")                   // 添加书籍
+	beego.Router("/book/star/:id", &controllers.BookController{}, "*:Star")                      // 收藏书籍
+	beego.Router("/book/score/:id", &controllers.BookController{}, "*:Score")                    // 书籍评分
+	beego.Router("/book/comment/:id", &controllers.BookController{}, "post:Comment")             // 书籍评论
+	beego.Router("/book/uploadProject", &controllers.BookController{}, "post:UploadProject")     // zip、EPUB上传导入书籍
+	beego.Router("/book/downloadProject", &controllers.BookController{}, "post:DownloadProject") // zip拉取导入书籍
+	beego.Router("/book/git-pull", &controllers.BookController{}, "post:GitPull")                // git clone导入书籍
+	beego.Router("/book/:key/dashboard", &controllers.BookController{}, "*:Dashboard")           // 书籍概要
+	beego.Router("/book/:key/setting", &controllers.BookController{}, "*:Setting")               // 书籍设置
+	beego.Router("/book/:key/users", &controllers.BookController{}, "*:Users")                   // 书籍成员
+	beego.Router("/book/:key/release", &controllers.BookController{}, "post:Release")            // 书籍发布
+	beego.Router("/book/:key/generate", &controllers.BookController{}, "get,post:Generate")      // 生成下载文档
+	beego.Router("/book/:key/sort", &controllers.BookController{}, "post:SaveSort")              // 文档排序
+	beego.Router("/book/:key/replace", &controllers.BookController{}, "get,post:Replace")        //
+	beego.Router("/book/setting/save", &controllers.BookController{}, "post:SaveBook")           // 保存书籍修改
+	beego.Router("/book/setting/private", &controllers.BookController{}, "post:PrivatelyOwned")  // 设置书籍私有状态
+	beego.Router("/book/setting/transfer", &controllers.BookController{}, "post:Transfer")       // 书籍转让
+	beego.Router("/book/setting/upload", &controllers.BookController{}, "post:UploadCover")      // 上传书籍封面
+	beego.Router("/book/setting/token", &controllers.BookController{}, "post:CreateToken")       // 生成私有书籍阅读令牌
+	beego.Router("/book/setting/delete", &controllers.BookController{}, "post:Delete")           // 删除书籍
+	beego.Router("/book/users/create", &controllers.BookMemberController{}, "post:AddMember")    // 添加书籍成员
+	beego.Router("/book/users/change", &controllers.BookMemberController{}, "post:ChangeRole")   // 修改书籍成员角色
+	beego.Router("/book/users/delete", &controllers.BookMemberController{}, "post:RemoveMember") // 删除书籍成员
+
+	// 管理后台(管理员用户)
 	beego.Router("/manager", &controllers.ManagerController{}, "*:Index")                                              // 管理后台首页
 	beego.Router("/manager/users", &controllers.ManagerController{}, "*:Users")                                        // 用户列表
 	beego.Router("/manager/users/edit/:id", &controllers.ManagerController{}, "*:EditMember")                          // 修改用户信息
@@ -88,41 +132,6 @@ func webRouter() {
 	beego.Router("/manager/submit-book/update", &controllers.ManagerController{}, "get:UpdateSubmitBook")              // 更新收录书籍
 	beego.Router("/manager/submit-book/delete", &controllers.ManagerController{}, "get:DeleteSubmitBook")              // 删除收录书籍
 
-	// 设置
-	beego.Router("/setting", &controllers.SettingController{}, "*:Index")             // 个人设置
-	beego.Router("/setting/password", &controllers.SettingController{}, "*:Password") // 修改密码
-	beego.Router("/setting/upload", &controllers.SettingController{}, "*:Upload")     // 上传图片
-	beego.Router("/setting/star", &controllers.SettingController{}, "*:Star")         // 我的收藏
-	beego.Router("/setting/qrcode", &controllers.SettingController{}, "*:Qrcode")
-
-	// 书籍
-	beego.Router("/book", &controllers.BookController{}, "*:Index")
-	beego.Router("/book/star/:id", &controllers.BookController{}, "*:Star")          // 收藏
-	beego.Router("/book/score/:id", &controllers.BookController{}, "*:Score")        // 评分
-	beego.Router("/book/comment/:id", &controllers.BookController{}, "post:Comment") // 点评
-	beego.Router("/book/uploadProject", &controllers.BookController{}, "post:UploadProject")
-	beego.Router("/book/downloadProject", &controllers.BookController{}, "post:DownloadProject")
-	beego.Router("/book/git-pull", &controllers.BookController{}, "post:GitPull")
-	beego.Router("/book/:key/dashboard", &controllers.BookController{}, "*:Dashboard")
-	beego.Router("/book/:key/setting", &controllers.BookController{}, "*:Setting")
-	beego.Router("/book/:key/users", &controllers.BookController{}, "*:Users")
-	beego.Router("/book/:key/release", &controllers.BookController{}, "post:Release")
-	beego.Router("/book/:key/generate", &controllers.BookController{}, "get,post:Generate")
-	beego.Router("/book/:key/sort", &controllers.BookController{}, "post:SaveSort")
-	beego.Router("/book/:key/replace", &controllers.BookController{}, "get,post:Replace")
-	beego.Router("/book/create", &controllers.BookController{}, "post:Create")
-	beego.Router("/book/setting/save", &controllers.BookController{}, "post:SaveBook")
-	beego.Router("/book/setting/open", &controllers.BookController{}, "post:PrivatelyOwned")
-	beego.Router("/book/setting/transfer", &controllers.BookController{}, "post:Transfer")
-	beego.Router("/book/setting/upload", &controllers.BookController{}, "post:UploadCover")
-	beego.Router("/book/setting/token", &controllers.BookController{}, "post:CreateToken")
-	beego.Router("/book/setting/delete", &controllers.BookController{}, "post:Delete")
-
-	// 书籍成员
-	beego.Router("/book/users/create", &controllers.BookMemberController{}, "post:AddMember")
-	beego.Router("/book/users/change", &controllers.BookMemberController{}, "post:ChangeRole")
-	beego.Router("/book/users/delete", &controllers.BookMemberController{}, "post:RemoveMember")
-
 	// 书签
 	beego.Router("/bookmark/:id", &controllers.BookmarkController{}, "get:Bookmark")
 	beego.Router("/bookmark/list/:book_id", &controllers.BookmarkController{}, "get:List")
@@ -155,24 +164,6 @@ func webRouter() {
 	beego.Router("/comment/create", &controllers.CommentController{}, "post:Create")
 	beego.Router("/comment/lists", &controllers.CommentController{}, "get:Lists")
 	beego.Router("/comment/index", &controllers.CommentController{}, "*:Index")
-
-	// 搜索
-	beego.Router("/search", &controllers.SearchController{}, "get:Search")
-	beego.Router("/search/result", &controllers.SearchController{}, "get:Result")
-
-	// 用户
-	beego.Router("/user/:username", &controllers.UserController{}, "get:Index")
-	beego.Router("/user/:username/collection", &controllers.UserController{}, "get:Collection")
-	beego.Router("/user/:username/follow", &controllers.UserController{}, "get:Follow")
-	beego.Router("/user/:username/fans", &controllers.UserController{}, "get:Fans")
-
-	// 标签
-	beego.Router("/tag/:key", &controllers.LabelController{}, "get:Index")
-	beego.Router("/tag", &controllers.LabelController{}, "get:List")
-	beego.Router("/tags", &controllers.LabelController{}, "get:List")
-
-	// 评分
-	beego.Router("/rank", &controllers.RankController{}, "get:Index")
 
 	beego.Router("/local-render", &controllers.LocalhostController{}, "get,post:RenderMarkdown")
 	beego.Router("/local-render-cover", &controllers.LocalhostController{}, "get:RenderCover")

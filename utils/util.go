@@ -16,6 +16,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"programming-learning-platform/utils/store"
 	"reflect"
 	"strconv"
 	"strings"
@@ -32,7 +33,6 @@ import (
 	"github.com/disintegration/imaging"
 	"github.com/mssola/user_agent"
 	"programming-learning-platform/conf"
-	"programming-learning-platform/models/store"
 	"programming-learning-platform/utils/html2md"
 )
 
@@ -868,7 +868,7 @@ func DeleteFile(file string) {
 	}
 	switch StoreType {
 	case StoreLocal:
-		go store.ModelStoreLocal.DelFromFolder(file)
+		go store.ModelStoreLocal.DelFolder(file)
 	case StoreOss:
 		go store.ModelStoreOss.DelOssFolder(file)
 	}

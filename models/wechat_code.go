@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"programming-learning-platform/utils/store"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/models/store"
 	"programming-learning-platform/utils"
 )
 

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"programming-learning-platform/utils/store"
 	"strconv"
 	"strings"
 	"time"
@@ -18,7 +19,6 @@ import (
 	"github.com/unknwon/com"
 	"programming-learning-platform/conf"
 	"programming-learning-platform/models"
-	"programming-learning-platform/models/store"
 	"programming-learning-platform/oauth"
 	"programming-learning-platform/utils"
 )

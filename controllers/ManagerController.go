@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"programming-learning-platform/utils/store"
 	"regexp"
 	"strconv"
 	"strings"
@@ -19,7 +20,6 @@ import (
 	"github.com/astaxie/beego/orm"
 	"programming-learning-platform/conf"
 	"programming-learning-platform/models"
-	"programming-learning-platform/models/store"
 	"programming-learning-platform/utils"
 )
 
@@ -1082,9 +1082,8 @@ func (this *ManagerController) UploadBanner() {
 		this.JsonResult(1, err.Error())
 	}
 	ext := strings.ToLower(filepath.Ext(strings.ToLower(h.Filename))) // 获取拓展名
-	rootPath, err := filepath.Abs("./")
-	tmpFile := fmt.Sprintf("%s/uploads/tmp/banner-%v-%v%v", rootPath, this.Member.MemberId, time.Now().Unix(), ext)
-	destFile := fmt.Sprintf("%s/uploads/banners/%v.%v%v", rootPath, this.Member.MemberId, time.Now().Unix(), ext)
+	tmpFile := fmt.Sprintf("uploads/tmp/banner-%v-%v%v", this.Member.MemberId, time.Now().Unix(), ext)
+	destFile := fmt.Sprintf("uploads/banners/%v.%v%v", this.Member.MemberId, time.Now().Unix(), ext)
 	defer func() {
 		f.Close()
 		os.Remove(tmpFile)

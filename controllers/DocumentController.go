@@ -23,9 +23,9 @@ import (
 	"github.com/boombuler/barcode/qr"
 	"programming-learning-platform/conf"
 	"programming-learning-platform/models"
-	"programming-learning-platform/models/store"
 	"programming-learning-platform/utils"
 	"programming-learning-platform/utils/html2md"
+	"programming-learning-platform/utils/store"
 )
 
 var (

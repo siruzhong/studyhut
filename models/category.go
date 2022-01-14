@@ -2,11 +2,11 @@ package models
 
 import (
 	"errors"
+	"programming-learning-platform/utils/store"
 	"strings"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/models/store"
 	"programming-learning-platform/utils"
 )
 

@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"programming-learning-platform/utils/store"
 	"strings"
 	"time"
 
@@ -19,7 +20,6 @@ import (
 	"github.com/astaxie/beego/httplib"
 	"github.com/astaxie/beego/orm"
 	"programming-learning-platform/conf"
-	"programming-learning-platform/models/store"
 	"programming-learning-platform/utils"
 )
 

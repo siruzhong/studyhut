@@ -261,7 +261,7 @@ func (this *BaseController) BaseUrl() string {
 	return this.Ctx.Input.Scheme() + "://" + this.Ctx.Request.Host
 }
 
-//显示错误信息页面.
+// ShowErrorPage 显示错误信息页面
 func (this *BaseController) ShowErrorPage(errCode int, errMsg string) {
 	this.TplName = "errors/error.html"
 	this.Data["ErrorMessage"] = errMsg

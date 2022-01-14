@@ -5,12 +5,12 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"programming-learning-platform/utils/store"
 	"strings"
 	"time"
 
 	"github.com/astaxie/beego"
 	"programming-learning-platform/models"
-	"programming-learning-platform/models/store"
 	"programming-learning-platform/utils"
 )
 

@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"os"
+	"programming-learning-platform/utils/store"
 	"strconv"
 	"strings"
 	"time"
@@ -11,7 +12,6 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"programming-learning-platform/conf"
-	"programming-learning-platform/models/store"
 	"programming-learning-platform/utils"
 )
 
@@ -331,7 +331,7 @@ func (m *Book) ThoroughDeleteBook(id int) (err error) {
 		if m.Cover != beego.AppConfig.DefaultString("cover", "/static/images/book.png") {
 			os.Remove(strings.TrimLeft(m.Cover, "/ ")) //删除封面
 		}
-		go store.ModelStoreLocal.DelFromFolder("uploads/projects/" + m.Identify)
+		go store.ModelStoreLocal.DelFolder("uploads/projects/" + m.Identify)
 	case utils.StoreOss:
 		go store.ModelStoreOss.DelOssFolder("projects/" + m.Identify)
 	}
