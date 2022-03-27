@@ -2,8 +2,7 @@ package models
 
 import "github.com/astaxie/beego/orm"
 
-var ModelQQ = new(QQ)
-
+// QQ 第三方qq接口
 type QQ struct {
 	Id        int
 	OpenId    string
@@ -13,12 +12,17 @@ type QQ struct {
 	AvatarURL string `orm:"column(avatar_url)"` //用户头像链接
 }
 
-//gitee用户的登录流程是这样的
-//1、获取gitee的用户信息，用gitee的用户id查询member_id是否大于0，大于0则表示已绑定了用户信息，直接登录
-//2、未绑定用户，先把gitee数据入库，然后再跳转绑定页面
+// ModelQQ qq实体
+var ModelQQ = new(QQ)
 
-// GetUserByOpenid 根据giteeid获取用户的gitee数据。这里可以查询用户是否绑定了或者数据是否在库中存在
+// TableName 获取表名
+func (this *QQ) TableName() string {
+	return "qq"
+}
+
+// GetUserByOpenid 根据openid获取用户的qq数据
 func (this *QQ) GetUserByOpenid(openid string, cols ...string) (user QQ, err error) {
+	// 查询用户的qq数据是否在数据库中存在
 	qs := orm.NewOrm().QueryTable("qq").Filter("openid", openid)
 	if len(cols) > 0 {
 		err = qs.One(&user, cols...)
@@ -28,12 +32,8 @@ func (this *QQ) GetUserByOpenid(openid string, cols ...string) (user QQ, err err
 	return
 }
 
-// Bind 绑定用户
+// Bind 绑定用户与qq
 func (this *QQ) Bind(openid, memberId interface{}) (err error) {
 	_, err = orm.NewOrm().QueryTable("qq").Filter("openid", openid).Update(orm.Params{"member_id": memberId})
 	return
-}
-
-func (this *QQ) TableName() string {
-	return "qq"
 }

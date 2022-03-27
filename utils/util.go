@@ -32,7 +32,6 @@ import (
 	"github.com/astaxie/beego/context"
 	"github.com/disintegration/imaging"
 	"github.com/mssola/user_agent"
-	"programming-learning-platform/conf"
 	"programming-learning-platform/utils/html2md"
 )
 
@@ -74,7 +73,7 @@ func ScoreFloat(score int) string {
 // @param	subject	邮件主题
 // @param	email	收件人
 // @param	body	邮件内容
-func SendMail(conf *conf.SmtpConf, subject, email string, body string) error {
+func SendMail(conf *SmtpConf, subject, email string, body string) error {
 	msg := &mail.Message{
 		Header: mail.Header{
 			"From":         {conf.FormUserName},

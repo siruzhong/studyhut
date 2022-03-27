@@ -8,11 +8,10 @@ import (
 	"strings"
 	"time"
 
-	ldap "gopkg.in/ldap.v2"
-
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
+	ldap "gopkg.in/ldap.v2"
 	"programming-learning-platform/conf"
 	"programming-learning-platform/utils"
 )

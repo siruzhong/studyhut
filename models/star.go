@@ -12,20 +12,22 @@ type DataCount struct {
 	Cnt int64
 }
 
+// Star 收藏
 type Star struct {
-	Id       int
-	Uid      int `orm:"index"` //用户id,user id
-	Bid      int //书籍id,book id
-	LastRead int `orm:"index;default(0)"` //最后阅读书剑
+	Id       int `json:"id"`
+	Uid      int `orm:"index"`            // 用户
+	Bid      int `json:"bid"`             // 书籍id
+	LastRead int `orm:"index;default(0)"` // 最后阅读时间
 }
 
-// 多字段唯一键
+// TableUnique 多字段唯一键
 func (this *Star) TableUnique() [][]string {
 	return [][]string{
 		[]string{"Uid", "Bid"},
 	}
 }
 
+// StarResult 收藏详细信息
 type StarResult struct {
 	BookId      int    `json:"book_id"`
 	BookName    string `json:"book_name"`
@@ -44,10 +46,10 @@ type StarResult struct {
 	OrderIndex  int    `json:"order_index"`
 }
 
-//收藏或者取消收藏
-//@param            uid         用户id
-//@param            bid         书籍id
-//@return           cancel      是否是取消收藏，只是标记属于取消还是收藏操作，err才表示执行操作成功与否
+// Star 收藏或者取消收藏
+// @param	uid		用户id
+// @param	bid		书籍id
+// @return	cancel	是否是取消收藏，只是标记属于取消还是收藏操作，err才表示执行操作成功与否
 func (this *Star) Star(uid, bid int) (cancel bool, err error) {
 	var star = Star{Uid: uid, Bid: bid}
 	o := orm.NewOrm()
@@ -71,7 +73,7 @@ func (this *Star) Star(uid, bid int) (cancel bool, err error) {
 	return
 }
 
-//是否收藏了文档
+// DoesStar 是否收藏了文档
 func (this *Star) DoesStar(uid, bid interface{}) bool {
 	var star Star
 	star.Uid, _ = strconv.Atoi(fmt.Sprintf("%v", uid))
@@ -83,9 +85,9 @@ func (this *Star) DoesStar(uid, bid interface{}) bool {
 	return false
 }
 
-//获取收藏列表，查询书籍信息
+// List 获取收藏列表，查询书籍信息
 func (this *Star) List(uid, p, listRows int, cid int, order ...string) (cnt int64, books []StarResult, err error) {
-	//根据用户id查询用户的收藏，先从收藏表中查询book_id
+	// 根据用户id查询用户的收藏，先从收藏表中查询book_id
 	o := orm.NewOrm()
 	var (
 		count DataCount
@@ -97,7 +99,7 @@ func (this *Star) List(uid, p, listRows int, cid int, order ...string) (cnt int6
 		sqlCount = `select count(s.bid) cnt from books b left join star s on s.bid=b.book_id left join book_category bc on bc.book_id = s.bid where s.uid=? and bc.category_id = ? and b.privately_owned=0`
 	}
 	o.Raw(sqlCount, args...).QueryRow(&count)
-	//这里先暂时每次都统计一次用户的收藏数量。合理的做法是在用户表字段中增加一个收藏计数
+	// 这里先暂时每次都统计一次用户的收藏数量。合理的做法是在用户表字段中增加一个收藏计数
 	orderBy := "s.last_read desc"
 	if len(order) > 0 && order[0] == "new" {
 		orderBy = "s.id desc"
@@ -113,6 +115,7 @@ func (this *Star) List(uid, p, listRows int, cid int, order ...string) (cnt int6
 	return
 }
 
+// SetLastReadTime 设置最后一次阅读时间
 func (this *Star) SetLastReadTime(uid, bid int) {
 	orm.NewOrm().QueryTable(this).Filter("uid", uid).Filter("bid", bid).Update(orm.Params{"last_read": time.Now().Unix()})
 }

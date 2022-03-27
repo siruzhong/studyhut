@@ -11,6 +11,7 @@ import (
 	"programming-learning-platform/utils"
 )
 
+// SearchController 搜索控制器
 type SearchController struct {
 	BaseController
 }
@@ -28,35 +29,26 @@ func (this *SearchController) Search() {
 
 // Result 搜索结果页
 func (this *SearchController) Result() {
-
 	totalRows := 0
-
 	var ids []int
-
-	wd := this.GetString("wd")
+	wd := this.GetString("wd") // 获取搜索框内容
 	if wd == "" {
 		this.Redirect(beego.URLFor("SearchController.Search"), 302)
 		return
 	}
-
 	now := time.Now()
-
 	tab := this.GetString("tab", models.GetOptionValue("DEFAULT_SEARCH", "book"))
 	isSearchDoc := false
 	if tab == "doc" {
 		isSearchDoc = true
 	}
-
 	page, _ := this.GetInt("page", 1)
 	size := 10
-
 	if page < 1 {
 		page = 1
 	}
-
-	client := models.NewElasticSearchClient()
-
-	if client.On { // elasticsearch 进行全文搜索
+	client := models.NewElasticSearchClient() // 创建ElasticSearch客户端
+	if client.On {                            // elasticsearch 进行全文搜索
 		result, err := models.NewElasticSearchClient().Search(wd, page, size, isSearchDoc)
 		if err != nil {
 			beego.Error(err.Error())
@@ -66,7 +58,7 @@ func (this *SearchController) Result() {
 				ids = append(ids, item.Source.Id)
 			}
 		}
-	} else { //MySQL like 查询
+	} else { // MySQL like 查询
 		if isSearchDoc { //搜索文档
 			docs, count, err := models.NewDocumentSearchResult().SearchDocument(wd, 0, page, size)
 			totalRows = count
@@ -97,7 +89,6 @@ func (this *SearchController) Result() {
 		}
 		this.Data["Words"] = client.SegWords(wd)
 	}
-
 	this.Data["TotalRows"] = totalRows
 	if totalRows > size {
 		if totalRows > 1000 {

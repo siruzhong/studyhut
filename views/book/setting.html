@@ -29,13 +29,12 @@
                     <li><a href="{{urlfor "BookController.Users" ":key" .Model.Identify}}" class="item"><i class="fa fa-users" aria-hidden="true"></i> 成员</a> </li>
                     <li class="active"><a href="{{urlfor "BookController.Setting" ":key" .Model.Identify}}" class="item"><i class="fa fa-gear" aria-hidden="true"></i> 设置</a> </li>
                 </ul>
-
             </div>
             <div class="page-right">
                 <div class="m-box">
                     <div class="box-head">
                         <strong class="box-title"> 书籍设置</strong>
-
+                        <!--导入书籍-->
                         <div class="btn-group pull-right btn-group-sm" style="margin-left: 5px;">
                             <button type="button" class="btn btn-default"><i class="fa fa-cloud-upload"></i> 导入书籍</button>
                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -55,9 +54,9 @@
                                 </li>
                             </ul>
                         </div>
-
+                        <!--编辑书籍-->
                         <a style="margin-left: 5px;" href="/api/{{.Model.Identify}}/edit" class="btn btn-default btn-sm pull-right">编辑文档</a>
-
+                        <!--书籍创作者/管理员的操作-->
                         {{if eq .Model.RoleId 0}}
                         <button type="button"  class="btn btn-success btn-sm pull-right" data-toggle="modal" data-target="#transferBookModal">转让书籍</button>
                         {{if eq .Model.PrivatelyOwned 1}}
@@ -70,7 +69,6 @@
                         </a>
                         <button type="button"  class="btn btn-danger btn-sm pull-right" style="margin-right: 5px;" data-toggle="modal" data-target="#deleteBookModal">删除书籍</button>
                         {{end}}
-
                     </div>
                 </div>
                 <div class="box-body">
@@ -104,13 +102,13 @@
                         <div class="form-group">
                             <label>来源</label>
                             <div class="input-group">
-                                    <span class="input-group-btn">
-                                        <button class="btn btn-default" type="button">来源名称</button>
-                                    </span>
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button">来源名称</button>
+                                </span>
                                 <input type="text" placeholder="选填" value="{{.Model.Author}}" name="author" id="author" class="form-control">
                                 <span class="input-group-btn">
-                                        <button class="btn btn-default" style="border-left: 0px;border-right: 0px;border-radius: 0px;" type="button">来源链接</button>
-                                    </span>
+                                    <button class="btn btn-default" style="border-left: 0px;border-right: 0px;border-radius: 0px;" type="button">来源链接</button>
+                                </span>
                                 <input type="text" placeholder="选填" value="{{.Model.AuthorURL}}" name="author_url" id="author_url" class="form-control">
                             </div>
                         </div>
@@ -138,9 +136,9 @@
                                 <div class="panel-heading"><h3 class="panel-title">{{$cate.Title}}</h3></div>
                                 <div class="panel-body">
                                     {{range $idx1,$item:=$.Cates}}
-                                    {{if eq $item.Pid $cate.Id}}
+<!--                                    {{if eq $item.Pid $cate.Id}}-->
                                     <label><input type="checkbox"  {{if (inMap $.Maps $item.Id)}}checked{{end}} name="cid" value="{{$item.Id}}">{{$item.Title}}</label>
-                                    {{end}}
+<!--                                    {{end}}-->
                                     {{end}}
                                 </div>
                             </div>

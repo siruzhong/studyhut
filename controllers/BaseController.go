@@ -151,7 +151,7 @@ func (this *BaseController) Prepare() {
 
 	if this.Member.MemberId > 0 {
 		ShowCreateBookEntrance = true
-		if opt, err := models.NewOption().FindByKey("ALL_CAN_WRITE_BOOK"); err == nil {
+		if opt, err := models.NewOption().FindByName("ALL_CAN_WRITE_BOOK"); err == nil {
 			if opt.OptionValue == "false" && this.Member.Role == conf.MemberGeneralRole {
 				// 如果用户现在是普通用户，但是之前是作者或者之前有新建书籍书籍的权限并且创建了书籍，则也给用户显示入口
 				ShowCreateBookEntrance = models.NewRelationship().HasRelatedBook(this.Member.MemberId)
@@ -204,7 +204,7 @@ func (this *BaseController) SetMember(member models.Member) {
 	}
 }
 
-// JsonResult 响应 json 结果
+// JsonResult 响应json结果
 func (this *BaseController) JsonResult(errCode int, errMsg string, data ...interface{}) {
 	jsonData := make(map[string]interface{}, 3)
 	jsonData["errcode"] = errCode

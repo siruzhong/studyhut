@@ -83,6 +83,9 @@ func webRouter() {
 	beego.Router("/book/users/change", &controllers.BookMemberController{}, "post:ChangeRole")   // 修改书籍成员角色
 	beego.Router("/book/users/delete", &controllers.BookMemberController{}, "post:RemoveMember") // 删除书籍成员
 
+	// 友链
+	beego.Router("/friendlink/list", &controllers.FriendLinkController{}, "*:List") // 展示所有友情链接
+
 	// 管理后台(管理员用户)
 	beego.Router("/manager", &controllers.ManagerController{}, "*:Index")                                              // 管理后台首页
 	beego.Router("/manager/users", &controllers.ManagerController{}, "*:Users")                                        // 用户列表
@@ -118,6 +121,7 @@ func webRouter() {
 	beego.Router("/manager/update-cate", &controllers.ManagerController{}, "get:UpdateCate")                           // 更新分类
 	beego.Router("/manager/del-cate", &controllers.ManagerController{}, "get:DelCate")                                 // 删除分类
 	beego.Router("/manager/icon-cate", &controllers.ManagerController{}, "post:UpdateCateIcon")                        // 更新分类的图标
+	beego.Router("/manager/icon-friendlink", &controllers.ManagerController{}, "post:UpdateFriendLinkIcon")            // 更新友链的图标
 	beego.Router("/manager/sitemap", &controllers.ManagerController{}, "get:Sitemap")                                  // 更新站点地图
 	beego.Router("/manager/friendlink", &controllers.ManagerController{}, "get:FriendLink")                            // 友链管理
 	beego.Router("/manager/add_friendlink", &controllers.ManagerController{}, "post:AddFriendLink")                    // 添加友链

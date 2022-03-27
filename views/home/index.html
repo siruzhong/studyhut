@@ -38,7 +38,6 @@
                                 <a {{if eq $.Pid .Id}}class="active"{{end}} href="{{urlfor "HomeController.Index"}}?tab={{$.Tab}}&cid={{.Id}}&lang={{$.Lang}}" title="{{.Title}}">{{.Title}}</a>
                             {{end}}
                             {{end}}
-
                         {{if gt $.Cid 0}}
                             <div class="help-block" style="text-indent: 45px;">
                             {{range .Cates}}
@@ -50,32 +49,22 @@
                         {{end}}
                     </div>
                 {{end}}
-
                 {{if .Cate.Intro}}
                     <div class="cate-intro">
                         <div>{{.Cate.Title}}，{{.Cate.Intro}}</div>
                     </div>
                 {{end}}
-
                 <ul class="nav nav-tabs">
                     <li {{if eq $.Tab "latest"}}class="active"{{end}}><a href="{{urlfor "HomeController.Index"}}?tab=latest&cid={{$.Cid}}&lang={{$.Lang}}">最新<span class="hidden-xs">发布</span></a></li>
                     <li {{if eq $.Tab "popular"}}class="active"{{end}}><a href="{{urlfor "HomeController.Index"}}?tab=popular&cid={{$.Cid}}&lang={{$.Lang}}">热门<span class="hidden-xs">书籍</span></a></li>
                     <li {{if eq $.Tab "recommend"}}class="active"{{end}}><a href="{{urlfor "HomeController.Index"}}?tab=recommend&cid={{$.Cid}}&lang={{$.Lang}}" title="网站推荐"><span class="hidden-xs">网站</span>推荐</a></li>
                     <li ><a href="{{urlfor "SettingController.Star"}}" target="_blank" class="text-red" title="我的收藏"><i class="fa fa-heart"></i> 我的收藏</a></li>
-{{/*                    {{if and (gt $.Member.MemberId 0) (eq .IsSignedToday false)}}*/}}
-{{/*                        <li ><a href="{{urlfor "UserController.Index" ":username" $.Member.Account}}" class="text-red" title="每日签到"><i class="fa fa-calendar-plus-o" aria-hidden="true"></i> 每日签到</a></li>*/}}
-{{/*                    {{end}}*/}}
                 </ul>
             </div>
-
-
-
         </div>
         <div class="row">
             <div class="manual-list">
                 {{range $index,$item := .Lists}}
-                {{/*<div class="list-item">*/}}
-
                 <div class="col-xs-6 col-sm-3 col-md-2">
                     <dl class="manual-item-standard">
                         <dt>
@@ -86,13 +75,6 @@
                         <dd>
                             <a href="{{urlfor "DocumentController.Index" ":key" $item.Identify}}" class="name tooltips" title="{{$item.BookName}}" target="_blank">{{$item.BookName}}</a>
                         </dd>
-                        {{/*<dd>*/}}
-                            {{/*<span class="author">*/}}
-                                {{/*<b class="text">作者</b>*/}}
-                                {{/*<b class="text">-</b>*/}}
-                                {{/*<b class="text">{{$item.CreateName}}</b>*/}}
-                            {{/*</span>*/}}
-                        {{/*</dd>*/}}
                     </dl>
                 </div>
                 {{end}}
@@ -117,6 +99,6 @@
         </div>
     </div>
 </div>
-{{template "widgets/footer.html" .}}
+    {{template "widgets/footer.html" .}}
 </body>
 </html>

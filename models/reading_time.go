@@ -18,6 +18,7 @@ type ReadingTime struct {
 	Duration int // 每天的阅读时长
 }
 
+// sum 总阅读时长
 type sum struct {
 	SumVal int
 }
@@ -45,6 +46,7 @@ func init() {
 	}
 }
 
+// NewReadingTime 创建阅读时长对象
 func NewReadingTime() *ReadingTime {
 	return &ReadingTime{}
 }
@@ -53,6 +55,7 @@ func (*ReadingTime) TableUnique() [][]string {
 	return [][]string{[]string{"uid", "day"}}
 }
 
+// GetReadingTime 获取阅读时长
 func (r *ReadingTime) GetReadingTime(uid int, prd period) int {
 	sum := &sum{}
 	o := orm.NewOrm()

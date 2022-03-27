@@ -711,7 +711,7 @@ func (this *DocumentController) Upload() {
 		this.JsonResult(6003, "无法解析文件的格式")
 	}
 
-	if !conf.IsAllowUploadFileExt(ext, fileType) {
+	if !utils.IsAllowUploadFileExt(ext, fileType) {
 		this.JsonResult(6004, "不允许的文件类型")
 	}
 
@@ -1082,7 +1082,7 @@ func (this *DocumentController) Content() {
 
 	//爬虫采集
 	access := this.Member.IsAdministrator()
-	if op, err := new(models.Option).FindByKey("SPIDER"); err == nil {
+	if op, err := new(models.Option).FindByName("SPIDER"); err == nil {
 		access = access && op.OptionValue == "true"
 	}
 	if access && strings.ToLower(doc.Identify) == "summary.md" && (strings.Contains(markdown, "<spider></spider>") || strings.Contains(doc.Markdown, "<spider/>")) {
@@ -1186,8 +1186,9 @@ func (this *DocumentController) Content() {
 
 }
 
-// Export 导出文件
+// Export 下载文档(PDF、EPUB、MOBI)
 func (this *DocumentController) Export() {
+	// 查验当前登陆用户信息
 	if this.Member == nil || this.Member.MemberId == 0 {
 		if tips, ok := this.Option["DOWNLOAD_LIMIT"]; ok {
 			tips = strings.TrimSpace(tips)
@@ -1196,10 +1197,9 @@ func (this *DocumentController) Export() {
 			}
 		}
 	}
-
-	this.TplName = "document/export.html"
-	identify := this.Ctx.Input.Param(":key")
-	ext := strings.ToLower(this.GetString("output"))
+	this.TplName = "document/export.html"            // view视图名称
+	identify := this.Ctx.Input.Param(":key")         // 获取文档的唯一标识
+	ext := strings.ToLower(this.GetString("output")) // 获取拓展名
 	switch ext {
 	case "pdf", "epub", "mobi":
 		ext = "." + ext

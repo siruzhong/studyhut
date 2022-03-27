@@ -6,12 +6,13 @@ import (
 
 // FriendLink 友链数据表
 type FriendLink struct {
-	Id     int    //自增主键
-	Sort   int    //排序
-	Link   string `orm:"unique;size(128)"` //链接地址
-	Title  string //链接名称
-	Remark string `orm:"default()"`  // 备注
-	Status bool   `orm:"default(1)"` //状态
+	Id     int    `json:"id"`              // 自增主键
+	Sort   int    `json:"sort"`            // 排序
+	Link   string `orm:"unique;size(128)"` // 链接地址
+	Title  string `json:"title"`           // 链接名称
+	Remark string `orm:"default()"`        // 备注
+	Status bool   `orm:"default(1)"`       // 状态
+	Pic    string `json:"pic,omitempty"`   // 图片
 }
 
 // Add 添加友情链接
@@ -24,6 +25,13 @@ func (this *FriendLink) Add(title, link string) (err error) {
 	}
 	_, err = orm.NewOrm().Insert(&fl)
 	return
+}
+
+// Find 查询单个友链
+func (this *FriendLink) Find(id int) (friendlink FriendLink) {
+	friendlink.Id = id
+	orm.NewOrm().Read(&friendlink)
+	return friendlink
 }
 
 // Update 根据字段更新友链

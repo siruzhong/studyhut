@@ -30,6 +30,7 @@ import (
 	"programming-learning-platform/utils/html2md"
 )
 
+// BookController 书籍控制器
 type BookController struct {
 	BaseController
 }
@@ -61,7 +62,7 @@ func (this *BookController) Replace() {
 func (this *BookController) Index() {
 	this.Data["SettingBook"] = true
 	this.TplName = "book/index.html"
-	private, _ := this.GetInt("private", 1) //是否是私有文档
+	private, _ := this.GetInt("private", 0) //是否是私有文档
 	this.Data["Private"] = private
 	pageIndex, _ := this.GetInt("page", 1)
 	books, totalCount, _ := models.NewBook().FindToPager(pageIndex, conf.PageSize, this.Member.MemberId, private)
@@ -71,7 +72,7 @@ func (this *BookController) Index() {
 	} else {
 		this.Data["PageHtml"] = ""
 	}
-	//处理封面图片
+	// 处理封面图片
 	for idx, book := range books {
 		book.Cover = utils.ShowImg(book.Cover, "cover")
 		books[idx] = book
@@ -137,39 +138,33 @@ func (this *BookController) Dashboard() {
 
 // Setting 书籍设置
 func (this *BookController) Setting() {
-
 	key := this.Ctx.Input.Param(":key")
-
 	if key == "" {
 		this.Abort("404")
 	}
-
+	// 根据用户id查找书籍
 	book, err := models.NewBookResult().FindByIdentify(key, this.Member.MemberId)
 	if err != nil && err != orm.ErrNoRows {
 		beego.Error(err.Error())
-
 		if err == orm.ErrNoRows {
 			this.Abort("404")
 		}
-
 		if err == models.ErrPermissionDenied {
 			this.Abort("404")
 		}
 		this.Abort("404")
 	}
-
-	//如果不是创始人也不是管理员则不能操作
+	//如果当前用户不是创始人也不是管理员则不能操作
 	if book.RoleId != conf.BookFounder && book.RoleId != conf.BookAdmin {
 		this.Abort("404")
 	}
-
+	// 如果书籍为私有
 	if book.PrivateToken != "" {
 		//book.PrivateToken = this.BaseUrl() + beego.URLFor("DocumentController.Index", ":key", book.Identify, "token", book.PrivateToken)
 		tipsFmt := "访问链接：%v  访问密码：%v"
 		book.PrivateToken = fmt.Sprintf(tipsFmt, this.BaseUrl()+beego.URLFor("DocumentController.Index", ":key", book.Identify), book.PrivateToken)
 	}
-
-	//查询当前书籍的分类id
+	// 查询当前书籍的分类id
 	if selectedCates, rows, _ := new(models.BookCategory).GetByBookId(book.BookId); rows > 0 {
 		var maps = make(map[int]bool)
 		for _, cate := range selectedCates {
@@ -177,7 +172,7 @@ func (this *BookController) Setting() {
 		}
 		this.Data["Maps"] = maps
 	}
-
+	// 查询所有分类
 	this.Data["Cates"], _ = new(models.Category).GetAllCategory(-1, 1)
 	this.Data["Model"] = book
 	this.TplName = "book/setting.html"
@@ -511,7 +506,7 @@ func (this *BookController) Users() {
 
 // Create 创建书籍.
 func (this *BookController) Create() {
-	if opt, err := models.NewOption().FindByKey("ALL_CAN_WRITE_BOOK"); err == nil {
+	if opt, err := models.NewOption().FindByName("ALL_CAN_WRITE_BOOK"); err == nil {
 		if opt.OptionValue == "false" && this.Member.Role == conf.MemberGeneralRole { // 读者无权限创建书籍
 			this.JsonResult(1, "普通读者无法创建书籍，如需创建书籍，请向管理员申请成为作者")
 		}

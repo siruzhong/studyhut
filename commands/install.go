@@ -14,9 +14,7 @@ import (
 
 // Install 系统安装
 func Install() {
-
 	fmt.Println("Initializing...")
-
 	err := orm.RunSyncdb("default", false, true)
 	if err == nil {
 		initialization()
@@ -91,7 +89,7 @@ func initialization() {
 
 // initSeo 初始化SEO
 func initSeo() {
-	sqlslice := []string{"insert ignore into `seo`(`id`,`page`,`statement`,`title`,`keywords`,`description`) values ('1','index','发现','书栈网(BookStack.CN)_分享，让知识传承更久远','{keywords}','{description}'),",
+	sqlSlice := []string{"insert ignore into `seo`(`id`,`page`,`statement`,`title`,`keywords`,`description`) values ('1','index','发现','书栈网(BookStack.CN)_分享，让知识传承更久远','{keywords}','{description}'),",
 		"('2','label_list','标签列表页','{title} - 书栈网(BookStack.CN)','{keywords}','{description}'),",
 		"('3','label_content','标签内容页','{title} - 书栈网(BookStack.CN)','{keywords}','{description}'),",
 		"('4','book_info','文档信息页','{title} - 书栈网(BookStack.CN)','{keywords}','{description}'),",
@@ -114,7 +112,7 @@ func initSeo() {
 		"('22','ucenter-fans','用户粉丝','{title} - 书栈网(BookStack.CN)','{keywords}','{description}'),",
 		"('23','ucenter-follow','用户关注','{title} - 书栈网(BookStack.CN)','{keywords}','{description}');",
 	}
-	if _, err := orm.NewOrm().Raw(strings.Join(sqlslice, "")).Exec(); err != nil {
+	if _, err := orm.NewOrm().Raw(strings.Join(sqlSlice, "")).Exec(); err != nil {
 		beego.Error(err.Error())
 	}
 

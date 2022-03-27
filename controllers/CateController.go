@@ -5,10 +5,12 @@ import (
 	"programming-learning-platform/models"
 )
 
+// CateController 分类控制器
 type CateController struct {
 	BaseController
 }
 
+// Index 分类首页
 func (this *CateController) Index() {
 	cid, _ := this.GetInt("cid")
 	if cid > 0 {
@@ -17,7 +19,7 @@ func (this *CateController) Index() {
 	this.List()
 }
 
-// List 分类
+// List 分类展示
 func (this *CateController) List() {
 	if cates, err := new(models.Category).GetAllCategory(-1, 1); err == nil {
 		this.Data["Cates"] = cates
@@ -32,5 +34,7 @@ func (this *CateController) List() {
 	this.Data["IsCate"] = true
 	this.Data["Friendlinks"] = new(models.FriendLink).GetList(false)
 	this.Data["Recommends"], _, _ = models.NewBook().HomeData(1, 12, models.OrderLatestRecommend, "", 0)
+	this.Data["SHOW_CATEGORY_INDEX"] = "true"
+	this.Data["Cates"], _ = models.NewCategory().GetAllCategory(-1, -1)
 	this.TplName = "cates/list.html"
 }

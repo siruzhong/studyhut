@@ -403,7 +403,7 @@ func (this *AccountController) Bind() {
 func (this *AccountController) FindPassword() {
 
 	this.TplName = "account/find_password_setp1.html"
-	mailConf := conf.GetMailConfig()
+	mailConf := utils.GetMailConfig()
 
 	if this.Ctx.Input.IsPost() {
 
@@ -537,7 +537,7 @@ func (this *AccountController) ValidEmail() {
 		this.JsonResult(6001, "验证码不正确")
 	}
 
-	mailConf := conf.GetMailConfig()
+	mailConf := utils.GetMailConfig()
 	memberToken, err := models.NewMemberToken().FindByFieldFirst("token", token)
 
 	if err != nil {

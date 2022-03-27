@@ -14,19 +14,17 @@ var tableCategory = "category"
 
 // Category 分类
 type Category struct {
-	Id     int    `json:"id"`                                    //自增主键
-	Pid    int    `json:"pid"`                                   //分类id
-	Title  string `orm:"size(30);unique" json:"title,omitempty"` //分类名称
-	Intro  string `json:"intro,omitempty"`                       //介绍
-	Icon   string `json:"icon,omitempty"`                        //分类icon
-	Cnt    int    `json:"cnt,omitempty"`                         //分类下的书籍统计
-	Sort   int    `json:"sort,omitempty"`                        //排序
-	Status bool   `json:"status,omitempty"`                      //分类状态，true表示显示，否则表示隐藏
-	//PrintBookCount int    `orm:"default(0)" json:"print_book_count"`
-	//WikiCount      int    `orm:"default(0)" json:"wiki_count"`
-	//ArticleCount   int    `orm:"default(0)" json:"article_count"`
+	Id     int    `json:"id"`                                    // 自增主键
+	Pid    int    `json:"pid"`                                   // 父分类id
+	Title  string `orm:"size(30);unique" json:"title,omitempty"` // 分类名称
+	Intro  string `json:"intro,omitempty"`                       // 介绍
+	Icon   string `json:"icon,omitempty"`                        // 分类icon
+	Cnt    int    `json:"cnt,omitempty"`                         // 分类下的书籍统计
+	Sort   int    `json:"sort,omitempty"`                        // 排序
+	Status bool   `json:"status,omitempty"`                      // 分类状态，true表示显示，否则表示隐藏
 }
 
+// NewCategory 创建分类
 func NewCategory() *Category {
 	return &Category{}
 }
@@ -37,7 +35,6 @@ func (this *Category) AddCategory(pid int, cates string) (err error) {
 	if len(slice) == 0 {
 		return
 	}
-
 	o := orm.NewOrm()
 	for _, item := range slice {
 		if item = strings.TrimSpace(item); item != "" {
@@ -88,7 +85,6 @@ func (this *Category) GetAllCategory(pid int, status int) (cates []Category, err
 	if pid > -1 {
 		qs = qs.Filter("pid", pid)
 	}
-
 	if status == 0 || status == 1 {
 		qs = qs.Filter("status", status)
 	}

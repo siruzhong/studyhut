@@ -7,6 +7,7 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
+// DownloadCounter 下载次数结构体
 type DownloadCounter struct {
 	Id    int
 	Uid   int `orm:"index"`
@@ -14,12 +15,14 @@ type DownloadCounter struct {
 	Total int
 }
 
+// NewDownloadCounter 创建下载次数结构体
 func NewDownloadCounter() *DownloadCounter {
 	return &DownloadCounter{}
 }
 
+// Increase 增加下载次数
 func (m *DownloadCounter) Increase(uid int) (err error) {
-	now, _ := strconv.Atoi(time.Now().Format("20060102"))
+	now, _ := strconv.Atoi(time.Now().Format("20060102")) // 获取当前时间
 	o := orm.NewOrm()
 	o.QueryTable(m).Filter("uid", uid).Filter("date", now).One(m)
 	if m.Id == 0 {
@@ -42,6 +45,7 @@ func (m *DownloadCounter) DoesICanDownload(uid int) (times int, min int) {
 		return
 	}
 
+	// 获取每阅读多少秒可以下载一个电子书
 	min, _ = strconv.Atoi(GetOptionValue("DOWNLOAD_INTERVAL", "0"))
 	if min <= 0 { // 不限制下载
 		return -1, min

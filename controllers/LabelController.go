@@ -27,12 +27,9 @@ func (this *LabelController) Prepare() {
 func (this *LabelController) Index() {
 	this.TplName = "label/index.html"
 	this.Data["IsLabel"] = true
-
 	labelName := this.Ctx.Input.Param(":key")
-
 	this.Redirect(beego.URLFor("SearchController.Result")+"?wd="+labelName, 302)
 	return
-
 	this.Data["Keyword"] = labelName
 	pageIndex, _ := this.GetInt("page", 1)
 	if labelName == "" {
@@ -48,7 +45,6 @@ func (this *LabelController) Index() {
 		beego.Error(err)
 		return
 	}
-
 	if totalCount > 0 {
 		html := utils.NewPaginations(conf.RollPage, totalCount, pageSize, pageIndex, beego.URLFor("LabelController.Index", ":key", labelName), "")
 		this.Data["PageHtml"] = html
@@ -68,10 +64,8 @@ func (this *LabelController) Index() {
 func (this *LabelController) List() {
 	this.Data["IsLabel"] = true
 	this.TplName = "label/list.html"
-
 	pageIndex, _ := this.GetInt("page", 1)
 	pageSize := 200
-
 	labels, totalCount, err := models.NewLabel().FindToPager(pageIndex, pageSize)
 	if err != nil {
 		this.ShowErrorPage(50001, err.Error())
@@ -90,5 +84,4 @@ func (this *LabelController) List() {
 		"keywords":    "标签",
 		"description": this.Sitename + "专注于文档在线写作、协作、分享、阅读与托管，让每个人更方便地发布、分享和获得知识。",
 	})
-
 }

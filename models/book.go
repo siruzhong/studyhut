@@ -18,16 +18,17 @@ import (
 // BookOrder 定义书籍排序类型
 type BookOrder string
 
+// 排序类型
 const (
-	OrderRecommend       BookOrder = "recommend"
-	OrderPopular         BookOrder = "popular"          //热门
-	OrderLatest          BookOrder = "latest"           //最新
-	OrderNew             BookOrder = "new"              //最新
-	OrderScore           BookOrder = "score"            //评分排序
-	OrderComment         BookOrder = "comment"          //评论排序
-	OrderStar            BookOrder = "star"             //收藏排序
-	OrderView            BookOrder = "vcnt"             //浏览排序
-	OrderLatestRecommend BookOrder = "latest-recommend" //最新推荐
+	OrderRecommend       BookOrder = "recommend"        // 推荐
+	OrderPopular         BookOrder = "popular"          // 热门
+	OrderLatest          BookOrder = "latest"           // 最新
+	OrderNew             BookOrder = "new"              // 最新
+	OrderScore           BookOrder = "score"            // 评分
+	OrderComment         BookOrder = "comment"          // 评论
+	OrderStar            BookOrder = "star"             // 收藏
+	OrderView            BookOrder = "vcnt"             // 浏览
+	OrderLatestRecommend BookOrder = "latest-recommend" // 最新推荐
 )
 
 // Book 书籍
@@ -87,11 +88,7 @@ func NewBook() *Book {
 	return &Book{}
 }
 
-// HasProjectAccess minRole 最小的角色权限
-//conf.BookFounder
-//conf.BookAdmin
-//conf.BookEditor
-//conf.BookObserver
+// HasProjectAccess 是否拥有项目权限
 func (m *Book) HasProjectAccess(identify string, memberId int, minRole int) bool {
 	book := NewBook()
 	rel := NewRelationship()
@@ -192,6 +189,7 @@ func (m *Book) FindByFieldFirst(field string, value interface{}) (book *Book, er
 	return m, err
 }
 
+// FindByIdentify 根据书籍唯一标识查找书籍
 func (m *Book) FindByIdentify(identify string, cols ...string) (book *Book, err error) {
 	o := orm.NewOrm()
 	book = &Book{}
@@ -259,7 +257,7 @@ func (m *Book) FindToPager(pageIndex, pageSize, memberId int, PrivatelyOwned ...
 	return
 }
 
-// 彻底删除书籍.
+// ThoroughDeleteBook 彻底删除书籍
 func (m *Book) ThoroughDeleteBook(id int) (err error) {
 	if id <= 0 {
 		return ErrInvalidParameter
@@ -348,40 +346,40 @@ func (m *Book) ThoroughDeleteBook(id int) (err error) {
 	return
 }
 
-//首页数据
-//完善根据分类查询数据
-//orderType:排序条件，可选值：recommend(推荐)、latest（）
+// HomeData 首页数据
+// 完善根据分类查询数据
+// orderType:排序条件，可选值：recommend(推荐)、latest（）
 func (m *Book) HomeData(pageIndex, pageSize int, orderType BookOrder, lang string, cid int, fields ...string) (books []Book, totalCount int, err error) {
 	if cid > 0 { //针对cid>0
 		return m.homeData(pageIndex, pageSize, orderType, lang, cid, fields...)
 	}
 	o := orm.NewOrm()
-	order := "pin desc" //排序
-	condStr := ""       //查询条件
-	cond := []string{"privately_owned=0", "order_index>=0"}
+	order := "pin desc"                                     // 排序
+	condStr := ""                                           // 查询条件
+	cond := []string{"privately_owned=0", "order_index>=0"} // 过滤条件:书籍公开,排序索引>0
 	if len(fields) == 0 {
 		fields = append(fields, "book_id", "book_name", "identify", "cover", "order_index", "pin")
 	} else {
 		fields = append(fields, "pin")
 	}
 	switch orderType {
-	case OrderRecommend: //推荐
+	case OrderRecommend: // 推荐
 		cond = append(cond, "order_index>0")
 		order = "pin desc,order_index desc"
-	case OrderLatestRecommend: //最新推荐
-		cond = append(cond, "order_index>0")
+	case OrderLatestRecommend: // 最新推荐
+		cond = append(cond, "order_index>=0")
 		order = "release_time desc"
-	case OrderPopular: //受欢迎
+	case OrderPopular: // 受欢迎
 		order = "pin desc,star desc,vcnt desc"
-	case OrderLatest, OrderNew: //最新发布
+	case OrderLatest, OrderNew: // 最新发布
 		order = "pin desc,release_time desc"
-	case OrderScore: //评分
+	case OrderScore: // 评分
 		order = "pin desc,score desc"
-	case OrderComment: //评论
+	case OrderComment: // 评论
 		order = "pin desc,cnt_comment desc"
-	case OrderStar: //收藏
+	case OrderStar: // 收藏
 		order = "pin desc,star desc"
-	case OrderView: //收藏
+	case OrderView: // 查看
 		order = "pin desc,vcnt desc"
 	}
 	if len(cond) > 0 {

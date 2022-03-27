@@ -970,7 +970,7 @@ func (this *CommonController) handleReleaseV3(release, bookIdentify string) inte
 	return nodes
 }
 
-// 【OK】
+// Banners
 func (this *CommonController) Banners() {
 	t := this.GetString("type", "wechat")
 	banners, _ := models.NewBanner().Lists(t)

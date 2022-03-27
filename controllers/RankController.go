@@ -2,10 +2,12 @@ package controllers
 
 import "programming-learning-platform/models"
 
+// RankController 榜单控制器
 type RankController struct {
 	BaseController
 }
 
+// Index 榜单页面
 func (this *RankController) Index() {
 	limit, _ := this.GetInt("limit", 50)
 	if limit > 200 {

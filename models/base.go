@@ -13,16 +13,18 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
+// 时间段
 type period string
 
+// 时间段类型常量
 const (
-	PeriodDay      period = "day"
-	PeriodWeek     period = "week"
-	PeriodLastWeek period = "last-week"
-	PeriodMonth    period = "month"
-	PeriodLastMoth period = "last-month"
-	PeriodAll      period = "all"
-	PeriodYear     period = "year"
+	PeriodDay      period = "day"        // 天
+	PeriodWeek     period = "week"       // 周
+	PeriodLastWeek period = "last-week"  // 上周
+	PeriodMonth    period = "month"      // 月
+	PeriodLastMoth period = "last-month" // 上个月
+	PeriodAll      period = "all"        // 所有
+	PeriodYear     period = "year"       // 年
 )
 
 const dateFormat = "20060102"
@@ -235,6 +237,7 @@ func CountCategory() {
 	}
 }
 
+// getTimeRange 获取时间范围
 func getTimeRange(t time.Time, prd period) (start, end string) {
 	switch prd {
 	case PeriodWeek:
@@ -260,6 +263,7 @@ func getTimeRange(t time.Time, prd period) (start, end string) {
 	return
 }
 
+// getWeek 获取周时间
 func getWeek(t time.Time) (start, end string) {
 	if t.Weekday() == 0 {
 		start = t.Add(-7 * 24 * time.Hour).Format(dateFormat)
@@ -272,6 +276,7 @@ func getWeek(t time.Time) (start, end string) {
 	return
 }
 
+// getYear 获取年时间
 func getYear(t time.Time) (start, end string) {
 	month := time.Date(t.Year(), 1, 1, 0, 0, 0, 0, time.Local)
 	start = month.Format(dateFormat)
@@ -279,6 +284,7 @@ func getYear(t time.Time) (start, end string) {
 	return
 }
 
+// getMonth 获取月时间
 func getMonth(t time.Time) (start, end string) {
 	month := time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.Local)
 	start = month.Format(dateFormat)

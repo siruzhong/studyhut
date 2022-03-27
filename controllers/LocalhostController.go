@@ -10,7 +10,7 @@ import (
 	"programming-learning-platform/models"
 )
 
-//只有请求头的host为localhost的才能访问。
+// LocalhostController 只有请求头的host为localhost的才能访问
 type LocalhostController struct {
 	BaseController
 }

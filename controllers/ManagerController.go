@@ -44,7 +44,7 @@ type installedDependency struct {
 	Name        string // 依赖名称
 	IsInstalled bool   // 是否已安装
 	Message     string // 相关信息
-	Error       string
+	Error       string // 错误信息
 }
 
 // Index 管理后台主页
@@ -476,7 +476,6 @@ func (this *ManagerController) DeleteBook() {
 				this.JsonResult(6002, "书籍标识输入不正确")
 			}
 		}
-
 		err := book.ThoroughDeleteBook(bookID)
 		if err == orm.ErrNoRows {
 			this.JsonResult(6002, "书籍不存在")
@@ -897,18 +896,18 @@ func (this *ManagerController) DelAds() {
 	this.JsonResult(0, "删除成功")
 }
 
-// Category 分类管理
+// Category 分类管理(post请求新增分类,get请求查询所有分类)
 func (this *ManagerController) Category() {
 	Model := new(models.Category)
 	if strings.ToLower(this.Ctx.Request.Method) == "post" {
-		//新增分类
+		// 新增分类
 		pid, _ := this.GetInt("pid")
 		if err := Model.AddCategory(pid, this.GetString("cates")); err != nil {
 			this.JsonResult(1, "新增失败："+err.Error())
 		}
 		this.JsonResult(0, "新增成功")
 	}
-	//查询所有分类
+	// 查询所有分类
 	cates, err := Model.GetAllCategory(-1, -1)
 	if err != nil {
 		beego.Error(err)
@@ -970,7 +969,6 @@ func (this *ManagerController) UpdateCateIcon() {
 			err = err1
 		}
 		defer f.Close()
-
 		tmpFile := fmt.Sprintf("uploads/icons/%v%v"+filepath.Ext(h.Filename), id, time.Now().Unix())
 		os.MkdirAll(filepath.Dir(tmpFile), os.ModePerm)
 		if err = this.SaveToFile("icon", tmpFile); err == nil {
@@ -992,6 +990,7 @@ func (this *ManagerController) UpdateCateIcon() {
 	this.JsonResult(0, "更新成功", data)
 }
 
+// Sitemap 站点地图
 func (this *ManagerController) Sitemap() {
 	baseUrl := this.Ctx.Input.Scheme() + "://" + this.Ctx.Request.Host
 	if host := beego.AppConfig.String("sitemap_host"); len(host) > 0 {
@@ -1001,10 +1000,19 @@ func (this *ManagerController) Sitemap() {
 	this.JsonResult(0, "站点地图更新提交成功，已交由后台执行更新，请耐心等待。")
 }
 
-// FriendLink 友链管理
+// FriendLink 显示所有友链
 func (this *ManagerController) FriendLink() {
+	friendlinks := new(models.FriendLink).GetList(true)
+	for idx, friendlink := range friendlinks {
+		if strings.TrimSpace(friendlink.Pic) == "" { // 赋值为默认图片
+			friendlink.Pic = "/static/images/icon.png"
+		} else {
+			friendlink.Pic = utils.ShowImg(friendlink.Pic)
+		}
+		friendlinks[idx] = friendlink
+	}
 	this.Data["SeoTitle"] = "友链管理"
-	this.Data["Links"] = new(models.FriendLink).GetList(true)
+	this.Data["Links"] = friendlinks
 	this.Data["IsFriendlink"] = true
 	this.TplName = "manager/friendlink.html"
 }
@@ -1033,6 +1041,43 @@ func (this *ManagerController) DelFriendLink() {
 		this.JsonResult(1, "删除失败："+err.Error())
 	}
 	this.JsonResult(0, "删除成功")
+}
+
+// UpdateFriendLinkIcon 更新友链的图标
+func (this *ManagerController) UpdateFriendLinkIcon() {
+	var err error
+	id, _ := this.GetInt("id")
+	if id == 0 {
+		this.JsonResult(1, "参数不正确")
+	}
+	data := make(map[string]interface{})
+	model := new(models.FriendLink)
+	if friendlink := model.Find(id); friendlink.Id > 0 {
+		friendlink.Pic = strings.TrimLeft(friendlink.Pic, "/")
+		f, h, err1 := this.GetFile("pic")
+		if err1 != nil {
+			err = err1
+		}
+		defer f.Close()
+		tmpFile := fmt.Sprintf("uploads/pics/%v%v"+filepath.Ext(h.Filename), id, time.Now().Unix())
+		os.MkdirAll(filepath.Dir(tmpFile), os.ModePerm)
+		if err = this.SaveToFile("pic", tmpFile); err == nil {
+			switch utils.StoreType {
+			case utils.StoreOss:
+				store.ModelStoreOss.MoveToOss(tmpFile, tmpFile, true, false)
+				store.ModelStoreOss.DelFromOss(friendlink.Pic)
+				data["icon"] = utils.ShowImg(tmpFile)
+			case utils.StoreLocal:
+				store.ModelStoreLocal.DelFiles(friendlink.Pic)
+				data["pic"] = "/" + tmpFile
+			}
+			err = model.Update(friendlink.Id, "pic", "/"+tmpFile)
+		}
+	}
+	if err != nil {
+		this.JsonResult(1, err.Error())
+	}
+	this.JsonResult(0, "更新成功", data)
 }
 
 // RebuildAllIndex 重建全量索引

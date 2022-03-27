@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-{{template "widgets/head.html" .}}
+    {{template "widgets/head.html" .}}
 </head>
 <body>
 <div class="manual-reader manual-container">
-{{template "widgets/header.html" .}}
+    {{template "widgets/header.html" .}}
     <div class="container manual-body cate-list">
         <div class="row visible-xs" style="margin:15px 0px 30px 0px;">
             <form method="get" action="{{urlfor "SearchController.Result"}}" class="search-form">
@@ -14,6 +14,18 @@
                     <span class="input-group-addon"><i class="fa fa-search"></i><span class="hidden-xs"> 搜索</span></span>
                 </div>
             </form>
+        </div>
+        <h4>-网站介绍-</h4>
+        <div class="help-block">分享知识，共享智慧；知识，因分享，传承久远。书栈网，一个专注于开源书籍和文档知识分享的站点。</div>
+        <h4>-书栈开源-</h4>
+        <div class="help-block">
+            <div>
+                <img src="https://img.shields.io/badge/gitee-red?logo=Gitee">
+                <a href="https://gitee.com/truthhun/BookStack" class="text-primary" target="_blank">Gitee(码云)</a>
+                <span class="text-muted"> &nbsp;|&nbsp; </span>
+                <img src="https://img.shields.io/badge/github-black?logo=Github">
+                <a href="https://github.com/truthhun/bookstack" class="text-primary" target="_blank">GitHub</a>
+            </div>
         </div>
         {{if .Recommends}}
             <div class="panel panel-default panel-recommend">
@@ -133,7 +145,7 @@
             }
             console.log(scrollTop)
             var panels = $(".category-detail>.panel")
-            
+
             for (var i = 0; i < panels.length; i++) {
                 if($(panels[i]).offset().top - scrollTop>=0){
                     $(".category-index a").removeClass("active");
@@ -142,7 +154,7 @@
                 }
             }
         }
-        
+
         $(".category-index a").tooltip();
         $(".category-index a").click(function () {
             var show=$(this).attr("data-show"),panels = $('.category-detail .panel');

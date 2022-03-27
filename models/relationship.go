@@ -39,6 +39,7 @@ func (m *Relationship) TableUnique() [][]string {
 	}
 }
 
+// NewRelationship 创建关联关系
 func NewRelationship() *Relationship {
 	return &Relationship{}
 }

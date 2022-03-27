@@ -8,17 +8,24 @@ import (
 	"programming-learning-platform/conf"
 )
 
-var optionCache sync.Map // map[int || string]*Option
-
-// Option struct
+// Option 配置项
 type Option struct {
-	OptionId    int    `orm:"column(option_id);pk;auto;unique;" json:"option_id"`
-	OptionTitle string `orm:"column(option_title);size(500)" json:"option_title"`
-	OptionName  string `orm:"column(option_name);unique;size(80)" json:"option_name"`
-	OptionValue string `orm:"column(option_value);type(text);null" json:"option_value"`
+	OptionId    int    `orm:"column(option_id);pk;auto;unique;" json:"option_id"`       // 配置id
+	OptionTitle string `orm:"column(option_title);size(500)" json:"option_title"`       // 配置标题
+	OptionName  string `orm:"column(option_name);unique;size(80)" json:"option_name"`   // 配置名称
+	OptionValue string `orm:"column(option_value);type(text);null" json:"option_value"` // 配置值
 	Remark      string `orm:"column(remark);type(text);null" json:"remark"`
 }
 
+// optionCache 配置项缓存
+var optionCache sync.Map
+
+// NewOption 创建配置项
+func NewOption() *Option {
+	return &Option{}
+}
+
+// initOptionCache 初始化配置缓存
 func initOptionCache() {
 	opts, _ := NewOption().All()
 	for _, opt := range opts {
@@ -27,97 +34,23 @@ func initOptionCache() {
 	}
 }
 
-// TableName 获取对应数据库表名
+// TableName 获取数据表名
 func (m *Option) TableName() string {
 	return "options"
 }
 
-// TableEngine 获取数据使用的引擎.
+// TableEngine 获取数据使用的引擎
 func (m *Option) TableEngine() string {
 	return "INNODB"
 }
 
+// TableNameWithPrefix 获取带前缀对数据表名
 func (m *Option) TableNameWithPrefix() string {
 	return conf.GetDatabasePrefix() + m.TableName()
 }
 
-func NewOption() *Option {
-	return &Option{}
-}
-
-func (p *Option) Find(id int) (*Option, error) {
-
-	if val, ok := optionCache.Load(id); ok {
-		p = val.(*Option)
-		return p, nil
-	}
-
-	o := orm.NewOrm()
-	p.OptionId = id
-	if err := o.Read(p); err != nil {
-		return p, err
-	}
-	return p, nil
-}
-
-func (p *Option) FindByKey(key string) (*Option, error) {
-
-	if val, ok := optionCache.Load(key); ok {
-		p = val.(*Option)
-		return p, nil
-	}
-
-	o := orm.NewOrm()
-	if err := o.QueryTable(p).Filter("option_name", key).One(p); err != nil {
-		return p, err
-	}
-	return p, nil
-}
-
-func GetOptionValue(key, def string) string {
-	if option, err := NewOption().FindByKey(key); err == nil {
-		return option.OptionValue
-	}
-	return def
-}
-
-func (p *Option) InsertOrUpdate() error {
-	defer func() {
-		initOptionCache()
-	}()
-	o := orm.NewOrm()
-
-	var err error
-
-	if p.OptionId > 0 || o.QueryTable(p.TableNameWithPrefix()).Filter("option_name", p.OptionName).Exist() {
-		_, err = o.Update(p)
-	} else {
-		_, err = o.Insert(p)
-	}
-	return err
-}
-
-func (p *Option) InsertMulti(option ...Option) error {
-	o := orm.NewOrm()
-	_, err := o.InsertMulti(len(option), option)
-	initOptionCache()
-	return err
-}
-
-func (p *Option) All() ([]*Option, error) {
-	o := orm.NewOrm()
-	var options []*Option
-
-	_, err := o.QueryTable(p.TableNameWithPrefix()).All(&options)
-
-	if err != nil {
-		return options, err
-	}
-	return options, nil
-}
-
+// Init 初始化配置项
 func (m *Option) Init() error {
-
 	o := orm.NewOrm()
 	options := []Option{
 		{
@@ -307,8 +240,8 @@ func (m *Option) Init() error {
 			OptionTitle: "每阅读多少秒可以下载一个电子书",
 		},
 	}
-
 	for _, op := range options {
+		// 不存在则插入
 		if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", op.OptionName).Exist() {
 			if _, err := o.Insert(&op); err != nil {
 				return err
@@ -319,10 +252,86 @@ func (m *Option) Init() error {
 	return nil
 }
 
+// Find 根据id查找配置项
+func (p *Option) Find(id int) (*Option, error) {
+	// 先查找缓存
+	if val, ok := optionCache.Load(id); ok {
+		p = val.(*Option)
+		return p, nil
+	}
+	// 缓存找不到从数据库中找
+	o := orm.NewOrm()
+	p.OptionId = id
+	if err := o.Read(p); err != nil {
+		return p, err
+	}
+	return p, nil
+}
+
+// FindByName 根据名称查找配置项
+func (p *Option) FindByName(name string) (*Option, error) {
+	// 先查找缓存
+	if val, ok := optionCache.Load(name); ok {
+		p = val.(*Option)
+		return p, nil
+	}
+	// 缓存找不到从数据库中找
+	o := orm.NewOrm()
+	if err := o.QueryTable(p).Filter("option_name", name).One(p); err != nil {
+		return p, err
+	}
+	return p, nil
+}
+
+// GetOptionValue 根据配置项名称获取配置项的值
+func GetOptionValue(name, def string) string {
+	if option, err := NewOption().FindByName(name); err == nil {
+		return option.OptionValue
+	}
+	return def
+}
+
+// InsertOrUpdate 插入或更新配置项
+func (p *Option) InsertOrUpdate() (err error) {
+	defer func() {
+		initOptionCache()
+	}()
+	o := orm.NewOrm()
+	if p.OptionId > 0 || o.QueryTable(p.TableNameWithPrefix()).Filter("option_name", p.OptionName).Exist() {
+		// 配置项存在则更新
+		_, err = o.Update(p)
+	} else {
+		// 配置项不存在则插入
+		_, err = o.Insert(p)
+	}
+	return err
+}
+
+// InsertMulti 批量插入配置项
+func (p *Option) InsertMulti(option ...Option) error {
+	o := orm.NewOrm()
+	_, err := o.InsertMulti(len(option), option)
+	initOptionCache()
+	return err
+}
+
+// All 查找所有配置项
+func (p *Option) All() ([]*Option, error) {
+	o := orm.NewOrm()
+	var options []*Option
+	_, err := o.QueryTable(p.TableNameWithPrefix()).All(&options)
+	if err != nil {
+		return options, err
+	}
+	return options, nil
+}
+
+// ForbiddenReferer 禁止的Referer
 func (m *Option) ForbiddenReferer() []string {
 	return strings.Split(GetOptionValue("FORBIDDEN_REFERER", ""), "\n")
 }
 
+// IsResponseEmptyForAPP 对应用程序对响应是否为空
 func (m *Option) IsResponseEmptyForAPP(requestVersion, word string) (yes bool) {
 	version := GetOptionValue("CheckingAppVersion", "")
 	if version == "" {

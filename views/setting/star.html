@@ -2,86 +2,78 @@
 <html lang="zh-CN">
 <head>
     {{template "widgets/head.html" .}}
-    <link href="{{$.StaticDomain}}/static/webuploader/webuploader.css" rel="stylesheet">
-    <link href="{{$.StaticDomain}}/static/cropper/2.3.4/cropper.min.css" rel="stylesheet">
+    <link href="/static/webuploader/webuploader.css" rel="stylesheet">
+    <link href="/static/cropper/2.3.4/cropper.min.css" rel="stylesheet">
 </head>
 <body>
-<div class="manual-reader">
+<div class="manual-reader manual-container">
     {{template "widgets/header.html" .}}
     <div class="container manual-body">
         <div class="row">
-
-            {{template "setting/menu.html" .}}
-
-            <div class="page-right">
-                <div class="m-box">
-                    <div class="box-head">
-                        <strong class="box-title">我的收藏</strong>
+            <div class="m-box" style="margin-top: 15px;margin-left: 15px;margin-right: 15px">
+                <ul class="nav nav-tabs" style="margin-top: 15px;">
+                    <li {{if eq .Sort "read"}}class="active"{{end}}><a href="{{urlfor "SettingController.Star"}}?sort=read">最近阅读</a></li>
+                    <li {{if eq .Sort "new"}}class="active"{{end}}><a href="{{urlfor "SettingController.Star"}}?sort=new">最新收藏</a></li>
+                </ul>
+                {{if $.Cates}}
+                <div class="mgt-15px help-block">
+                    <div>
+                        <a href="{{urlfor "SettingController.Star"}}?sort={{$.Sort}}" class="mgr-15px {{if eq $.Cid 0}}text-danger{{end}}">全部分类</a>
+                        {{range .Cates}}
+                            {{if eq .Pid 0}}
+                                <a class="mgr-15px {{if eq $.Cid .Id}}text-danger{{end}}" href="{{urlfor "SettingController.Star"}}?sort={{$.Sort}}&cid={{.Id}}">{{.Title}}</a>
+                            {{end}}
+                        {{end}}
                     </div>
-                    <ul class="nav nav-tabs" style="margin-top: 15px;">
-                        <li {{if eq .Sort "read"}}class="active"{{end}}><a href="{{urlfor "SettingController.Star"}}?sort=read">最近阅读</a></li>
-                        <li {{if eq .Sort "new"}}class="active"{{end}}><a href="{{urlfor "SettingController.Star"}}?sort=new">最新收藏</a></li>
-                    </ul>
-                    {{if $.Cates}}
-                    <div class="mgt-15px help-block">
-                        <div>
-                            <a href="{{urlfor "SettingController.Star"}}?sort={{$.Sort}}" class="mgr-15px {{if eq $.Cid 0}}text-danger{{end}}">全部分类</a>
-                            {{range .Cates}}
-                                {{if eq .Pid 0}}
-                                    <a class="mgr-15px {{if eq $.Cid .Id}}text-danger{{end}}" href="{{urlfor "SettingController.Star"}}?sort={{$.Sort}}&cid={{.Id}}">{{.Title}}</a>
-                                {{end}}
+                    {{if gt $.Pid 0}}
+                    <div class="mgt-15px">
+                        {{range .Cates}}
+                            {{if eq .Pid $.Pid}}
+                                <a class="mgr-15px {{if eq .Id $.Cid}}text-danger{{end}}" href="{{urlfor "SettingController.Star"}}?sort={{$.Sort}}&cid={{.Id}}">{{.Title}}</a>
                             {{end}}
-                        </div>
-                        {{if gt $.Pid 0}}
-                        <div class="mgt-15px">
-                            {{range .Cates}}
-                                {{if eq .Pid $.Pid}}
-                                    <a class="mgr-15px {{if eq .Id $.Cid}}text-danger{{end}}" href="{{urlfor "SettingController.Star"}}?sort={{$.Sort}}&cid={{.Id}}">{{.Title}}</a>
-                                {{end}}
-                            {{end}}
-                        </div>
                         {{end}}
                     </div>
                     {{end}}
                 </div>
-                <div id="bookList" class="box-body">
-                    <div class="book-list book-star">
-                        {{range .Books}}
-                            <div class="list-item clearfix">
-                                <div class="col-sm-2 col-xs-4" style="padding-left: 0px;">
-                                    <a class="{{if gt .OrderIndex 0}}recommend-book{{end}}" href="{{urlfor "DocumentController.Index" ":key" .Identify}}" data-toggle="tooltip" title="阅读书籍">
-                                        <img onerror="this.src='/static/images/book.png'"  src="{{showImg .Cover "cover"}}" alt="" class="img-responsive border-cover-img">
-                                    </a>
+                {{end}}
+            </div>
+            <div id="bookList" class="box-body">
+                <div class="book-list book-star">
+                    {{range .Books}}
+                        <div class="list-item clearfix">
+                            <div class="col-sm-2 col-xs-4" style="padding-left: 0px;">
+                                <a class="{{if gt .OrderIndex 0}}recommend-book{{end}}" href="{{urlfor "DocumentController.Index" ":key" .Identify}}" data-toggle="tooltip" title="阅读书籍">
+                                    <img onerror="this.src='/static/images/book.png'"  src="{{showImg .Cover "cover"}}" alt="" class="img-responsive border-cover-img">
+                                </a>
+                            </div>
+                            <div class="col-sm-10 col-xs-8" style="padding-right: 0px; padding-left: 0px;">
+                                <div class="book-title">
+                                    <div class="pull-left">
+                                        <a href="{{urlfor "DocumentController.Index" ":key" .Identify}}" title="阅读书籍" data-toggle="tooltip">
+                                            {{.BookName}}
+                                        </a>
+                                    </div>
+                                    <div class="clearfix"></div>
                                 </div>
-                                <div class="col-sm-10 col-xs-8" style="padding-right: 0px; padding-left: 0px;">
-                                    <div class="book-title">
-                                        <div class="pull-left">
-                                            <a href="{{urlfor "DocumentController.Index" ":key" .Identify}}" title="阅读书籍" data-toggle="tooltip">
-                                                {{.BookName}}
-                                            </a>
-                                        </div>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div class="info hidden-xs">
-                                        <span title="" data-toggle="tooltip" data-original-title="创建者"><i class="fa fa-user"></i> {{.Nickname}}</span>
-                                        <span title="" data-toggle="tooltip" data-original-title="文档数量"><i class="fa fa-pie-chart"></i> {{.DocCount}}</span>
-                                        <span title="" data-toggle="tooltip" data-original-title="收藏人次"><i class="fa fa-heart"></i> {{.Star}}</span>
-                                        <span title="" data-toggle="tooltip" data-original-title="阅读人次"><i class="fa fa-eye"></i> {{.Vcnt}}</span>
-                                        <span title="" data-toggle="tooltip" data-original-title="文档评分"><i class="fa fa-line-chart"></i> {{scoreFloat .Score}}</span>
-                                    </div>
-                                    <div class="desc-text" title="阅读书籍" data-url="{{urlfor "DocumentController.Index" ":key" .Identify}}">{{.Description}}</div>
-                                    <div class="btns hidden-xs">
+                                <div class="info hidden-xs">
+                                    <span title="" data-toggle="tooltip" data-original-title="创建者"><i class="fa fa-user"></i> {{.Nickname}}</span>
+                                    <span title="" data-toggle="tooltip" data-original-title="文档数量"><i class="fa fa-pie-chart"></i> {{.DocCount}}</span>
+                                    <span title="" data-toggle="tooltip" data-original-title="收藏人次"><i class="fa fa-heart"></i> {{.Star}}</span>
+                                    <span title="" data-toggle="tooltip" data-original-title="阅读人次"><i class="fa fa-eye"></i> {{.Vcnt}}</span>
+                                    <span title="" data-toggle="tooltip" data-original-title="文档评分"><i class="fa fa-line-chart"></i> {{scoreFloat .Score}}</span>
+                                </div>
+                                <div class="desc-text" title="阅读书籍" data-url="{{urlfor "DocumentController.Index" ":key" .Identify}}">{{.Description}}</div>
+                                <div class="btns hidden-xs">
 {{/*                                        <a href="{{urlfor "DocumentController.Index" ":key" .Identify}}" data-toggle="tooltip" target="_blank" class="btn btn-default btn-sm" title="阅读文档"><i class="fa fa-eye"></i> 阅读文档</a>*/}}
-                                        <a href="{{urlfor "BookController.Star" ":id" .BookId}}" data-toggle="tooltip" class="btn btn-default btn-sm ajax-get confirm" class="ajax-get" title="取消收藏"><i aria-hidden="true" class="fa fa-remove"></i> 取消收藏</a>
-                                    </div>
+                                    <a href="{{urlfor "BookController.Star" ":id" .BookId}}" data-toggle="tooltip" class="btn btn-default btn-sm ajax-get confirm" class="ajax-get" title="取消收藏"><i aria-hidden="true" class="fa fa-remove"></i> 取消收藏</a>
                                 </div>
                             </div>
-                        {{end}}
-                        <nav class="pagination-container">
-                            {{.PageHtml}}
-                        </nav>
-                    </div>
-            </div>
+                        </div>
+                    {{end}}
+                    <nav class="pagination-container">
+                        {{.PageHtml}}
+                    </nav>
+                </div>
         </div>
     </div>
 </div>
@@ -95,19 +87,13 @@
             </div>
             <div class="modal-body">
                 <div class="wraper">
-                    <div id="image-wraper">
-
-                    </div>
+                    <div id="image-wraper"></div>
                 </div>
                 <div class="watch-crop-list">
                     <div class="preview-title">预览</div>
                     <ul>
-                        <li>
-                            <div class="img-preview preview-lg"></div>
-                        </li>
-                        <li>
-                            <div class="img-preview preview-sm"></div>
-                        </li>
+                        <li><div class="img-preview preview-lg"></div></li>
+                        <li><div class="img-preview preview-sm"></div></li>
                     </ul>
                 </div>
                 <div style="clear: both"></div>
@@ -121,17 +107,13 @@
     </div>
 </div>
 
-
-{{/*<script src="/static/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>*/}}
-<script src="{{$.StaticDomain}}/static/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>
-{{/*<script src="/static/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>*/}}
-<script src="{{$.StaticDomain}}/static/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
-
-<script src="{{$.StaticDomain}}/static/webuploader/webuploader.min.js" type="text/javascript"></script>
-<script src="{{$.StaticDomain}}/static/cropper/2.3.4/cropper.min.js" type="text/javascript"></script>
-<script src="{{$.StaticDomain}}/static/js/jquery.form.js" type="text/javascript"></script>
-        <script src="{{$.StaticDomain}}/static/js/toast.script.js"></script>
-        <script src="/static/js/main.js?version={{$.Version}}" type="text/javascript"></script>
+<script src="/static/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>
+<script src="/static/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="/static/webuploader/webuploader.min.js" type="text/javascript"></script>
+<script src="/static/cropper/2.3.4/cropper.min.js" type="text/javascript"></script>
+<script src="/static/js/jquery.form.js" type="text/javascript"></script>
+<script src="/static/js/toast.script.js"></script>
+<script src="/static/js/main.js?version={{$.Version}}" type="text/javascript"></script>
 <script type="text/javascript">
     $(function () {
         $("#upload-logo-panel").on("hidden.bs.modal",function () {
@@ -146,7 +128,6 @@
 
         $("#memberInfoForm").ajaxForm({
             beforeSubmit : function () {
-
                 var email = $.trim($("#userEmail").val());
                 if(!email){
                     return showError('邮箱不能为空');
@@ -162,7 +143,6 @@
                 }
             }
         });
-
         try {
             var uploader = WebUploader.create({
                 auto: false,
@@ -198,9 +178,7 @@
             }).on("uploadError",function (file,reason) {
                 console.log(reason);
                 $("#error-message").text("上传失败:" + reason);
-
             }).on("uploadSuccess",function (file, res) {
-
                 if(res.errcode === 0){
                     console.log(res);
                     $("#upload-logo-panel").modal('hide');
@@ -223,9 +201,7 @@
                 if(files.length > 0) {
                     $("#saveImage").button('loading');
                     var cropper = window.ImageCropper.cropper("getData");
-
                     uploader.option("formData", cropper);
-
                     uploader.upload();
                 }else{
                     alert("请选择头像");

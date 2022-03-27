@@ -1,169 +1,138 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-
-    <title>我的书籍 - {{.SITE_NAME}}</title>
-
-    <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/static/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-    <link href="/static/css/toast.css" rel="stylesheet" type="text/css">
-    <link href="/static/css/main.css?version={{$.Version}}" rel="stylesheet">
-
-    <script src="/static/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <script src="/static/respond.js/1.4.2/respond.min.js"></script>
+    {{template "widgets/head.html" .}}
 </head>
 <body>
-<div class="manual-reader">
+<div class="manual-reader manual-container">
     {{template "widgets/header.html" .}}
     <div class="container manual-body">
         <div class="row">
+            <div class="m-box" style="margin-top: 15px;margin-left: 15px;margin-right: 15px">
+                <button type="button" data-toggle="modal" data-target="#addBookDialogModal" class="btn btn-success btn-sm pull-right">添加书籍</button>
+                <ul class="nav nav-tabs">
+                    <li {{if ne .Private 1}}class="active"{{end}}><a href="{{urlfor "BookController.Index"}}?private=0">公开书籍</a></li>
+                    <li {{if eq .Private 1}}class="active"{{end}}><a href="{{urlfor "BookController.Index"}}?private=1">私有书籍</a></li>
+                </ul>
+            </div>
+            <div class="box-body container" id="bookList">
+                <div class="book-list">
+                    <template v-if="lists.length <= 0">
+                        <div class="text-center">暂无数据</div>
+                    </template>
+                    <template v-else>
+                        <form target="notarget" style="display: none;" action="{{urlfor "BookController.UploadProject"}}" enctype="multipart/form-data" method="post" id="uploadZip">
+                        <input type="file" name="zipfile" accept="application/zip">
+                        <input type="text" name="identify" value="">
+                        </form>
 
-            {{template "setting/menu.html" .}}
-
-            <div class="page-right">
-                <div class="m-box">
-                    <div class="box-head">
-                        <strong class="box-title">书籍列表</strong>
-                        <button type="button" data-toggle="modal" data-target="#addBookDialogModal" class="btn btn-success btn-sm pull-right">添加书籍</button>
-                    </div>
-                    <div class="help-block text-left" style="margin-top: 15px;"><span class="text-danger">凡是违反国家法律法规或恶意发布的内容，本站有权在不提前告知的情况下对内容进行删除，请须知！</span></div>
-                    <ul class="nav nav-tabs" style="margin-top: 15px;">
-                        <li {{if eq .Private 1}}class="active"{{end}}><a href="{{urlfor "BookController.Index"}}?private=1">私有书籍</a></li>
-                        <li {{if ne .Private 1}}class="active"{{end}}><a href="{{urlfor "BookController.Index"}}?private=0">公开书籍</a></li>
-                    </ul>
-                </div>
-                <div class="box-body" id="bookList">
-                    <div class="book-list">
-                        <template v-if="lists.length <= 0">
-                            <div class="text-center">暂无数据</div>
-                        </template>
-                        <template v-else>
-                            <form target="notarget" style="display: none;" action="{{urlfor "BookController.UploadProject"}}" enctype="multipart/form-data" method="post" id="uploadZip">
-                            <input type="file" name="zipfile" accept="application/zip">
+                        <form target="notarget" style="display: none;" action="{{urlfor "BookController.UploadProject"}}" enctype="multipart/form-data" method="post" id="uploadEpub">
+                            <input type="file" name="zipfile" accept=".epub">
                             <input type="text" name="identify" value="">
-                            </form>
-
-                            <form target="notarget" style="display: none;" action="{{urlfor "BookController.UploadProject"}}" enctype="multipart/form-data" method="post" id="uploadEpub">
-                                <input type="file" name="zipfile" accept=".epub">
-                                <input type="text" name="identify" value="">
-                            </form>
-                            <div class="list-item clearfix" v-for="item in lists">
-                                <div class="col-sm-2 col-xs-4" style="padding-left: 0px">
-                                    <a :class="item.order_index>0 ? 'recommend-book' : ''" :href="'{{urlfor "DocumentController.Index" ":key" ""}}' + item.identify" title="查看文档" data-toggle="tooltip">
-                                        <img  onerror="this.src='/static/images/book.png'"  class="img-responsive border-cover-img" :src="item.cover" alt="">
-                                    </a>
-                                </div>
-                                <div class="col-sm-10 col-xs-8" style="padding-right: 0px;padding-left: 0px;">
-                                    <div class="book-title">
-                                        <div class="pull-left">
-                                            <a :href="'{{urlfor "DocumentController.Index" ":key" ""}}' + item.identify" title="查看文档" data-toggle="tooltip">
-                                                <template v-if="item.privately_owned == 0">
-                                                    <i class="fa fa-unlock" aria-hidden="true"></i>
-                                                </template>
-                                                <template v-else-if="item.privately_owned == 1">
-                                                    <i class="fa fa-lock" aria-hidden="true"></i>
-                                                </template>
-                                                ${item.book_name}
-                                            </a>
-                                        </div>
-
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div class="info hidden-xs">
-                                        <span title="创建者" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-user"></i> ${item.create_name}</span>
-                                        <span title="文档数量" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-pie-chart"></i> ${item.doc_count}</span>
-                                        <span title="书籍角色" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-user-secret"></i> ${item.role_name}</span>
-                                        <span title="创建时间" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-clock-o"></i>
-                                            ${(new Date(item.create_time)).format("yyyy-MM-dd hh:mm:ss")}
-                                        </span>
-                                        <template v-if="item.last_modify_text !== ''">
-                                            <span title="最后编辑" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-pencil"></i> 最后编辑: ${item.last_modify_text}</span>
-                                        </template>
-                                    </div>
-                                    <div class="desc-text">
-                                        <template v-if="item.description === ''"></template>
-                                        <template v-else="">
-                                                ${item.description}
-                                        </template>
-                                    </div>
-
-                                    <div class="btns">
-                                        <a :href="'{{urlfor "DocumentController.Index" ":key" ""}}' + item.identify" title="查看文档" class="btn btn-default btn-sm" data-toggle="tooltip" target="_blank"><i class="fa fa-eye"></i> 查看<span class="hidden-xs">文档</span></a>
-                                        <a v-if="item.role_id < 2" :href="'/book/' + item.identify + '/setting'" title="书籍设置" class="btn btn-default btn-sm" data-toggle="tooltip" target="_blank"><i class="fa fa-cogs"></i> <span class="hidden-xs">书籍</span>设置</a>
-                                        <a v-if="item.role_id < 2" :href="'/book/'+ item.identify +'/generate'" class="btn btn-default btn-sm ajax-get confirm" :data-identify="item.identify">
-                                            <i class="fa fa-book"></i> 生成下载文档
+                        </form>
+                        <div class="list-item clearfix" v-for="item in lists">
+                            <div class="col-sm-2 col-xs-4" style="padding-left: 0px">
+                                <a :class="item.order_index>0 ? 'recommend-book' : ''" :href="'{{urlfor "DocumentController.Index" ":key" ""}}' + item.identify" title="查看文档" data-toggle="tooltip">
+                                    <img  onerror="this.src='/static/images/book.png'"  class="img-responsive border-cover-img" :src="item.cover" alt="">
+                                </a>
+                            </div>
+                            <div class="col-sm-10 col-xs-8" style="padding-right: 0px;padding-left: 0px;">
+                                <div class="book-title">
+                                    <div class="pull-left">
+                                        <a :href="'{{urlfor "DocumentController.Index" ":key" ""}}' + item.identify" title="查看文档" data-toggle="tooltip">
+                                            <template v-if="item.privately_owned == 0">
+                                                <i class="fa fa-unlock" aria-hidden="true"></i>
+                                            </template>
+                                            <template v-else-if="item.privately_owned == 1">
+                                                <i class="fa fa-lock" aria-hidden="true"></i>
+                                            </template>
+                                            ${item.book_name}
                                         </a>
-
-                                        <template v-if="item.role_id != 3">
-                                            <a :href="'/api/' + item.identify + '/edit'" title="编辑文档" data-toggle="tooltip" class="btn btn-default btn-sm"><i class="fa fa-edit" aria-hidden="true"></i> 编辑<span class="hidden-xs">文档</span></a>
-
-
-                                            <!-- Split button -->
-                                            <div class="btn-group">
-                                                <button type="button" class="btn btn-default"><i class="fa fa-cloud-upload"></i> 导入书籍</button>
-                                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                    <span class="caret"></span>
-                                                    <span class="sr-only">Toggle Dropdown</span>
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li>
-                                                        <a href="javascript:void(0);" class="btn-upload-epub" data-toggle="tooltip" :data-identify="item.identify" title="支持epub格式电子书导入。">
-                                                            <i class="fa fa-cloud-upload"></i> EPUB 上传导入
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0);" class="btn-upload-zip" data-toggle="tooltip" :data-identify="item.identify" title="支持任意zip压缩的markdown书籍导入。">
-                                                            <i class="fa fa-cloud-upload"></i> ZIP 上传导入
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0);" class="btn-pull-by-zip" data-toggle="tooltip" :data-identify="item.identify" title="从任意源拉取zip压缩的markdown书籍">
-                                                            <i class="fa fa-link"></i> ZIP 拉取导入
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0);" class="btn-pull-by-git" data-toggle="tooltip" :data-identify="item.identify" title="从Git仓库导入markdown书籍">
-                                                            <i class="fa fa-git"></i> Git Clone 导入
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </template>
-
-                                        <div class="btn-group btn-group-download">
-                                            <button type="button" class="btn btn-default"><i class="fa fa-cloud-download"></i> 导出书籍</button>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="info hidden-xs">
+                                    <span title="创建者" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-user"></i> ${item.create_name}</span>
+                                    <span title="文档数量" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-pie-chart"></i> ${item.doc_count}</span>
+                                    <span title="书籍角色" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-user-secret"></i> ${item.role_name}</span>
+                                    <span title="创建时间" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-clock-o"></i>
+                                        ${(new Date(item.create_time)).format("yyyy-MM-dd hh:mm:ss")}
+                                    </span>
+                                    <template v-if="item.last_modify_text !== ''">
+                                        <span title="最后编辑" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-pencil"></i> 最后编辑: ${item.last_modify_text}</span>
+                                    </template>
+                                </div>
+                                <div class="desc-text">
+                                    <template v-if="item.description === ''"></template>
+                                    <template v-else="">
+                                        ${item.description}
+                                    </template>
+                                </div>
+                                <div class="btns">
+                                    <a :href="'{{urlfor "DocumentController.Index" ":key" ""}}' + item.identify" title="查看文档" class="btn btn-default btn-sm" data-toggle="tooltip" target="_blank"><i class="fa fa-eye"></i> 查看<span class="hidden-xs">文档</span></a>
+                                    <a v-if="item.role_id < 2" :href="'/book/' + item.identify + '/setting'" title="书籍设置" class="btn btn-default btn-sm" data-toggle="tooltip" target="_blank"><i class="fa fa-cogs"></i> <span class="hidden-xs">书籍</span>设置</a>
+                                    <a v-if="item.role_id < 2" :href="'/book/'+ item.identify +'/generate'" class="btn btn-default btn-sm ajax-get confirm" :data-identify="item.identify">
+                                        <i class="fa fa-book"></i> 生成下载文档
+                                    </a>
+                                    <template v-if="item.role_id != 3">
+                                        <a :href="'/api/' + item.identify + '/edit'" title="编辑文档" data-toggle="tooltip" class="btn btn-default btn-sm"><i class="fa fa-edit" aria-hidden="true"></i> 编辑<span class="hidden-xs">文档</span></a>
+                                        <!-- Split button -->
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-default"><i class="fa fa-cloud-upload"></i> 导入书籍</button>
                                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                 <span class="caret"></span>
                                                 <span class="sr-only">Toggle Dropdown</span>
                                             </button>
                                             <ul class="dropdown-menu">
-                                                <li><a :href="'{{urlfor "DocumentController.Export" ":key" ""}}' + item.identify+'?output=pdf'">导出 PDF</a></li>
-                                                <li><a :href="'{{urlfor "DocumentController.Export" ":key" ""}}' + item.identify+'?output=mobi'">导出 MOBI</a></li>
-                                                <li><a :href="'{{urlfor "DocumentController.Export" ":key" ""}}' + item.identify+'?output=epub'">导出 EPUB</a></li>
+                                                <li>
+                                                    <a href="javascript:void(0);" class="btn-upload-epub" data-toggle="tooltip" :data-identify="item.identify" title="支持epub格式电子书导入。">
+                                                        <i class="fa fa-cloud-upload"></i> EPUB 上传导入
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:void(0);" class="btn-upload-zip" data-toggle="tooltip" :data-identify="item.identify" title="支持任意zip压缩的markdown书籍导入。">
+                                                        <i class="fa fa-cloud-upload"></i> ZIP 上传导入
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:void(0);" class="btn-pull-by-zip" data-toggle="tooltip" :data-identify="item.identify" title="从任意源拉取zip压缩的markdown书籍">
+                                                        <i class="fa fa-link"></i> ZIP 拉取导入
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:void(0);" class="btn-pull-by-git" data-toggle="tooltip" :data-identify="item.identify" title="从Git仓库导入markdown书籍">
+                                                        <i class="fa fa-git"></i> Git Clone 导入
+                                                    </a>
+                                                </li>
                                             </ul>
                                         </div>
+                                    </template>
 
+                                    <div class="btn-group btn-group-download">
+                                        <button type="button" class="btn btn-default"><i class="fa fa-cloud-download"></i> 导出书籍</button>
+                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <span class="caret"></span>
+                                            <span class="sr-only">Toggle Dropdown</span>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a :href="'{{urlfor "DocumentController.Export" ":key" ""}}' + item.identify+'?output=pdf'">导出 PDF</a></li>
+                                            <li><a :href="'{{urlfor "DocumentController.Export" ":key" ""}}' + item.identify+'?output=mobi'">导出 MOBI</a></li>
+                                            <li><a :href="'{{urlfor "DocumentController.Export" ":key" ""}}' + item.identify+'?output=epub'">导出 EPUB</a></li>
+                                        </ul>
                                     </div>
                                 </div>
-
                             </div>
-                        </template>
-                    </div>
-                    <template v-if="lists.length >= 0">
-                        <nav class="pagination-container">
-                            {{.PageHtml}}
-                        </nav>
+                        </div>
                     </template>
                 </div>
-
-
+                <template v-if="lists.length >= 0">
+                    <nav class="pagination-container">
+                        {{.PageHtml}}
+                    </nav>
+                </template>
             </div>
         </div>
     </div>
-
 </div>
 
 <!-- Modal -->

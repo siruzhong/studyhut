@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+	"os"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/kardianos/service"
-	"os"
 	"programming-learning-platform/commands"
 	"programming-learning-platform/commands/daemon"
 	_ "programming-learning-platform/routers"
@@ -20,6 +21,7 @@ func main() {
 			daemon.Restart()
 		}
 	}
+
 	// 注册orm命令行工具
 	commands.RegisterCommand()
 
@@ -33,5 +35,6 @@ func main() {
 		os.Exit(1)
 	}
 
+	// 启动服务
 	s.Run()
 }

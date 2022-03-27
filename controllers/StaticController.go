@@ -14,6 +14,7 @@ import (
 	"programming-learning-platform/utils"
 )
 
+// StaticController 静态文件控制器
 type StaticController struct {
 	beego.Controller
 	OssDomain string
@@ -31,13 +32,12 @@ func (this *StaticController) APP() {
 	this.Abort("404")
 }
 
-// Uploads 查询上传的静态资源。
+// Uploads 查询上传的静态资源
 // 如果是音频和视频文件，需要根据后台设置而判断是否加密处理
 // 如果使用了OSS存储，则需要将文件处理好
 func (this *StaticController) Uploads() {
 	file := strings.TrimLeft(this.GetString(":splat"), "./")
 	path := strings.ReplaceAll(filepath.Join("uploads", file), "\\", "/")
-
 	if this.isMedia(path) { // 签名验证
 		sign := this.GetString("sign")
 		if !this.isValidSign(sign, path) {
@@ -47,12 +47,7 @@ func (this *StaticController) Uploads() {
 				return
 			}
 		}
-
-		// if sign != "" && utils.IsSignUsed(sign) {
-		// 	this.Abort("404")
-		// }
 	}
-
 	http.ServeFile(this.Ctx.ResponseWriter, this.Ctx.Request, path)
 }
 
@@ -111,8 +106,8 @@ func (this *StaticController) ProjectsFile() {
 func (this *StaticController) isMedia(path string) (yes bool) {
 	var videoOK, audioOK bool
 	ext := strings.ToLower(filepath.Ext(path))
-	_, videoOK = conf.VideoExt.Load(ext)
-	_, audioOK = conf.AudioExt.Load(ext)
+	_, videoOK = utils.VideoExt.Load(ext) // 判断是否为视频拓展名
+	_, audioOK = utils.AudioExt.Load(ext) // 判断是否为音频拓展名
 	return audioOK || videoOK
 }
 

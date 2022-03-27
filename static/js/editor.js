@@ -184,21 +184,21 @@ $("#addDocumentModal").on("hidden.bs.modal",function () {
     $(this).find("input[name='doc_name']").focus();
 });
 
-function showError($msg,$id) {
-    if(!$id){
-        $id = "#form-error-message"
-    }
-    $($id).addClass("error-message").removeClass("success-message").text($msg);
-    return false;
-}
+// function showError($msg,$id) {
+//     if(!$id){
+//         $id = "#form-error-message"
+//     }
+//     $($id).addClass("error-message").removeClass("success-message").text($msg);
+//     return false;
+// }
 
-function showSuccess($msg,$id) {
-    if(!$id){
-        $id = "#form-error-message"
-    }
-    $($id).addClass("success-message").removeClass("error-message").text($msg);
-    return true;
-}
+// function showSuccess($msg,$id) {
+//     if(!$id){
+//         $id = "#form-error-message"
+//     }
+//     $($id).addClass("success-message").removeClass("error-message").text($msg);
+//     return true;
+// }
 
 window.documentHistory = function() {
     layer.open({

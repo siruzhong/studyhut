@@ -212,11 +212,12 @@ func RegisterFunction() {
 	beego.AddFuncMap("add", func(a, b int) int { return a + b })
 }
 
+// ResolveCommand 解析命令行参数
 func ResolveCommand(args []string) {
 	flagSet := flag.NewFlagSet("MinDoc command: ", flag.ExitOnError)
-	flagSet.StringVar(&ConfigurationFile, "config", "", "BookStack configuration file.")
-	flagSet.StringVar(&LogFile, "log", "", "BookStack log file path.")
-
+	flagSet.StringVar(&ConfigurationFile, "config", "", "project configuration file.")
+	flagSet.StringVar(&LogFile, "log", "", "project log file path.")
+	// 解析命令行参数
 	flagSet.Parse(args)
 
 	if ConfigurationFile == "" {
@@ -229,13 +230,12 @@ func ResolveCommand(args []string) {
 	gocaptcha.ReadFonts(filepath.Join("static", "fonts"), ".ttf")
 
 	err := beego.LoadAppConfig("ini", ConfigurationFile)
-
 	if err != nil {
 		log.Println("An error occurred:", err)
 		os.Exit(1)
 	}
-	uploads := filepath.Join("uploads")
 
+	uploads := filepath.Join("uploads")
 	os.MkdirAll(uploads, 0666)
 
 	beego.BConfig.WebConfig.StaticDir["/static"] = filepath.Join("static")
@@ -256,7 +256,6 @@ func ResolveCommand(args []string) {
 }
 
 func init() {
-
 	gocaptcha.ReadFonts("./static/fonts", ".ttf")
 	gob.Register(models.Member{})
 }

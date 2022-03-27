@@ -7,6 +7,7 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
+// Wechat 第三方微信接口
 type Wechat struct {
 	Id        int
 	MemberId  int    //绑定的用户id
@@ -17,13 +18,15 @@ type Wechat struct {
 	SessKey   string `orm:"size(50);unique"`
 }
 
+// NewWechat 创建微信实体
 func NewWechat() *Wechat {
 	return &Wechat{}
 }
 
-//根据giteeid获取用户的gitee数据。这里可以查询用户是否绑定了或者数据是否在库中存在
-func (m *Wechat) GetUserByOpenid(openid string, cols ...string) (user Wechat, err error) {
-	qs := orm.NewOrm().QueryTable(m).Filter("openid", openid)
+// GetUserByOpenid 根据openid获取用户的微信数据
+func (this *Wechat) GetUserByOpenid(openid string, cols ...string) (user Wechat, err error) {
+	// 查询用户的微信数据是否在数据库中存在
+	qs := orm.NewOrm().QueryTable(this).Filter("openid", openid)
 	if len(cols) > 0 {
 		err = qs.One(&user, cols...)
 	} else {
@@ -32,9 +35,9 @@ func (m *Wechat) GetUserByOpenid(openid string, cols ...string) (user Wechat, er
 	return
 }
 
-//根据giteeid获取用户的gitee数据。这里可以查询用户是否绑定了或者数据是否在库中存在
-func (m *Wechat) GetUserBySess(sessKey string, cols ...string) (user Wechat, err error) {
-	qs := orm.NewOrm().QueryTable(m).Filter("sess_key", sessKey)
+// GetUserBySess 根据SessKey获取用户的微信数据
+func (this *Wechat) GetUserBySess(sessKey string, cols ...string) (user Wechat, err error) {
+	qs := orm.NewOrm().QueryTable(this).Filter("sess_key", sessKey)
 	if len(cols) > 0 {
 		err = qs.One(&user, cols...)
 	} else {
@@ -43,21 +46,22 @@ func (m *Wechat) GetUserBySess(sessKey string, cols ...string) (user Wechat, err
 	return
 }
 
-func (m *Wechat) Insert() (err error) {
+// Insert 插入用户微信数据到数据库
+func (this *Wechat) Insert() (err error) {
 	o := orm.NewOrm()
 	exist := &Wechat{}
-	o.QueryTable(m).Filter("openid", m.Openid).One(exist)
+	o.QueryTable(this).Filter("openid", this.Openid).One(exist)
 	if exist.Id > 0 {
-		exist.SessKey = m.SessKey
+		exist.SessKey = this.SessKey
 		_, err = o.Update(exist)
 	} else {
-		_, err = o.Insert(m)
+		_, err = o.Insert(this)
 	}
 	return
 }
 
-//绑定用户
-func (m *Wechat) Bind(openid, memberId interface{}) (err error) {
-	_, err = orm.NewOrm().QueryTable(m).Filter("openid", openid).Filter("member_id", 0).Update(orm.Params{"member_id": memberId, "sess_key": cryptil.Md5Crypt(fmt.Sprint(openid))})
+// Bind 绑定用户与微信
+func (this *Wechat) Bind(openid, memberId interface{}) (err error) {
+	_, err = orm.NewOrm().QueryTable(this).Filter("openid", openid).Filter("member_id", 0).Update(orm.Params{"member_id": memberId, "sess_key": cryptil.Md5Crypt(fmt.Sprint(openid))})
 	return
 }
