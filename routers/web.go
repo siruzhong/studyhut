@@ -21,9 +21,8 @@ func webRouter() {
 	beego.Router("/login/:oauth", &controllers.AccountController{}, "*:Oauth")         // 用户第三方登陆鉴权
 	beego.Router("/logout", &controllers.AccountController{}, "*:Logout")              // 用户退出登陆
 	beego.Router("/bind", &controllers.AccountController{}, "post:Bind")               // 用户注册
-	beego.Router("/note", &controllers.AccountController{}, "get,post:Note")           //
 	beego.Router("/find_password", &controllers.AccountController{}, "*:FindPassword") // 找回密码
-	beego.Router("/valid_email", &controllers.AccountController{}, "post:ValidEmail")  //
+	beego.Router("/valid_email", &controllers.AccountController{}, "post:ValidEmail")  // 邮箱校验
 
 	// 首页
 	beego.Router("/", &controllers.CateController{}, "get:Index")
@@ -163,11 +162,6 @@ func webRouter() {
 	beego.Router("/export/:key", &controllers.DocumentController{}, "*:Export")
 	beego.Router("/qrcode/:key.png", &controllers.DocumentController{}, "get:QrCode")
 	beego.Router("/attach_files/:key/:attach_id", &controllers.DocumentController{}, "get:DownloadAttachment")
-
-	// 评论
-	beego.Router("/comment/create", &controllers.CommentController{}, "post:Create")
-	beego.Router("/comment/lists", &controllers.CommentController{}, "get:Lists")
-	beego.Router("/comment/index", &controllers.CommentController{}, "*:Index")
 
 	beego.Router("/local-render", &controllers.LocalhostController{}, "get,post:RenderMarkdown")
 	beego.Router("/local-render-cover", &controllers.LocalhostController{}, "get:RenderCover")

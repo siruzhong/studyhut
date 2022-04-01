@@ -542,7 +542,7 @@ func (this *BookController) CreateToken() {
 		if bookResult.PrivatelyOwned == 0 {
 			this.JsonResult(6001, "公开书籍不能创建阅读令牌")
 		}
-		book.PrivateToken = string(utils.Krand(conf.GetTokenSize(), utils.KC_RAND_KIND_ALL))
+		book.PrivateToken = string(utils.Krand(conf.GetTokenSize(), conf.KC_RAND_KIND_ALL))
 		if err := book.Update(); err != nil {
 			logs.Error("生成阅读令牌失败 => ", err)
 			this.JsonResult(6003, "生成阅读令牌失败")

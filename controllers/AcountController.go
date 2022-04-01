@@ -406,7 +406,7 @@ func (this *AccountController) FindPassword() {
 			this.JsonResult(6008, "发送次数太多，请稍候再试")
 		}
 		memberToken := models.NewMemberToken()
-		memberToken.Token = string(utils.Krand(32, utils.KC_RAND_KIND_ALL)) // 随机生成32位的字符串
+		memberToken.Token = string(utils.Krand(32, conf.KC_RAND_KIND_ALL)) // 随机生成32位的字符串
 		memberToken.Email = email
 		memberToken.MemberId = member.MemberId
 		memberToken.IsValid = false
@@ -526,16 +526,4 @@ func (this *AccountController) Logout() {
 	this.SetSecureCookie(conf.GetAppKey(), "login", "", -3600)
 
 	this.Redirect(beego.URLFor("AccountController.Login"), 302)
-}
-
-// Note 记录笔记
-func (this *AccountController) Note() {
-	docid, _ := this.GetInt("doc_id")
-	fmt.Println(docid)
-	if strings.ToLower(this.Ctx.Request.Method) == "post" {
-
-	} else {
-		this.Data["SeoTitle"] = "笔记"
-		this.TplName = "account/note.html"
-	}
 }

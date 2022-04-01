@@ -16,7 +16,7 @@ if (isset($_GET['debug'])) {
 	<meta name="description" content="Merge and Diff your documents with diff online and share" />
 	<meta name="keywords" content="diff,merge,compare,jsdiff,comparison,difference,file,text,unix,patch,algorithm,saas,longest common subsequence,diff online" />
 	<meta name="author" content="Jamie Peabody" />
-	<link rel="shortcut icon" href="/favicon.ico" />
+	<link rel="shortcut icon" href="/static/images/logo.png" />
 	<link rel="canonical" href="http://www.mergely.com" />
     <link href='http://fonts.googleapis.com/css?family=Noto+Sans:400,700' rel='stylesheet' type='text/css' />
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
@@ -55,7 +55,7 @@ if (isset($_GET['debug'])) {
         var key = '<?php echo htmlspecialchars($key, ENT_QUOTES, 'UTF-8'); ?>';
         var isSample = key == 'usaindep';
     </script>
-    
+
     <!-- analytics -->
     <script type="text/javascript">
         var _gaq = _gaq || [];
@@ -67,7 +67,7 @@ if (isset($_GET['debug'])) {
             var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
         })();
     </script>
-    
+
     <!-- google +1 -->
 	<script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
 </head>
@@ -82,7 +82,7 @@ if (isset($_GET['debug'])) {
 
 
     <a href="/"><div id="banner"></div></a>
-    
+
     <!-- menu -->
     <ul id="main-menu">
         <li accesskey="f">
@@ -236,7 +236,7 @@ if (isset($_GET['debug'])) {
             </div>
         </div>
     </div>
-    
+
     <!-- dialog colors -->
 	<div id="dialog-colors" title="Mergely Color Settings" style="display:none">
 		<div id="picker" style="float: right;"></div>
@@ -267,11 +267,11 @@ if (isset($_GET['debug'])) {
 	<div id="dialog-confirm" title="Save a Permanent Copy?" style="display:none;">
 		<p>
 			Are you sure you want to save? A permanent copy will be
-			created at the server and a link will be provided for you to share the URL 
+			created at the server and a link will be provided for you to share the URL
             in an email, blog, twitter, etc.
 		</p>
 	</div>
-    
+
     <!-- find -->
     <div class="find">
         <input type="text" />
@@ -279,12 +279,12 @@ if (isset($_GET['debug'])) {
         <button class="find-next"><span class="icon icon-arrow-down"></span></button>
         <button class="find-close"><span class="icon icon-x-mark"></span></button>
     </div>
-    
+
     <!-- editor -->
     <div style="position: absolute;top: 73px;bottom: 10px;left: 5px;right: 5px;overflow-y: hidden;padding-bottom: 2px;">
         <div id="mergely">
         </div>
     </div>
-    
+
 </body>
 </html>
