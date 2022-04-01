@@ -73,11 +73,6 @@ func (m *Book) TableName() string {
 	return "books"
 }
 
-// TableEngine 获取数据使用的引擎
-func (m *Book) TableEngine() string {
-	return "INNODB"
-}
-
 // TableNameWithPrefix 获取带前缀带数据表名
 func (m *Book) TableNameWithPrefix() string {
 	return conf.GetDatabasePrefix() + m.TableName()
@@ -104,6 +99,7 @@ func (m *Book) HasProjectAccess(identify string, memberId int, minRole int) bool
 	return rel.RoleId <= minRole
 }
 
+// Sorted 书籍排序
 func (m *Book) Sorted(limit int, orderField string) (books []Book) {
 	o := orm.NewOrm()
 	fields := []string{"book_id", "book_name", "identify", "cover", "vcnt", "star", "cnt_comment"}
@@ -111,32 +107,28 @@ func (m *Book) Sorted(limit int, orderField string) (books []Book) {
 	return
 }
 
+// Insert 插入书籍
 func (m *Book) Insert() (err error) {
 	o := orm.NewOrm()
 	if _, err = o.Insert(m); err != nil {
 		return
 	}
-
 	if m.Label != "" {
 		NewLabel().InsertOrUpdateMulti(m.Label)
 	}
-
 	relationship := NewRelationship()
 	relationship.BookId = m.BookId
 	relationship.RoleId = 0
 	relationship.MemberId = m.MemberId
-
 	if err = relationship.Insert(); err != nil {
 		logs.Error("插入书籍与用户关联 => ", err)
 		return err
 	}
-
 	document := NewDocument()
 	document.BookId = m.BookId
 	document.DocumentName = "空白文档"
 	document.Identify = "blank"
 	document.MemberId = m.MemberId
-
 	var id int64
 	if id, err = document.InsertOrUpdate(); err == nil {
 		var ds = DocumentStore{

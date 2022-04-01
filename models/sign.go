@@ -185,14 +185,12 @@ func (m *Sign) GetSignRule() (r *Rule) {
 
 // 更新签到奖励规则
 func (m *Sign) UpdateSignRule() {
-	ops := []string{"SIGN_BASIC_REWARD", "SIGN_APP_REWARD", "SIGN_CONTINUOUS_REWARD", "SIGN_CONTINUOUS_MAX_REWARD"}
+	ops := []string{"SIGN_BASIC_REWARD", "SIGN_CONTINUOUS_REWARD", "SIGN_CONTINUOUS_MAX_REWARD"}
 	for _, op := range ops {
 		num, _ := strconv.Atoi(GetOptionValue(op, ""))
 		switch op {
 		case "SIGN_BASIC_REWARD":
 			_rule.BasicReward = num
-		case "SIGN_APP_REWARD":
-			_rule.AppReward = num
 		case "SIGN_CONTINUOUS_REWARD":
 			_rule.ContinuousReward = num
 		case "SIGN_CONTINUOUS_MAX_REWARD":

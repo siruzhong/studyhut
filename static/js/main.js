@@ -12,6 +12,7 @@ function showSuccess($msg, $id) {
     }
     $($id).addClass("success-message").removeClass("error-message").text($msg);
     return true;
+    return true;
 }
 
 Date.prototype.format = function (fmt) {

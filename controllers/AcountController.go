@@ -25,7 +25,7 @@ type AccountController struct {
 var cpt *captcha.Captcha
 
 func init() {
-	// use beego cache system store the captcha data
+	// 通过beego的缓存系统存储验证码数据
 	fc := &cache.FileCache{CachePath: "./cache/captcha"}
 	cpt = captcha.NewWithFilter("/captcha/", fc)
 }
@@ -33,37 +33,35 @@ func init() {
 // Oauth 第三方登录回调(封装一个内部调用的函数loginByMemberId)
 func (this *AccountController) Oauth() {
 	var (
-		nickname  string //昵称
-		avatar    string //头像的http链接地址
-		email     string //邮箱地址
-		username  string //用户名
-		tips      string
-		id        interface{} //第三方的用户id，唯一识别码
-		IsEmail   bool        //是否是使用邮箱注册
-		captchaOn bool        //是否开启了验证码
+		nickname  string      // 昵称
+		avatar    string      // 头像的http链接地址
+		email     string      // 邮箱地址
+		username  string      // 用户名
+		tips      string      // 登陆提示信息
+		id        interface{} // 第三方的用户id，唯一识别码
+		IsEmail   bool        // 是否是使用邮箱注册
+		captchaOn bool        // 是否开启了验证码
 	)
-
 	// 如果开启了验证码
 	if v, ok := this.Option["ENABLED_CAPTCHA"]; ok && strings.EqualFold(v, "true") {
 		captchaOn = true
 		this.Data["CaptchaOn"] = captchaOn
 	}
-
+	// 如果开启了鉴权登陆
 	oauthLogin := false
 	if v, ok := this.Option["LOGIN_QQ"]; ok && strings.EqualFold(v, "true") {
-		this.Data["LoginQQ"] = true
+		this.Data["LoginQQ"] = true // qq登陆
 		oauthLogin = true
 	}
 	if v, ok := this.Option["LOGIN_GITHUB"]; ok && strings.EqualFold(v, "true") {
-		this.Data["LoginGitHub"] = true
+		this.Data["LoginGitHub"] = true // GitHub登陆
 		oauthLogin = true
 	}
 	if v, ok := this.Option["LOGIN_GITEE"]; ok && strings.EqualFold(v, "true") {
-		this.Data["LoginGitee"] = true
+		this.Data["LoginGitee"] = true // Gitee登陆
 		oauthLogin = true
 	}
 	this.Data["OauthLogin"] = oauthLogin
-
 	oa := this.GetString(":oauth")
 	code := this.GetString("code")
 	switch oa {
@@ -74,15 +72,13 @@ func (this *AccountController) Oauth() {
 			beego.Error(err)
 			this.Abort("404")
 		}
-
-		info, err := oauth.GetGiteeUserInfo(token.AccessToken)
+		userInfo, err := oauth.GetGiteeUserInfo(token.AccessToken)
 		if err != nil {
 			beego.Error(err)
 			this.Abort("404")
 		}
-
-		if info.Id > 0 {
-			existInfo, _ := models.ModelGitee.GetUserByGiteeId(info.Id, "id", "member_id")
+		if userInfo.Id > 0 {
+			existInfo, _ := models.ModelGitee.GetUserByGiteeId(userInfo.Id, "id", "member_id")
 			if existInfo.MemberId > 0 { //直接登录
 				err = this.loginByMemberId(existInfo.MemberId)
 				if err != nil {
@@ -92,14 +88,14 @@ func (this *AccountController) Oauth() {
 				this.Redirect(beego.URLFor("HomeController.Index"), 302)
 				return
 			}
-			if existInfo.Id == 0 { //原本不存在于数据库中的数据需要入库
-				orm.NewOrm().Insert(&models.Gitee{GiteeUser: info})
+			if existInfo.Id == 0 { // 原本不存在于数据库中的数据需要入库
+				orm.NewOrm().Insert(&models.Gitee{GiteeUser: userInfo})
 			}
-			nickname = info.Name
-			username = info.Login
-			avatar = info.AvatarURL
-			email = info.Email
-			id = info.Id
+			nickname = userInfo.Name
+			username = userInfo.Login
+			avatar = userInfo.AvatarURL
+			email = userInfo.Email
+			id = userInfo.Id
 		} else {
 			err = errors.New("获取gitee用户数据失败")
 			beego.Error(err)
@@ -112,13 +108,11 @@ func (this *AccountController) Oauth() {
 			beego.Error(err.Error())
 			this.Abort("404")
 		}
-
 		info, err := oauth.GetGithubUserInfo(token.AccessToken)
 		if err != nil {
 			beego.Error(err.Error())
 			this.Abort("404")
 		}
-
 		if info.Id > 0 {
 			existInfo, _ := models.ModelGithub.GetUserByGithubId(info.Id, "id", "member_id")
 			if existInfo.MemberId > 0 { //直接登录
@@ -143,7 +137,6 @@ func (this *AccountController) Oauth() {
 			beego.Error(err.Error())
 			this.Abort("404")
 		}
-
 	case "qq":
 		tips = `您正在使用【QQ】登录`
 		token, err := oauth.GetQQAccessToken(code)
@@ -151,19 +144,16 @@ func (this *AccountController) Oauth() {
 			beego.Error(err)
 			this.Abort("404")
 		}
-
 		openid, err := oauth.GetQQOpenId(token)
 		if err != nil {
 			beego.Error(err.Error())
 			this.Abort("404")
 		}
-
 		info, err := oauth.GetQQUserInfo(token.AccessToken, openid)
 		if err != nil {
 			beego.Error(err.Error())
 			this.Abort("404")
 		}
-
 		if info.Ret == 0 {
 			existInfo, _ := models.ModelQQ.GetUserByOpenid(openid, "id", "member_id")
 			if existInfo.MemberId > 0 { //直接登录
@@ -175,7 +165,6 @@ func (this *AccountController) Oauth() {
 				this.Redirect(beego.URLFor("HomeController.Index"), 302)
 				return
 			}
-
 			if existInfo.Id == 0 { //原本不存在于数据库中的数据需要入库
 				orm.NewOrm().Insert(&models.QQ{
 					OpenId:    openid,
@@ -197,7 +186,6 @@ func (this *AccountController) Oauth() {
 	default: //email
 		IsEmail = true
 	}
-
 	this.Data["IsEmail"] = IsEmail
 	this.Data["Nickname"] = nickname
 	this.Data["Avatar"] = avatar
@@ -216,24 +204,20 @@ func (this *AccountController) Oauth() {
 	this.Data["RandomStr"] = time.Now().Unix()
 	this.SetSession("auth", fmt.Sprintf("%v-%v", oa, id)) //存储标识，以标记是哪个用户，在完善用户信息的时候跟传递过来的auth和id进行校验
 	this.TplName = "account/bind.html"
-
 }
 
 // Login 用户登录
 func (this *AccountController) Login() {
 	var (
 		remember  CookieRemember
-		captchaOn bool //是否开启了验证码
+		captchaOn bool // 是否开启了验证码
 	)
-
 	this.TplName = "account/login.html"
-
-	//如果开启了验证码
+	// 如果开启了验证码
 	if v, ok := this.Option["ENABLED_CAPTCHA"]; ok && strings.EqualFold(v, "true") {
 		captchaOn = true
 		this.Data["CaptchaOn"] = captchaOn
 	}
-
 	oauthLogin := false
 	if v, ok := this.Option["LOGIN_QQ"]; ok && strings.EqualFold(v, "true") {
 		this.Data["LoginQQ"] = true
@@ -248,8 +232,7 @@ func (this *AccountController) Login() {
 		oauthLogin = true
 	}
 	this.Data["OauthLogin"] = oauthLogin
-
-	//如果Cookie中存在登录信息
+	// 如果Cookie中存在登录信息
 	if cookie, ok := this.GetSecureCookie(conf.GetAppKey(), "login"); ok {
 		if err := utils.Decode(cookie, &remember); err == nil {
 			if err = this.loginByMemberId(remember.MemberId); err == nil {
@@ -258,18 +241,14 @@ func (this *AccountController) Login() {
 			}
 		}
 	}
-
 	if this.Ctx.Input.IsPost() {
 		account := this.GetString("account")
 		password := this.GetString("password")
-
 		if captchaOn && !cpt.VerifyReq(this.Ctx.Request) {
 			this.JsonResult(1, "验证码不正确")
 		}
-
 		member, err := models.NewMember().Login(account, password)
-
-		//如果没有数据
+		// 如果没有数据
 		if err != nil {
 			beego.Error("用户登录 =>", err)
 			this.JsonResult(500, "账号或密码错误", nil)
@@ -286,7 +265,6 @@ func (this *AccountController) Login() {
 		}
 		this.JsonResult(0, "ok")
 	}
-
 	this.Data["GiteeClientId"] = beego.AppConfig.String("oauth::giteeClientId")
 	this.Data["GiteeCallback"] = beego.AppConfig.String("oauth::giteeCallback")
 	this.Data["GithubClientId"] = beego.AppConfig.String("oauth::githubClientId")
@@ -314,7 +292,6 @@ func (this *AccountController) Bind() {
 	oauthId := this.GetString("id")
 	avatar := this.GetString("avatar") //用户头像
 	isbind, _ := this.GetInt("isbind", 0)
-
 	ibind := func(oauthType string, oauthId, memberId interface{}) (err error) {
 		//注册成功，绑定用户
 		switch oauthType {
@@ -327,7 +304,6 @@ func (this *AccountController) Bind() {
 		}
 		return
 	}
-
 	if oauthType != "email" {
 		if auth, ok := this.GetSession("auth").(string); !ok || fmt.Sprintf("%v-%v", oauthType, oauthId) != auth {
 			this.JsonResult(6005, "绑定信息有误，授权类型不符")
@@ -339,9 +315,7 @@ func (this *AccountController) Bind() {
 			}
 		}
 	}
-
 	member := models.NewMember()
-
 	if isbind == 1 {
 		if member, err = models.NewMember().Login(account, password1); err != nil || member.MemberId == 0 {
 			beego.Error("绑定用户失败", err, member)
@@ -387,12 +361,10 @@ func (this *AccountController) Bind() {
 		beego.Error(err.Error())
 		this.JsonResult(1, err.Error())
 	}
-
 	if err = ibind(oauthType, oauthId, member.MemberId); err != nil {
 		beego.Error(err)
 		this.JsonResult(0, "登录失败")
 	}
-
 	if oauthType == "email" {
 		this.JsonResult(0, "注册成功")
 	}
@@ -401,34 +373,19 @@ func (this *AccountController) Bind() {
 
 // FindPassword 找回密码
 func (this *AccountController) FindPassword() {
-
 	this.TplName = "account/find_password_setp1.html"
 	mailConf := utils.GetMailConfig()
-
 	if this.Ctx.Input.IsPost() {
-
 		email := this.GetString("email")
-
 		if email == "" {
 			this.JsonResult(6005, "邮箱地址不能为空")
 		}
 		if !mailConf.EnableMail {
 			this.JsonResult(6004, "未启用邮件服务")
 		}
-
-		//captcha := this.GetString("code")
-		//如果开启了验证码
-		//if v, ok := this.Option["ENABLED_CAPTCHA"]; ok && strings.EqualFold(v, "true") {
-		//	v, ok := this.GetSession(conf.CaptchaSessionName).(string)
-		//	if !ok || !strings.EqualFold(v, captcha) {
-		//		this.JsonResult(6001, "验证码不正确")
-		//	}
-		//}
-
 		if !cpt.VerifyReq(this.Ctx.Request) {
 			this.JsonResult(6001, "验证码不正确")
 		}
-
 		member, err := models.NewMember().FindByFieldFirst("email", email)
 		if err != nil {
 			beego.Error(err)
@@ -440,9 +397,7 @@ func (this *AccountController) FindPassword() {
 		if member.AuthMethod == conf.AuthMethodLDAP {
 			this.JsonResult(6011, "当前用户不支持找回密码")
 		}
-
 		count, err := models.NewMemberToken().FindSendCount(email, time.Now().Add(-1*time.Hour), time.Now())
-
 		if err != nil {
 			beego.Error(err)
 			this.JsonResult(6008, "发送邮件失败")
@@ -450,48 +405,38 @@ func (this *AccountController) FindPassword() {
 		if count > mailConf.MailNumber {
 			this.JsonResult(6008, "发送次数太多，请稍候再试")
 		}
-
 		memberToken := models.NewMemberToken()
-
-		memberToken.Token = string(utils.Krand(32, utils.KC_RAND_KIND_ALL))
+		memberToken.Token = string(utils.Krand(32, utils.KC_RAND_KIND_ALL)) // 随机生成32位的字符串
 		memberToken.Email = email
 		memberToken.MemberId = member.MemberId
 		memberToken.IsValid = false
 		if _, err := memberToken.InsertOrUpdate(); err != nil {
 			this.JsonResult(6009, "邮件发送失败")
 		}
-
 		data := map[string]interface{}{
 			"SITE_NAME": this.Option["SITE_NAME"],
 			"url":       this.BaseUrl() + beego.URLFor("AccountController.FindPassword", "token", memberToken.Token, "mail", email),
 		}
-
 		body, err := this.ExecuteViewPathTemplate("account/mail_template.html", data)
 		if err != nil {
 			beego.Error(err)
 			this.JsonResult(6003, "邮件发送失败")
 		}
-
 		if err = utils.SendMail(mailConf, "找回密码", email, body); err != nil {
 			beego.Error(err)
 			this.JsonResult(6003, "邮件发送失败")
 		}
-
 		this.JsonResult(0, "ok", this.BaseUrl()+beego.URLFor("AccountController.Login"))
 	}
-
 	this.GetSeoByPage("findpwd", map[string]string{
 		"title":       "找回密码 - " + this.Sitename,
 		"keywords":    "找回密码",
 		"description": this.Sitename + "专注于文档在线写作、协作、分享、阅读与托管，让每个人更方便地发布、分享和获得知识。",
 	})
-
 	token := this.GetString("token")
 	mail := this.GetString("mail")
-
 	if token != "" && mail != "" {
 		memberToken, err := models.NewMemberToken().FindByFieldFirst("token", token)
-
 		if err != nil {
 			beego.Error(err)
 			this.Data["ErrorMessage"] = "邮件已失效"
@@ -499,7 +444,6 @@ func (this *AccountController) FindPassword() {
 			return
 		}
 		subTime := memberToken.SendTime.Sub(time.Now())
-
 		if !strings.EqualFold(memberToken.Email, mail) || subTime.Minutes() > float64(mailConf.MailExpired) || !memberToken.ValidTime.IsZero() {
 			this.Data["ErrorMessage"] = "验证码已过期，请重新操作。"
 			this.TplName = "errors/error.html"
@@ -508,7 +452,6 @@ func (this *AccountController) FindPassword() {
 		this.Data["Email"] = memberToken.Email
 		this.Data["Token"] = memberToken.Token
 		this.TplName = "account/find_password_setp2.html"
-
 	}
 
 }

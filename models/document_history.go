@@ -37,11 +37,6 @@ func (m *DocumentHistory) TableName() string {
 	return "document_history"
 }
 
-// TableEngine 获取数据使用的引擎.
-func (m *DocumentHistory) TableEngine() string {
-	return "INNODB"
-}
-
 func (m *DocumentHistory) TableNameWithPrefix() string {
 	return conf.GetDatabasePrefix() + m.TableName()
 }

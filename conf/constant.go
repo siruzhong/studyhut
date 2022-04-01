@@ -39,8 +39,7 @@ const (
 )
 
 const (
-	LoginSessionName   = "LoginSessionName" // 登录用户的Session名
-	CaptchaSessionName = "__captcha__"
+	LoginSessionName = "LoginSessionName" // 登录用户的Session名
 
 	RegexpEmail   = `(?i)[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,6}`
 	RegexpAccount = `^[a-zA-z0-9_]{2,50}$` // 允许用户名中出现点号
@@ -48,19 +47,8 @@ const (
 	PageSize = 10 // 默认分页条数
 	RollPage = 4  // 展示分页的个数
 
-	LoggerOperate   = "operate"
-	LoggerSystem    = "system"
-	LoggerException = "exception"
-	LoggerDocument  = "document"
-
 	AuthMethodLocal = "local" // 本地账户校验
 	AuthMethodLDAP  = "ldap"  // LDAP用户校验
-)
-
-var (
-	VERSION    string
-	BUILD_TIME string
-	GO_VERSION string
 )
 
 // GetAppKey 获取app_key

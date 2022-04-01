@@ -21,11 +21,6 @@ func (m *Migration) TableName() string {
 	return "migrations"
 }
 
-// TableEngine 获取数据使用的引擎.
-func (m *Migration) TableEngine() string {
-	return "INNODB"
-}
-
 func (m *Migration) TableNameWithPrefix() string {
 	return conf.GetDatabasePrefix() + m.TableName()
 }

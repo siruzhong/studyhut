@@ -19,11 +19,6 @@ func (m *Label) TableName() string {
 	return "label"
 }
 
-// TableEngine 获取数据使用的引擎.
-func (m *Label) TableEngine() string {
-	return "INNODB"
-}
-
 func (m *Label) TableNameWithPrefix() string {
 	return conf.GetDatabasePrefix() + m.TableName()
 }
@@ -34,9 +29,7 @@ func NewLabel() *Label {
 
 func (m *Label) FindFirst(field string, value interface{}) (*Label, error) {
 	o := orm.NewOrm()
-
 	err := o.QueryTable(m.TableNameWithPrefix()).Filter(field, value).One(m)
-
 	return m, err
 }
 
@@ -79,10 +72,7 @@ func (m *Label) FindToPager(pageIndex, pageSize int, word ...string) (labels []*
 		return
 	}
 	totalCount = int(count)
-
 	offset := (pageIndex - 1) * pageSize
-
 	_, err = q.Offset(offset).Limit(pageSize).All(&labels)
-
 	return
 }

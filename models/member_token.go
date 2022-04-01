@@ -7,6 +7,7 @@ import (
 	"programming-learning-platform/conf"
 )
 
+// MemberToken 用户token
 type MemberToken struct {
 	TokenId   int       `orm:"column(token_id);pk;auto;unique" json:"token_id"`
 	MemberId  int       `orm:"column(member_id);type(int)" json:"member_id"`
@@ -22,19 +23,16 @@ func (m *MemberToken) TableName() string {
 	return "member_token"
 }
 
-// TableEngine 获取数据使用的引擎.
-func (m *MemberToken) TableEngine() string {
-	return "INNODB"
-}
-
 func (m *MemberToken) TableNameWithPrefix() string {
 	return conf.GetDatabasePrefix() + m.TableName()
 }
 
+// NewMemberToken 创建用户token
 func NewMemberToken() *MemberToken {
 	return &MemberToken{}
 }
 
+// InsertOrUpdate 插入或更新
 func (m *MemberToken) InsertOrUpdate() (*MemberToken, error) {
 	o := orm.NewOrm()
 
@@ -55,11 +53,10 @@ func (m *MemberToken) FindByFieldFirst(field string, value interface{}) (*Member
 	return m, err
 }
 
+// FindSendCount 查找时间段内的发送次数
 func (m *MemberToken) FindSendCount(mail string, startTime time.Time, endTime time.Time) (int, error) {
 	o := orm.NewOrm()
-
 	c, err := o.QueryTable(m.TableNameWithPrefix()).Filter("send_time__gte", startTime.Format("2006-01-02 15:04:05")).Filter("send_time__lte", endTime.Format("2006-01-02 15:04:05")).Count()
-
 	if err != nil {
 		return 0, err
 	}

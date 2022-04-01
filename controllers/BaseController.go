@@ -21,26 +21,29 @@ import (
 	"programming-learning-platform/utils"
 )
 
+// BaseController 基础控制器
 type BaseController struct {
-	beego.Controller
-	Member                *models.Member
-	Option                map[string]string
-	EnableAnonymous       bool
-	AllowRegister         bool
-	EnableDocumentHistory int
-	Sitename              string
-	IsMobile              bool
-	OssDomain             string
-	StaticDomain          string
-	NoNeedLoginRouter     bool
+	beego.Controller                        // Beego控制器
+	Member                *models.Member    // 用户信息
+	Option                map[string]string // 配置项
+	EnableAnonymous       bool              // 是否开启匿名
+	AllowRegister         bool              // 允许注册
+	EnableDocumentHistory int               // 是否开启文档历史
+	Sitename              string            // 站点名称
+	IsMobile              bool              // 是否是移动端
+	OssDomain             string            // oss域名
+	StaticDomain          string            // 静态文件根地址
+	NoNeedLoginRouter     bool              // 是否开启不需要登陆路由
 }
 
+// CookieRemember 记住cookie
 type CookieRemember struct {
 	MemberId int
 	Account  string
 	Time     time.Time
 }
 
+// refreshReferer 更新防盗链
 func (this *BaseController) refreshReferer() {
 	referer := this.Ctx.Request.Header.Get("referer")
 	if referer != "" {
@@ -69,7 +72,6 @@ func (this *BaseController) refreshReferer() {
 // Prepare 预处理函数，该函数会在以下定义的方法前执行，用于用户扩展，可以实现类似用户验证之类)
 func (this *BaseController) Prepare() {
 	this.refreshReferer()
-
 	this.Data["Version"] = utils.Version
 	this.IsMobile = utils.IsMobile(this.Ctx.Request.UserAgent())
 	this.Data["IsMobile"] = this.IsMobile
@@ -81,13 +83,12 @@ func (this *BaseController) Prepare() {
 	this.Data["OssDomain"] = this.OssDomain
 	this.StaticDomain = strings.Trim(beego.AppConfig.DefaultString("static_domain", ""), "/")
 	this.Data["StaticDomain"] = this.StaticDomain
-
-	//从session中获取用户信息
+	// 从session中获取用户信息
 	if member, ok := this.GetSession(conf.LoginSessionName).(models.Member); ok && member.MemberId > 0 {
 		m, _ := models.NewMember().Find(member.MemberId)
 		this.Member = m
 	} else {
-		//如果Cookie中存在登录信息，从cookie中获取用户信息
+		// 如果Cookie中存在登录信息，从cookie中获取用户信息
 		if cookie, ok := this.GetSecureCookie(conf.GetAppKey(), "login"); ok {
 			var remember CookieRemember
 			err := utils.Decode(cookie, &remember)
@@ -109,7 +110,6 @@ func (this *BaseController) Prepare() {
 	if this.Member.MemberId > 0 {
 		this.Data["IsSignedToday"] = models.NewSign().IsSignToday(this.Member.MemberId)
 	}
-
 	if options, err := models.NewOption().All(); err == nil {
 		this.Option = make(map[string]string, len(options))
 		for _, item := range options {
@@ -193,7 +193,6 @@ func (this *BaseController) Prepare() {
 
 // SetMember 获取或设置当前登录用户信息,如果 MemberId 小于 0 则标识删除 Session
 func (this *BaseController) SetMember(member models.Member) {
-
 	if member.MemberId <= 0 {
 		this.DelSession(conf.LoginSessionName)
 		this.DelSession("uid")
@@ -236,14 +235,11 @@ func (this *BaseController) JsonResult(errCode int, errMsg string, data ...inter
 // ExecuteViewPathTemplate 执行指定的模板并返回执行结果.
 func (this *BaseController) ExecuteViewPathTemplate(tplName string, data interface{}) (string, error) {
 	var buf bytes.Buffer
-
 	viewPath := this.ViewPath
-
 	if this.ViewPath == "" {
 		viewPath = beego.BConfig.WebConfig.ViewsPath
 
 	}
-
 	if err := beego.ExecuteViewPathTemplate(&buf, tplName, viewPath, data); err != nil {
 		return "", err
 	}
@@ -306,12 +302,13 @@ func (this *BaseController) Sitemap() {
 	this.TplName = "widgets/sitemap.html"
 }
 
+// loginByMemberId 通过memberID登陆
 func (this *BaseController) loginByMemberId(memberId int) (err error) {
 	member, err := models.NewMember().Find(memberId)
 	if member.MemberId == 0 {
 		return errors.New("用户不存在")
 	}
-	//如果没有数据
+	// 如果没有数据
 	if err != nil {
 		return err
 	}

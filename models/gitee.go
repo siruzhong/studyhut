@@ -5,17 +5,19 @@ import (
 	"programming-learning-platform/oauth"
 )
 
-var ModelGitee = new(Gitee)
+/* Gitee用户的登录流程是这样的:
+	1、获取gitee的用户信息，用gitee的用户id查询member_id是否大于0，大于0则表示已绑定了用户信息，直接登录
+	2、未绑定用户，先把gitee数据入库，然后再跳转绑定页面 */
 
+// Gitee 码云结构体
 type Gitee struct {
 	oauth.GiteeUser
 }
 
-//gitee用户的登录流程是这样的
-//1、获取gitee的用户信息，用gitee的用户id查询member_id是否大于0，大于0则表示已绑定了用户信息，直接登录
-//2、未绑定用户，先把gitee数据入库，然后再跳转绑定页面
+// ModelGitee 创建码云结构体
+var ModelGitee = new(Gitee)
 
-// GetUserByGiteeId 根据giteeid获取用户的gitee数据。这里可以查询用户是否绑定了或者数据是否在库中存在
+// GetUserByGiteeId 根据GiteeId获取用户的Gitee数据（这里可以查询用户是否绑定了或者数据是否在库中存在）
 func (this *Gitee) GetUserByGiteeId(id int, cols ...string) (user Gitee, err error) {
 	qs := orm.NewOrm().QueryTable("gitee").Filter("id", id)
 	if len(cols) > 0 {

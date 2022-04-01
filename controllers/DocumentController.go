@@ -49,11 +49,12 @@ var (
   `
 )
 
-// DocumentController struct
+// DocumentController 文档控制器
 type DocumentController struct {
 	BaseController
 }
 
+// Abort404 跳转404
 func (this *DocumentController) Abort404(bookName, bookLink string) {
 	this.Ctx.ResponseWriter.WriteHeader(404)
 	this.Data["BookName"] = bookName
@@ -95,8 +96,7 @@ func isReadable(identify, token string, this *DocumentController) *models.BookRe
 		beego.Error(err)
 		this.Abort("404")
 	}
-
-	//如果文档是私有的
+	// 如果文档是私有的或者当前用户不是管理员
 	if book.PrivatelyOwned == 1 && !this.Member.IsAdministrator() {
 		isOk := false
 		if this.Member != nil {
@@ -105,11 +105,10 @@ func isReadable(identify, token string, this *DocumentController) *models.BookRe
 				isOk = true
 			}
 		}
-
 		if book.PrivateToken != "" && !isOk {
-			//如果有访问的Token，并且该书籍设置了访问Token，并且和用户提供的相匹配，则记录到Session中.
-			//如果用户未提供Token且用户登录了，则判断用户是否参与了该书籍.
-			//如果用户未登录，则从Session中读取Token.
+			// 如果有访问的Token，并且该书籍设置了访问Token，并且和用户提供的相匹配，则记录到Session中.
+			// 如果用户未提供Token且用户登录了，则判断用户是否参与了该书籍.
+			// 如果用户未登录，则从Session中读取Token.
 			if token != "" && strings.EqualFold(token, book.PrivateToken) {
 				this.SetSession(identify, token)
 			} else if token, ok := this.GetSession(identify).(string); !ok || !strings.EqualFold(token, book.PrivateToken) {
@@ -124,7 +123,6 @@ func isReadable(identify, token string, this *DocumentController) *models.BookRe
 			this.Abort("404")
 		}
 	}
-
 	bookResult := book.ToBookResult()
 	if this.Member != nil {
 		rel, err := models.NewRelationship().FindByBookIdAndMemberId(bookResult.BookId, this.Member.MemberId)
@@ -134,7 +132,7 @@ func isReadable(identify, token string, this *DocumentController) *models.BookRe
 			bookResult.RelationshipId = rel.RelationshipId
 		}
 	}
-	//判断是否需要显示评论框
+	// 判断是否需要显示评论框
 	switch bookResult.CommentStatus {
 	case "closed":
 		bookResult.IsDisplayComment = false
@@ -148,31 +146,26 @@ func isReadable(identify, token string, this *DocumentController) *models.BookRe
 	return bookResult
 }
 
-// Index 文档首页
+// Index 公开文档简介
 func (this *DocumentController) Index() {
 	identify := this.Ctx.Input.Param(":key")
 	if identify == "" {
 		this.Abort("404")
 	}
-
 	token := this.GetString("token")
 	if len(strings.TrimSpace(this.GetString("with-password"))) > 0 {
 		this.indexWithPassword()
 		return
 	}
-
 	tab := strings.ToLower(this.GetString("tab"))
-
 	bookResult := isReadable(identify, token, this)
-	if bookResult.BookId == 0 { //没有阅读权限
+	if bookResult.BookId == 0 { // 没有阅读权限
 		this.Redirect(beego.URLFor("HomeController.Index"), 302)
 		return
 	}
-
 	this.TplName = "document/intro.html"
 	bookResult.Lang = utils.GetLang(bookResult.Lang)
 	this.Data["Book"] = bookResult
-
 	switch tab {
 	case "comment", "score":
 	default:
@@ -181,12 +174,6 @@ func (this *DocumentController) Index() {
 	this.Data["Qrcode"] = new(models.Member).GetQrcodeByUid(bookResult.MemberId)
 	this.Data["MyScore"] = new(models.Score).BookScoreByUid(this.Member.MemberId, bookResult.BookId)
 	this.Data["Tab"] = tab
-	if beego.AppConfig.DefaultBool("showWechatCode", false) && bookResult.PrivatelyOwned == 0 {
-		wechatCode := models.NewWechatCode()
-		go wechatCode.CreateWechatCode(bookResult.BookId) //如果已经生成了小程序码，则不会再生成
-		this.Data["Wxacode"] = wechatCode.GetCode(bookResult.BookId)
-	}
-
 	//当前默认展示100条评论
 	this.Data["Comments"], _ = new(models.Comments).Comments(1, 100, bookResult.BookId, 1)
 	this.Data["Menu"], _ = new(models.Document).GetMenuTop(bookResult.BookId)
@@ -202,7 +189,7 @@ func (this *DocumentController) Index() {
 	this.Data["RelateBooks"] = models.NewRelateBook().Lists(bookResult.BookId)
 }
 
-// indexWithPassword 文档首页
+// indexWithPassword 私有文档输入密码
 func (this *DocumentController) indexWithPassword() {
 	identify := this.Ctx.Input.Param(":key")
 	if identify == "" {
@@ -223,21 +210,17 @@ func (this *DocumentController) Read() {
 	identify := this.Ctx.Input.Param(":key")
 	token := this.GetString("token")
 	id := this.GetString(":id")
-
 	if identify == "" || id == "" {
 		this.Abort("404")
 	}
-
-	//如果没有开启你们匿名则跳转到登录
+	// 如果没有开启你们匿名则跳转到登录
 	if !this.EnableAnonymous && this.Member == nil {
 		this.Redirect(beego.URLFor("AccountController.Login"), 302)
 		return
 	}
-
 	bookResult := isReadable(identify, token, this)
 	bookName := bookResult.BookName
 	bookLink := beego.URLFor("DocumentController.Index", ":key", bookResult.Identify)
-
 	this.TplName = "document/" + bookResult.Theme + "_read.html"
 
 	var err error
@@ -443,12 +426,6 @@ func (this *DocumentController) Read() {
 		tree, _ = menuDoc.Find("body").Html()
 	}
 
-	if beego.AppConfig.DefaultBool("showWechatCode", false) && bookResult.PrivatelyOwned == 0 {
-		wechatCode := models.NewWechatCode()
-		go wechatCode.CreateWechatCode(bookResult.BookId) //如果已经生成了小程序码，则不会再生成
-		this.Data["Wxacode"] = wechatCode.GetCode(bookResult.BookId)
-	}
-
 	if wd := this.GetString("wd"); strings.TrimSpace(wd) != "" {
 		this.Data["Keywords"] = models.NewElasticSearchClient().SegWords(wd)
 	}
@@ -630,11 +607,9 @@ func (this *DocumentController) Create() {
 // CreateMulti 批量创建文档
 func (this *DocumentController) CreateMulti() {
 	bookId, _ := this.GetInt("book_id")
-
 	if !(this.Member.MemberId > 0 && bookId > 0) {
 		this.JsonResult(1, "操作失败：只有书籍创始人才能批量添加")
 	}
-
 	var book models.Book
 	o := orm.NewOrm()
 	o.QueryTable("books").Filter("book_id", bookId).Filter("member_id", this.Member.MemberId).One(&book, "book_id")

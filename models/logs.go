@@ -35,10 +35,6 @@ func (m *Logger) TableName() string {
 	return "logs"
 }
 
-// TableEngine 获取数据使用的引擎
-func (m *Logger) TableEngine() string {
-	return "INNODB"
-}
 func (m *Logger) TableNameWithPrefix() string {
 	return conf.GetDatabasePrefix() + m.TableName()
 }

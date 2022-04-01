@@ -7,27 +7,43 @@
     <title>{{.SeoTitle}}</title>
     <meta name="keywords" content="{{.SeoKeywords}}"/>
     <meta name="description" content="{{.SeoDescription}}"/>
-    <link href="{{$.StaticDomain}}/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="{{$.StaticDomain}}/static/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-    <link href="{{$.StaticDomain}}/static/nprogress/nprogress.css" rel="stylesheet">
-    <link href="{{$.StaticDomain}}/static/editor.md/css/editormd.preview.css" rel="stylesheet">
-    <link href="{{$.StaticDomain}}/static/css/toast.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{$.StaticDomain}}/static/katex/katex.min.css">
-	<link rel="stylesheet" href="{{$.StaticDomain}}/static/mind-map/mindmap.css">
-    <script src="{{$.StaticDomain}}/static/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <script src="{{$.StaticDomain}}/static/respond.js/1.4.2/respond.min.js"></script>
-    <link href="/static/css/bookstack.css?version={{$.Version}}"rel="stylesheet">
 
+    <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/static/nprogress/nprogress.css" rel="stylesheet">
+    <link href="/static/editor.md/css/editormd.preview.css" rel="stylesheet">
+    <link href="/static/css/toast.css" rel="stylesheet">
+    <link href="/static/katex/katex.min.css" rel="stylesheet">
+    <link href="/static/mind-map/mindmap.css" rel="stylesheet">
+    <link href="/static/css/bookstack.css?version={{$.Version}}" rel="stylesheet">
+
+    <script src="/static/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="/static/respond.js/1.4.2/respond.min.js"></script>
     <style>
-        .editormd-preview-container ol.linenums li code, .editormd-html-preview ol.linenums li code{
+        .editormd-preview-container ol.linenums li code, .editormd-html-preview ol.linenums li code {
             display: block;
             white-space: pre;
         }
-        li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
-        .editormd-preview-container pre.prettyprint, .editormd-html-preview pre.prettyprint{border-color: transparent;}
-        body{-webkit-overflow-scrolling:touch;}
-        .alink,.alink a{color: #888 !important;}
-        .alink:hover,.alink a:hover{color: red !important;}
+
+        li.L1, li.L3, li.L5, li.L7, li.L9 {
+            background-color: transparent;
+        }
+
+        .editormd-preview-container pre.prettyprint, .editormd-html-preview pre.prettyprint {
+            border-color: transparent;
+        }
+
+        body {
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .alink, .alink a {
+            color: #888 !important;
+        }
+
+        .alink:hover, .alink a:hover {
+            color: red !important;
+        }
     </style>
 </head>
 <body>
@@ -97,7 +113,6 @@
         </div>
     </header>
     <div class="container-fluid manual-body">
-
         <div class="manual-right">
             <div class="manual-article">
                 <div class="article-head">
@@ -119,7 +134,6 @@
                             <span><i class="fa fa-user-o"></i> <a target="_blank" title="来源" href="{{.Model.AuthorURL}}">来源 {{.Model.Author}}</a></span>
                         {{end}}
                         <span><i class="fa fa-eye"></i> 浏览 <i class="read-count">{{.View}}</i></span>
-                        <span class="hidden-xs"><a href="#" data-target="#ModalQRcode" data-toggle="modal"><i class="fa fa-qrcode"></i> 扫码</a></span>
                         <span><a href="#" data-target="#ModalShare" data-toggle="modal"><i class="fa fa-share-alt"></i> 分享</a></span>
                         <span class="pull-right hidden-xs tooltips" title="更新时间"><i class="fa fa-clock-o"></i> <i class="updated-at">{{.UpdatedAt}}</i></span>
                     </div>
@@ -145,12 +159,8 @@
                         </div>
                     </div>
 
-                    {{/*<div class="jump-top">*/}}
-                        {{/*<a href="javascript:;" class="view-backtop"><i class="fa fa-arrow-up" aria-hidden="true"></i></a>*/}}
-                    {{/*</div>*/}}
                     <div class="bookstack-bars">
                         <ul>
-
                             <li class="visible-xs visible-sm bars-menu bars-menu-hide"><a href="/" title="首页"><i class="fa fa-home"></i></a></li>
                             <li class="visible-xs visible-sm bars-menu bars-menu-hide">
                                 <a title="下载" href="javascript:" data-toggle="modal" data-target="#ModalDownload"><i class="fa fa-cloud-download"></i></a>
@@ -181,7 +191,6 @@
                             <li>
                                 <a href="javascript:;" class="view-backtop"><i class="fa fa-arrow-up" aria-hidden="true"></i></a>
                             </li>
-
                         </ul>
                     </div>
                 </div>
@@ -216,7 +225,6 @@
                     <ul class="search-list" id="searchList"></ul>
                 </div>
                 </div>
-
                 <div class="m-copyright">
                     <p>
                         本文档使用 <a href="//www.bookstack.cn" style="color: #0e8c8c;font-weight: bold" target="_blank">BookStack</a> 构建
@@ -234,9 +242,7 @@
     {{str2html $.TONGJI}}
 </div>
 
-
 {{template "widgets/share.html" .}}
-{{template "widgets/qrcode.html" .}}
 
 {{template "widgets/download.html" .}}
 
@@ -250,24 +256,20 @@
 
 <div class="bookstack-viewer"></div>
 
-{{/*<script src="/static/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>*/}}
-<script src="{{$.StaticDomain}}/static/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>
-{{/*<script src="/static/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>*/}}
-<script src="{{$.StaticDomain}}/static/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
-
-
-<script type="text/javascript" src="{{$.StaticDomain}}/static/nprogress/nprogress.js"></script>
-<script type="text/javascript" src="{{$.StaticDomain}}/static/highlight/highlight.js"></script>
-<script type="text/javascript" src="{{$.StaticDomain}}/static/highlight/highlightjs-line-numbers.min.js"></script>
-<script type="text/javascript" src="{{$.StaticDomain}}/static/js/jquery.highlight.js"></script>
-<script type="text/javascript" src="{{$.StaticDomain}}/static/js/toast.script.js"></script>
-<script type="text/javascript" src="{{$.StaticDomain}}/static/js/jquery.qrcode.min.js"></script>
-<script type="text/javascript" src="{{$.StaticDomain}}/static/js/clipboard.min.js"></script>
-<script type="text/javascript" src="{{$.StaticDomain}}/static/katex/katex.min.js"></script>
-<script src="{{$.StaticDomain}}/static/editor.md/lib/marked.min.js" type="text/javascript"></script>
-<script src="{{$.StaticDomain}}/static/mind-map/kity.min.js" type="text/javascript"></script>
-<script src="{{$.StaticDomain}}/static/mind-map/kityminder.core.min.js" type="text/javascript"></script>
-<script src="{{$.StaticDomain}}/static/mind-map/mindmap.min.js" type="text/javascript"></script>
+<script src="/static/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>
+<script src="/static/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="/static/nprogress/nprogress.js"></script>
+<script type="text/javascript" src="/static/highlight/highlight.js"></script>
+<script type="text/javascript" src="/static/highlight/highlightjs-line-numbers.min.js"></script>
+<script type="text/javascript" src="/static/js/jquery.highlight.js"></script>
+<script type="text/javascript" src="/static/js/toast.script.js"></script>
+<script type="text/javascript" src="/static/js/jquery.qrcode.min.js"></script>
+<script type="text/javascript" src="/static/js/clipboard.min.js"></script>
+<script type="text/javascript" src="/static/katex/katex.min.js"></script>
+<script src="/static/editor.md/lib/marked.min.js" type="text/javascript"></script>
+<script src="/static/mind-map/kity.min.js" type="text/javascript"></script>
+<script src="/static/mind-map/kityminder.core.min.js" type="text/javascript"></script>
+<script src="/static/mind-map/mindmap.min.js" type="text/javascript"></script>
 <script type="text/javascript" src="/static/js/bookstack.js?version={{$.Version}}"></script>
 <script type="text/javascript" src="/static/js/main.js?version={{$.Version}}"></script>
 

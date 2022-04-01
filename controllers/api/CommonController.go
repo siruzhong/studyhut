@@ -408,10 +408,6 @@ func (this *CommonController) SearchBook() {
 		this.Response(http.StatusBadRequest, messageBadRequest)
 	}
 
-	if models.NewOption().IsResponseEmptyForAPP(this.Version, wd) {
-		this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"total": 0})
-	}
-
 	var (
 		page, _  = this.GetInt("page", 1)
 		size, _  = this.GetInt("size", 10)
@@ -469,10 +465,6 @@ func (this *CommonController) SearchDoc() {
 	wd := this.GetString("wd")
 	if wd == "" {
 		this.Response(http.StatusBadRequest, messageBadRequest)
-	}
-
-	if models.NewOption().IsResponseEmptyForAPP(this.Version, wd) {
-		this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"total": 0})
 	}
 
 	var (
@@ -570,13 +562,8 @@ func (this *CommonController) Categories() {
 	if err != nil {
 		pid = -1
 	}
-	m := models.NewOption()
 	categories, _ := model.GetAllCategory(pid, 1)
 	for idx, category := range categories {
-		if m.IsResponseEmptyForAPP(this.Version, category.Title) {
-			// 为0，APP端就不会显示该分类
-			category.Cnt = 0
-		}
 		if category.Icon != "" {
 			if category.Icon == "" {
 				category.Icon = "/static/images/cate.png"
@@ -970,23 +957,6 @@ func (this *CommonController) handleReleaseV3(release, bookIdentify string) inte
 	return nodes
 }
 
-// Banners
-func (this *CommonController) Banners() {
-	t := this.GetString("type", "wechat")
-	banners, _ := models.NewBanner().Lists(t)
-	bannerSize, _ := strconv.ParseFloat(models.GetOptionValue("MOBILE_BANNER_SIZE", "2.619"), 64)
-	if bannerSize <= 0 {
-		bannerSize = 2.619
-	}
-
-	for idx, banner := range banners {
-		banner.Image = this.completeLink(banner.Image)
-		banners[idx] = banner
-	}
-
-	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"banners": banners, "size": bannerSize})
-}
-
 func (this *CommonController) Download() {
 	identify := this.GetString("identify")
 	if identify == "" {
@@ -1151,12 +1121,6 @@ func (this *CommonController) HistoryReadBook() {
 		data["books"] = books
 	}
 	this.Response(http.StatusOK, messageSuccess, data)
-}
-
-func (this *CommonController) LatestVersion() {
-	version, _ := strconv.Atoi(models.GetOptionValue("APP_VERSION", "0"))
-	page := models.GetOptionValue("APP_PAGE", "")
-	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"version": version, "url": page})
 }
 
 func (this *CommonController) Rank() {

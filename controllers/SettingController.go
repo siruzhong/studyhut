@@ -180,13 +180,11 @@ func (this *SettingController) Qrcode() {
 				url = "/" + savePath
 			}
 		}
-
 		var member models.Member
 		o := orm.NewOrm()
 		o.QueryTable("md_members").Filter("member_id", this.Member.MemberId).Filter("member_id", this.Member.MemberId).One(&member, "member_id", "wxpay", "alipay")
 		if member.MemberId > 0 {
 			dels := []string{}
-
 			if alipay {
 				dels = append(dels, member.Alipay)
 				member.Alipay = savePath

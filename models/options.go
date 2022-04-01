@@ -14,7 +14,7 @@ type Option struct {
 	OptionTitle string `orm:"column(option_title);size(500)" json:"option_title"`       // 配置标题
 	OptionName  string `orm:"column(option_name);unique;size(80)" json:"option_name"`   // 配置名称
 	OptionValue string `orm:"column(option_value);type(text);null" json:"option_value"` // 配置值
-	Remark      string `orm:"column(remark);type(text);null" json:"remark"`
+	Remark      string `orm:"column(remark);type(text);null" json:"remark"`             // 描述
 }
 
 // optionCache 配置项缓存
@@ -37,11 +37,6 @@ func initOptionCache() {
 // TableName 获取数据表名
 func (m *Option) TableName() string {
 	return "options"
-}
-
-// TableEngine 获取数据使用的引擎
-func (m *Option) TableEngine() string {
-	return "INNODB"
 }
 
 // TableNameWithPrefix 获取带前缀对数据表名
@@ -159,33 +154,14 @@ func (m *Option) Init() error {
 			OptionName:  "DOWNLOAD_LIMIT",
 			OptionTitle: "是否需要登录才能下载电子书",
 		}, {
-			OptionValue: "",
-			OptionName:  "MOBILE_BANNER_SIZE",
-			OptionTitle: "手机端横幅宽高比",
-		}, {
 			OptionValue: "false",
 			OptionName:  "AUTO_HTTPS",
 			OptionTitle: "图片链接HTTP转HTTPS",
 		}, {
-			OptionValue: "0",
-			OptionName:  "APP_VERSION",
-			OptionTitle: "Android APP版本号（数字）",
-		}, {
-			OptionValue: "",
-			OptionName:  "APP_QRCODE",
-			OptionTitle: "是否在用户下载电子书的时候显示APP下载二维码",
-		},
-		{
 			OptionValue: "5",
 			OptionName:  "SIGN_BASIC_REWARD",
 			OptionTitle: "用户每次签到基础奖励阅读时长(秒)",
-		},
-		{
-			OptionValue: "10",
-			OptionName:  "SIGN_APP_REWARD",
-			OptionTitle: "使用APP签到额外奖励阅读时长(秒)",
-		},
-		{
+		}, {
 			OptionValue: "0",
 			OptionName:  "SIGN_CONTINUOUS_REWARD", //
 			OptionTitle: "用户连续签到奖励阅读时长(秒)",
@@ -223,18 +199,7 @@ func (m *Option) Init() error {
 			OptionValue: "",
 			OptionName:  "FORBIDDEN_REFERER",
 			OptionTitle: "禁止的Referer",
-		},
-		{
-			OptionValue: "",
-			OptionName:  "CheckingAppVersion",
-			OptionTitle: "审核中的APP版本",
-		},
-		{
-			OptionValue: "Android, 安卓",
-			OptionName:  "CheckingForbidWords",
-			OptionTitle: "iOS APP提交审核时屏蔽的关键字",
-		},
-		{
+		}, {
 			OptionValue: "1",
 			OptionName:  "DOWNLOAD_INTERVAL",
 			OptionTitle: "每阅读多少秒可以下载一个电子书",
@@ -329,23 +294,4 @@ func (p *Option) All() ([]*Option, error) {
 // ForbiddenReferer 禁止的Referer
 func (m *Option) ForbiddenReferer() []string {
 	return strings.Split(GetOptionValue("FORBIDDEN_REFERER", ""), "\n")
-}
-
-// IsResponseEmptyForAPP 对应用程序对响应是否为空
-func (m *Option) IsResponseEmptyForAPP(requestVersion, word string) (yes bool) {
-	version := GetOptionValue("CheckingAppVersion", "")
-	if version == "" {
-		return
-	}
-	if strings.ToLower(strings.TrimSpace(requestVersion)) == version {
-		words := strings.Split(GetOptionValue("CheckingForbidWords", ""), ",")
-		word = strings.ToLower(strings.TrimSpace(word))
-		for _, item := range words {
-			item = strings.ToLower(strings.TrimSpace(item))
-			if strings.Contains(word, item) {
-				return true
-			}
-		}
-	}
-	return
 }

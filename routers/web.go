@@ -157,7 +157,7 @@ func webRouter() {
 	beego.Router("/history/get", &controllers.DocumentController{}, "get:History")
 	beego.Router("/history/delete", &controllers.DocumentController{}, "*:DeleteHistory")
 	beego.Router("/history/restore", &controllers.DocumentController{}, "*:RestoreHistory")
-	beego.Router("/books/:key", &controllers.DocumentController{}, "*:Index")
+	beego.Router("/books/:key", &controllers.DocumentController{}, "*:Index") // 文档简介
 	beego.Router("/read/:key/:id", &controllers.DocumentController{}, "*:Read")
 	beego.Router("/read/:key/search", &controllers.DocumentController{}, "post:Search")
 	beego.Router("/export/:key", &controllers.DocumentController{}, "*:Export")

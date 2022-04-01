@@ -48,11 +48,6 @@ func (m *Member) TableName() string {
 	return "members"
 }
 
-// TableEngine 获取数据使用的引擎
-func (m *Member) TableEngine() string {
-	return "INNODB"
-}
-
 func (m *Member) TableNameWithPrefix() string {
 	return conf.GetDatabasePrefix() + m.TableName()
 }
@@ -215,7 +210,6 @@ func (m *Member) Add() error {
 // Update 更新用户信息
 func (m *Member) Update(cols ...string) error {
 	o := orm.NewOrm()
-
 	if m.Email == "" {
 		return errors.New("邮箱不能为空")
 	}
@@ -316,9 +310,7 @@ func (m *Member) IsAdministrator() bool {
 // FindByFieldFirst 根据指定字段查找用户
 func (m *Member) FindByFieldFirst(field string, value interface{}) (*Member, error) {
 	o := orm.NewOrm()
-
 	err := o.QueryTable(m.TableNameWithPrefix()).Filter(field, value).OrderBy("-member_id").One(m)
-
 	return m, err
 }
 

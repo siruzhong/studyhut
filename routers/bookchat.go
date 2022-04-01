@@ -20,13 +20,11 @@ func bookChatRouters() {
 	}
 
 	// finished
-	beego.Router(prefix+"/api/v1/version", &api.CommonController{}, "get:LatestVersion")
 	beego.Router(prefix+"/api/v1/register", &api.CommonController{}, "get,post:Register")
 	beego.Router(prefix+"/api/v1/login", &api.CommonController{}, "post:Login")
 	beego.Router(prefix+"/api/v1/login-by-wechat", &api.CommonController{}, "post:LoginByWechat")
 	beego.Router(prefix+"/api/v1/login-bind-wechat", &api.CommonController{}, "post:LoginBindWechat")
 	beego.Router(prefix+"/api/v1/logout", &api.LoginedController{}, "get:Logout")
-	beego.Router(prefix+"/api/v1/banners", &api.CommonController{}, "get:Banners")
 	beego.Router(prefix+"/api/v1/rank", &api.CommonController{}, "get:Rank")
 	beego.Router(prefix+"/api/v1/book/categories", &api.CommonController{}, "get:Categories")
 	beego.Router(prefix+"/api/v1/book/lists", &api.CommonController{}, "get:BookLists")

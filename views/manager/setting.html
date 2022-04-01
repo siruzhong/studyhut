@@ -205,7 +205,6 @@
                             </div>
                         </div>
 
-
                         <div class="form-group">
                             <label>获取访客真实IP的request header字段</label>
                             <input type="text" name="REAL_IP_FIELD" class="form-control" value="{{.REAL_IP_FIELD.OptionValue}}">
@@ -224,33 +223,6 @@
                             <label>同一IP每天允许注册人数( <span class="text-muted">针对APP和小程序接口请求注册的用户。0 表示不限制</span> )</label>
                             <input type="number" name="DAILY_REG_NUM" class="form-control" value="{{.DAILY_REG_NUM.OptionValue}}">
                         </div>
-
-                        <div class="form-group">
-                            <label>移动端横幅宽高比( <span class="text-muted">填写横幅宽高比例数字，如长300，宽100，则填3或3.0。【针对 <a href="/manager/banners" target="_blank">横幅管理</a> 中的移动端横幅比例】</span> )</label>
-                            <input type="number" name="MOBILE_BANNER_SIZE" class="form-control" value="{{.MOBILE_BANNER_SIZE.OptionValue}}">
-                        </div>
-
-
-                        <div class="form-group">
-                            <label>手机APP版本号( <span class="text-muted">应用版本号，必须是整数，用于提示用户升级APP</span> )</label>
-                            <input type="number" name="APP_VERSION" class="form-control" value="{{.APP_VERSION.OptionValue}}">
-                        </div>
-                        <div class="form-group">
-                            <label>App Store审核中的版本( <span class="text-muted">如v1.5.0。iOS APP审核通过后，请务必置空，避免屏蔽的内容无法在APP端显示</span> )</label>
-                            <input type="text" name="CheckingAppVersion" class="form-control" value="{{.CheckingAppVersion.OptionValue}}">
-                        </div>
-                        <div class="form-group">
-                            <label>App Store审核时屏蔽的关键字( <span class="text-muted">多个关键字用英文逗号分隔</span> )</label>
-                            <input type="text" name="CheckingForbidWords" class="form-control" value="{{.CheckingForbidWords.OptionValue}}">
-                        </div>
-                        <div class="form-group">
-                            <label>手机APP下载单页( <span class="text-muted">如果单页链接不为空，则会在导航栏显示APP下载页面</span> )</label>
-                            <input type="text" name="APP_PAGE" class="form-control" value="{{.M_APP_PAGE.OptionValue}}">
-                        </div>
-                        <div class="form-group">
-                            <label>是否展示APP下载二维码( <span class="text-muted">请填写二维码图片链接。如果不为空，则用户在下载电子书的时候展示APP下载二维码</span> )</label>
-                            <input type="text" name="APP_QRCODE" class="form-control" value="{{.APP_QRCODE.OptionValue}}">
-                        </div>
                         <div class="form-group">
                             <label>是否需要登录才能下载电子书( <span class="text-muted">如果需要登录才能下载电子书，请输入相关登录下载提示；置空则表示允许免登录下载</span> )</label>
                             <input type="text" name="DOWNLOAD_LIMIT" class="form-control" value="{{.DOWNLOAD_LIMIT.OptionValue}}">
@@ -261,14 +233,9 @@
                             <input type="text" name="DOWNLOAD_INTERVAL" class="form-control" value="{{.DOWNLOAD_INTERVAL.OptionValue}}">
                         </div>
 
-
                         <div class="form-group">
                             <label>签到基础奖励阅读时长(秒)</label>
                             <input type="number" name="SIGN_BASIC_REWARD" class="form-control" value="{{.SIGN_BASIC_REWARD.OptionValue}}">
-                        </div>
-                        <div class="form-group">
-                            <label>APP签到额外奖励阅读时长(秒)</label>
-                            <input type="number" name="SIGN_APP_REWARD" class="form-control" value="{{.SIGN_APP_REWARD.OptionValue}}">
                         </div>
                         <div class="form-group">
                             <label>用户连续签到奖励阅读时长(秒)</label>
@@ -278,7 +245,6 @@
                             <label>连续签到奖励阅读时长上限(秒)</label>
                             <input type="number" name="SIGN_CONTINUOUS_MAX_REWARD" class="form-control" value="{{.SIGN_CONTINUOUS_MAX_REWARD.OptionValue}}">
                         </div>
-
 
                         <div class="form-group">
                             <label>内容最小阅读计时间隔(秒)</label>
@@ -296,7 +262,6 @@
                             <label>内容阅读无效计时间隔(秒)</label>
                             <input type="number" name="READING_INVALID_INTERVAL" class="form-control" value="{{.READING_INVALID_INTERVAL.OptionValue}}">
                         </div>
-
 
                         <div class="form-group">
                             <label>是否开启全文搜索( <span class="text-muted">每次重新启用全文搜索，请务必点击右上角的 <strong>更新全量索引</strong> 按钮，以免用户搜索不到结果 </span> )</label>
@@ -343,7 +308,6 @@
                             <textarea name="FORBIDDEN_REFERER" PLACEHOLDER=""  class="form-control" rows="4">{{.FORBIDDEN_REFERER.OptionValue}}</textarea>
                         </div>
 
-
                         <div class="form-group">
                             <button type="submit" id="btnSaveBookInfo" class="btn btn-success" data-loading-text="保存中...">保存修改</button>
                             <span id="form-error-message" class="error-message"></span>
@@ -351,20 +315,16 @@
                         </form>
 
                     <div class="clearfix"></div>
-
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-
-{{/*<script src="/static/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>*/}}
-<script src="{{$.StaticDomain}}/static/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>
-{{/*<script src="/static/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>*/}}
-<script src="{{$.StaticDomain}}/static/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
-<script src="{{$.StaticDomain}}/static/js/toast.script.js" type="text/javascript"></script>
-<script src="{{$.StaticDomain}}/static/js/jquery.form.js" type="text/javascript"></script>
+<script src="/static/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>
+<script src="/static/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="/static/js/toast.script.js" type="text/javascript"></script>
+<script src="/static/js/jquery.form.js" type="text/javascript"></script>
 <script src="/static/js/main.js?version={{$.Version}}" type="text/javascript"></script>
 <script type="text/javascript">
     $(function () {

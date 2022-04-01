@@ -204,7 +204,6 @@ func (this *ManagerController) CreateMember() {
 	email := strings.TrimSpace(this.GetString("email"))
 	phone := strings.TrimSpace(this.GetString("phone"))
 	role, _ := this.GetInt("role", 1)
-	//status, _ := this.GetInt("status", 0)
 	if ok, err := regexp.MatchString(conf.RegexpAccount, account); account == "" || !ok || err != nil {
 		this.JsonResult(6001, "账号只能由英文字母数字组成，且在3-50个字符")
 	}
@@ -688,12 +687,7 @@ func (this *ManagerController) Setting() {
 		this.JsonResult(0, "ok")
 	}
 	for _, item := range options {
-		if item.OptionName == "APP_PAGE" {
-			this.Data["APP_PAGE"] = item.OptionValue
-			this.Data["M_APP_PAGE"] = item
-		} else {
-			this.Data[item.OptionName] = item
-		}
+		this.Data[item.OptionName] = item
 	}
 	this.Data["SITE_TITLE"] = this.Option["SITE_NAME"]
 	this.Data["IsSetting"] = true

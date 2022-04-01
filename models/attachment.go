@@ -30,10 +30,6 @@ func (m *Attachment) TableName() string {
 	return "attachment"
 }
 
-// TableEngine 获取数据使用的引擎.
-func (m *Attachment) TableEngine() string {
-	return "INNODB"
-}
 func (m *Attachment) TableNameWithPrefix() string {
 	return conf.GetDatabasePrefix() + m.TableName()
 }

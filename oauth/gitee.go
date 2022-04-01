@@ -40,7 +40,7 @@ func GetGiteeAccessToken(code string) (token GiteeAccessToken, err error) {
 	ClientSecret := beego.AppConfig.String("oauth::giteeClientSecret")
 	Callback := beego.AppConfig.String("oauth::giteeCallback")
 	req := httplib.Post(Api)
-	if strings.HasPrefix(Api, "https") {
+	if strings.HasPrefix(Api, "https") { // 支持 HTTPS 请求，需要设置 client 的 TLS 信息
 		req.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
 	}
 	req.Param("grant_type", "authorization_code")
@@ -55,7 +55,7 @@ func GetGiteeAccessToken(code string) (token GiteeAccessToken, err error) {
 }
 
 // GetGiteeUserInfo 获取用户信息
-func GetGiteeUserInfo(accessToken string) (info GiteeUser, err error) {
+func GetGiteeUserInfo(accessToken string) (userInfo GiteeUser, err error) {
 	var resp string
 	Api := beego.AppConfig.String("oauth::giteeUserInfo") + "?access_token=" + accessToken
 	req := httplib.Get(Api)
@@ -64,7 +64,7 @@ func GetGiteeUserInfo(accessToken string) (info GiteeUser, err error) {
 	}
 	if resp, err = req.String(); err == nil {
 		beego.Debug(resp)
-		err = json.Unmarshal([]byte(resp), &info)
+		err = json.Unmarshal([]byte(resp), &userInfo)
 	}
 	return
 }

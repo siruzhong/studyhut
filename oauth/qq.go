@@ -20,7 +20,7 @@ type QQAccessToken struct {
 
 // QQUser 用户数据(用户使用qq登录的时候，直接根据qq的id获取数据)
 type QQUser struct {
-	Ret       int    `json:"ret"`
+	Ret       int    `json:"gret"`
 	Msg       string `json:"msg"`
 	AvatarURL string `json:"figureurl_qq_2"` //用户头像链接
 	Name      string `json:"nickname"`       //昵称

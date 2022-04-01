@@ -47,11 +47,6 @@ func (m *Document) TableName() string {
 	return "documents"
 }
 
-// TableEngine 获取数据使用的引擎
-func (m *Document) TableEngine() string {
-	return "INNODB"
-}
-
 func (m *Document) TableNameWithPrefix() string {
 	return conf.GetDatabasePrefix() + m.TableName()
 }

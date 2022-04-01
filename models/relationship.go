@@ -27,11 +27,6 @@ func (m *Relationship) TableNameWithPrefix() string {
 	return conf.GetDatabasePrefix() + m.TableName()
 }
 
-// TableEngine 获取数据使用的引擎
-func (m *Relationship) TableEngine() string {
-	return "INNODB"
-}
-
 // TableUnique 联合唯一键
 func (m *Relationship) TableUnique() [][]string {
 	return [][]string{
@@ -54,9 +49,7 @@ func (m *Relationship) Find(id int) (*Relationship, error) {
 // FindFounder 查询指定书籍的创始人
 func (m *Relationship) FindFounder(bookId int) (*Relationship, error) {
 	o := orm.NewOrm()
-
 	err := o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", bookId).Filter("role_id", 0).One(m)
-
 	return m, err
 }
 
@@ -64,7 +57,6 @@ func (m *Relationship) UpdateRoleId(bookId, memberId, roleId int) (*Relationship
 	o := orm.NewOrm()
 	book := NewBook()
 	book.BookId = bookId
-
 	if err := o.Read(book); err != nil {
 		logs.Error("UpdateRoleId => ", err)
 		return m, errors.New("书籍不存在")
@@ -86,9 +78,7 @@ func (m *Relationship) UpdateRoleId(bookId, memberId, roleId int) (*Relationship
 	} else {
 		_, err = o.Insert(m)
 	}
-
 	return m, err
-
 }
 
 func (m *Relationship) FindForRoleId(bookId, memberId int) (int, error) {

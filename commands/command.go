@@ -91,7 +91,6 @@ func RegisterModel() {
 		new(models.RelateBook),
 		new(models.Auth),
 		new(models.Banner),
-		new(models.WechatCode),
 		new(models.Wechat),
 		new(models.RegLimit),
 		new(models.AdsPosition),
@@ -130,9 +129,6 @@ func RegisterCommand() {
 	if len(os.Args) >= 2 && os.Args[1] == "install" {
 		ResolveCommand(os.Args[2:])
 		Install()
-	} else if len(os.Args) >= 2 && os.Args[1] == "version" {
-		ResolveCommand(os.Args[2:])
-		CheckUpdate()
 	} else if len(os.Args) >= 2 && os.Args[1] == "migrate" {
 		ResolveCommand(os.Args[2:])
 		migrate.RunMigration()
@@ -239,7 +235,6 @@ func ResolveCommand(args []string) {
 	os.MkdirAll(uploads, 0666)
 
 	beego.BConfig.WebConfig.StaticDir["/static"] = filepath.Join("static")
-	// beego.BConfig.WebConfig.StaticDir["/uploads"] = uploads
 	beego.BConfig.WebConfig.ViewsPath = filepath.Join("views")
 
 	fonts := filepath.Join("static", "fonts")
