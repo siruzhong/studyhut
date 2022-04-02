@@ -3,6 +3,7 @@ package controllers
 import (
 	"errors"
 	"fmt"
+	"programming-learning-platform/constant"
 	"regexp"
 	"strings"
 	"time"
@@ -11,7 +12,6 @@ import (
 	"github.com/astaxie/beego/cache"
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/utils/captcha"
-	"programming-learning-platform/conf"
 	"programming-learning-platform/models"
 	"programming-learning-platform/oauth"
 	"programming-learning-platform/utils"
@@ -233,7 +233,7 @@ func (this *AccountController) Login() {
 	}
 	this.Data["OauthLogin"] = oauthLogin
 	// 如果Cookie中存在登录信息
-	if cookie, ok := this.GetSecureCookie(conf.GetAppKey(), "login"); ok {
+	if cookie, ok := this.GetSecureCookie(utils.GetAppKey(), "login"); ok {
 		if err := utils.Decode(cookie, &remember); err == nil {
 			if err = this.loginByMemberId(remember.MemberId); err == nil {
 				this.Redirect(beego.URLFor("HomeController.Index"), 302)
@@ -261,7 +261,7 @@ func (this *AccountController) Login() {
 		remember.Time = time.Now()
 		v, err := utils.Encode(remember)
 		if err == nil {
-			this.SetSecureCookie(conf.GetAppKey(), "login", v, 24*3600*365)
+			this.SetSecureCookie(utils.GetAppKey(), "login", v, 24*3600*365)
 		}
 		this.JsonResult(0, "ok")
 	}
@@ -326,14 +326,14 @@ func (this *AccountController) Bind() {
 			this.JsonResult(6003, "登录密码与确认密码不一致")
 		}
 
-		if ok, err := regexp.MatchString(conf.RegexpAccount, account); account == "" || !ok || err != nil {
+		if ok, err := regexp.MatchString(constant.RegexpAccount, account); account == "" || !ok || err != nil {
 			this.JsonResult(6001, "用户名只能由英文字母数字组成，且在3-50个字符")
 		}
 		if l := strings.Count(password1, ""); password1 == "" || l > 50 || l < 6 {
 			this.JsonResult(6002, "密码必须在6-50个字符之间")
 		}
 
-		if ok, err := regexp.MatchString(conf.RegexpEmail, email); !ok || err != nil || email == "" {
+		if ok, err := regexp.MatchString(constant.RegexpEmail, email); !ok || err != nil || email == "" {
 			this.JsonResult(6004, "邮箱格式不正确")
 		}
 		if l := strings.Count(nickname, "") - 1; l < 2 || l > 20 {
@@ -344,8 +344,8 @@ func (this *AccountController) Bind() {
 		member.Account = account
 		member.Nickname = nickname
 		member.Password = password1
-		member.Role = conf.MemberGeneralRole
-		member.Avatar = conf.GetDefaultAvatar()
+		member.Role = constant.MemberGeneralRole
+		member.Avatar = utils.GetDefaultAvatar()
 		member.CreateAt = 0
 		member.Email = email
 		member.Status = 0
@@ -394,7 +394,7 @@ func (this *AccountController) FindPassword() {
 		if member.Status != 0 {
 			this.JsonResult(6007, "账号已被禁用")
 		}
-		if member.AuthMethod == conf.AuthMethodLDAP {
+		if member.AuthMethod == constant.AuthMethodLDAP {
 			this.JsonResult(6011, "当前用户不支持找回密码")
 		}
 		count, err := models.NewMemberToken().FindSendCount(email, time.Now().Add(-1*time.Hour), time.Now())
@@ -406,7 +406,7 @@ func (this *AccountController) FindPassword() {
 			this.JsonResult(6008, "发送次数太多，请稍候再试")
 		}
 		memberToken := models.NewMemberToken()
-		memberToken.Token = string(utils.Krand(32, conf.KC_RAND_KIND_ALL)) // 随机生成32位的字符串
+		memberToken.Token = string(utils.Krand(32, constant.KC_RAND_KIND_ALL)) // 随机生成32位的字符串
 		memberToken.Email = email
 		memberToken.MemberId = member.MemberId
 		memberToken.IsValid = false
@@ -523,7 +523,7 @@ func (this *AccountController) ValidEmail() {
 func (this *AccountController) Logout() {
 	this.SetMember(models.Member{})
 
-	this.SetSecureCookie(conf.GetAppKey(), "login", "", -3600)
+	this.SetSecureCookie(utils.GetAppKey(), "login", "", -3600)
 
 	this.Redirect(beego.URLFor("AccountController.Login"), 302)
 }

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/url"
+	"programming-learning-platform/constant"
 	"strconv"
 	"strings"
 	"time"
@@ -16,7 +17,6 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/conf"
 	"programming-learning-platform/models"
 	"programming-learning-platform/utils"
 )
@@ -84,12 +84,12 @@ func (this *BaseController) Prepare() {
 	this.StaticDomain = strings.Trim(beego.AppConfig.DefaultString("static_domain", ""), "/")
 	this.Data["StaticDomain"] = this.StaticDomain
 	// 从session中获取用户信息
-	if member, ok := this.GetSession(conf.LoginSessionName).(models.Member); ok && member.MemberId > 0 {
+	if member, ok := this.GetSession(constant.LoginSessionName).(models.Member); ok && member.MemberId > 0 {
 		m, _ := models.NewMember().Find(member.MemberId)
 		this.Member = m
 	} else {
 		// 如果Cookie中存在登录信息，从cookie中获取用户信息
-		if cookie, ok := this.GetSecureCookie(conf.GetAppKey(), "login"); ok {
+		if cookie, ok := this.GetSecureCookie(utils.GetAppKey(), "login"); ok {
 			var remember CookieRemember
 			err := utils.Decode(cookie, &remember)
 			if err == nil {
@@ -152,7 +152,7 @@ func (this *BaseController) Prepare() {
 	if this.Member.MemberId > 0 {
 		ShowCreateBookEntrance = true
 		if opt, err := models.NewOption().FindByName("ALL_CAN_WRITE_BOOK"); err == nil {
-			if opt.OptionValue == "false" && this.Member.Role == conf.MemberGeneralRole {
+			if opt.OptionValue == "false" && this.Member.Role == constant.MemberGeneralRole {
 				// 如果用户现在是普通用户，但是之前是作者或者之前有新建书籍书籍的权限并且创建了书籍，则也给用户显示入口
 				ShowCreateBookEntrance = models.NewRelationship().HasRelatedBook(this.Member.MemberId)
 			}
@@ -194,11 +194,11 @@ func (this *BaseController) Prepare() {
 // SetMember 获取或设置当前登录用户信息,如果 MemberId 小于 0 则标识删除 Session
 func (this *BaseController) SetMember(member models.Member) {
 	if member.MemberId <= 0 {
-		this.DelSession(conf.LoginSessionName)
+		this.DelSession(constant.LoginSessionName)
 		this.DelSession("uid")
 		this.DestroySession()
 	} else {
-		this.SetSession(conf.LoginSessionName, member)
+		this.SetSession(constant.LoginSessionName, member)
 		this.SetSession("uid", member.MemberId)
 	}
 }
@@ -321,7 +321,7 @@ func (this *BaseController) loginByMemberId(memberId int) (err error) {
 	remember.Time = time.Now()
 	v, err := utils.Encode(remember)
 	if err == nil {
-		this.SetSecureCookie(conf.GetAppKey(), "login", v, 24*3600*365)
+		this.SetSecureCookie(utils.GetAppKey(), "login", v, 24*3600*365)
 	}
 	return err
 }
@@ -566,7 +566,7 @@ func (this *BaseController) SignToday() {
 // forbidGeneralRole 判断用户角色是否为读者
 func (this *BaseController) forbidGeneralRole() bool {
 	// 如果只有作者和管理员才能写作的话，那么已创建了书籍的普通用户无法将书籍转为公开或者是私密分享
-	if this.Member.Role == conf.MemberGeneralRole && models.GetOptionValue("ALL_CAN_WRITE_BOOK", "true") != "true" {
+	if this.Member.Role == constant.MemberGeneralRole && models.GetOptionValue("ALL_CAN_WRITE_BOOK", "true") != "true" {
 		return true
 	}
 	return false

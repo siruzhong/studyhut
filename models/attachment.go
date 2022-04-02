@@ -3,11 +3,11 @@ package models
 
 import (
 	"os"
+	"programming-learning-platform/constant"
 	"strings"
 	"time"
 
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/conf"
 	"programming-learning-platform/utils"
 )
 
@@ -31,7 +31,7 @@ func (m *Attachment) TableName() string {
 }
 
 func (m *Attachment) TableNameWithPrefix() string {
-	return conf.GetDatabasePrefix() + m.TableName()
+	return utils.GetDatabasePrefix() + m.TableName()
 }
 
 func NewAttachment() *Attachment {
@@ -61,7 +61,7 @@ func (m *Attachment) Delete() (err error) {
 
 func (m *Attachment) Find(id int) (*Attachment, error) {
 	if id <= 0 {
-		return m, ErrInvalidParameter
+		return m, constant.ErrInvalidParameter
 	}
 	o := orm.NewOrm()
 	err := o.QueryTable(m.TableNameWithPrefix()).Filter("attachment_id", id).One(m)
@@ -74,10 +74,9 @@ func (m *Attachment) FindListByDocumentId(docId int) (attaches []*Attachment, er
 	return
 }
 
-//分页查询附件
+// FindToPager 分页查询附件
 func (m *Attachment) FindToPager(pageIndex, pageSize int) (attachList []*AttachmentResult, totalCount int64, err error) {
 	o := orm.NewOrm()
-
 	totalCount, err = o.QueryTable(m.TableNameWithPrefix()).Count()
 	if err != nil {
 		return

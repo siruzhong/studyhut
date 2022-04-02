@@ -1,10 +1,10 @@
 package controllers
 
 import (
+	"programming-learning-platform/constant"
 	"time"
 
 	"github.com/astaxie/beego"
-	"programming-learning-platform/conf"
 	"programming-learning-platform/models"
 	"programming-learning-platform/utils"
 )
@@ -28,9 +28,9 @@ func (this *UserController) Prepare() {
 	this.Data["User"] = this.UcenterMember
 	this.Data["JoinedDays"] = int(time.Now().Sub(this.UcenterMember.CreateTime).Seconds()/(24*3600)) + 1
 	this.Data["TotalReading"] = utils.FormatReadingTime(this.UcenterMember.TotalReadingTime)
-	this.Data["MonthReading"] = utils.FormatReadingTime(rt.GetReadingTime(this.UcenterMember.MemberId, models.PeriodMonth))
-	this.Data["WeekReading"] = utils.FormatReadingTime(rt.GetReadingTime(this.UcenterMember.MemberId, models.PeriodWeek))
-	this.Data["TodayReading"] = utils.FormatReadingTime(rt.GetReadingTime(this.UcenterMember.MemberId, models.PeriodDay))
+	this.Data["MonthReading"] = utils.FormatReadingTime(rt.GetReadingTime(this.UcenterMember.MemberId, constant.PeriodMonth))
+	this.Data["WeekReading"] = utils.FormatReadingTime(rt.GetReadingTime(this.UcenterMember.MemberId, constant.PeriodWeek))
+	this.Data["TodayReading"] = utils.FormatReadingTime(rt.GetReadingTime(this.UcenterMember.MemberId, constant.PeriodDay))
 	this.Data["Tab"] = "share"
 	this.Data["IsSign"] = false
 	if this.Member != nil && this.Member.MemberId > 0 {
@@ -50,7 +50,7 @@ func (this *UserController) Index() {
 	this.Data["Books"] = books
 
 	if totalCount > 0 {
-		html := utils.NewPaginations(conf.RollPage, totalCount, pageSize, page, beego.URLFor("UserController.Index", ":username", this.UcenterMember.Account), "")
+		html := utils.NewPaginations(constant.RollPage, totalCount, pageSize, page, beego.URLFor("UserController.Index", ":username", this.UcenterMember.Account), "")
 		this.Data["PageHtml"] = html
 	} else {
 		this.Data["PageHtml"] = ""
@@ -78,7 +78,7 @@ func (this *UserController) Collection() {
 	this.Data["Books"] = books
 
 	if totalCount > 0 {
-		html := utils.NewPaginations(conf.RollPage, int(totalCount), pageSize, page, beego.URLFor("UserController.Collection", ":username", this.UcenterMember.Account), "")
+		html := utils.NewPaginations(constant.RollPage, int(totalCount), pageSize, page, beego.URLFor("UserController.Collection", ":username", this.UcenterMember.Account), "")
 		this.Data["PageHtml"] = html
 	} else {
 		this.Data["PageHtml"] = ""
@@ -102,7 +102,7 @@ func (this *UserController) Follow() {
 	}
 	fans, totalCount, _ := new(models.Fans).GetFollowList(this.UcenterMember.MemberId, page, pageSize)
 	if totalCount > 0 {
-		html := utils.NewPaginations(conf.RollPage, int(totalCount), pageSize, page, beego.URLFor("UserController.Follow", ":username", this.UcenterMember.Account), "")
+		html := utils.NewPaginations(constant.RollPage, int(totalCount), pageSize, page, beego.URLFor("UserController.Follow", ":username", this.UcenterMember.Account), "")
 		this.Data["PageHtml"] = html
 	} else {
 		this.Data["PageHtml"] = ""
@@ -126,7 +126,7 @@ func (this *UserController) Fans() {
 	}
 	fans, totalCount, _ := new(models.Fans).GetFansList(this.UcenterMember.MemberId, page, pageSize)
 	if totalCount > 0 {
-		html := utils.NewPaginations(conf.RollPage, int(totalCount), pageSize, page, beego.URLFor("UserController.Fans", ":username", this.UcenterMember.Account), "")
+		html := utils.NewPaginations(constant.RollPage, int(totalCount), pageSize, page, beego.URLFor("UserController.Fans", ":username", this.UcenterMember.Account), "")
 		this.Data["PageHtml"] = html
 	} else {
 		this.Data["PageHtml"] = ""

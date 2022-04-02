@@ -3,12 +3,12 @@ package commands
 import (
 	"fmt"
 	"os"
+	"programming-learning-platform/utils"
 	"strings"
 	"time"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/conf"
 	"programming-learning-platform/models"
 )
 
@@ -63,7 +63,7 @@ func initialization() {
 		book.DocCount = 0
 		book.CommentCount = 0
 		book.Version = time.Now().Unix()
-		book.Cover = conf.GetDefaultCover()
+		book.Cover = utils.GetDefaultCover()
 		book.Editor = "markdown"
 		book.Theme = "default"
 		//设置默认时间，因为beego的orm好像无法设置datetime的默认值

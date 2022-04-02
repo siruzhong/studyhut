@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"math"
+	"programming-learning-platform/constant"
 
 	"github.com/astaxie/beego"
-	"programming-learning-platform/conf"
 	"programming-learning-platform/models"
 	"programming-learning-platform/utils"
 )
@@ -46,7 +46,7 @@ func (this *LabelController) Index() {
 		return
 	}
 	if totalCount > 0 {
-		html := utils.NewPaginations(conf.RollPage, totalCount, pageSize, pageIndex, beego.URLFor("LabelController.Index", ":key", labelName), "")
+		html := utils.NewPaginations(constant.RollPage, totalCount, pageSize, pageIndex, beego.URLFor("LabelController.Index", ":key", labelName), "")
 		this.Data["PageHtml"] = html
 	} else {
 		this.Data["PageHtml"] = ""
@@ -71,7 +71,7 @@ func (this *LabelController) List() {
 		this.ShowErrorPage(50001, err.Error())
 	}
 	if totalCount > 0 {
-		html := utils.NewPaginations(conf.RollPage, totalCount, pageSize, pageIndex, beego.URLFor("LabelController.List"), "")
+		html := utils.NewPaginations(constant.RollPage, totalCount, pageSize, pageIndex, beego.URLFor("LabelController.List"), "")
 		this.Data["PageHtml"] = html
 	} else {
 		this.Data["PageHtml"] = ""

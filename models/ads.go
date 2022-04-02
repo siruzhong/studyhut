@@ -3,7 +3,7 @@ package models
 import (
 	"fmt"
 	"math/rand"
-	"programming-learning-platform/conf"
+	"programming-learning-platform/constant"
 	"sync"
 	"time"
 
@@ -52,137 +52,137 @@ func InstallAdsPosition() {
 		{
 			IsMobile: false,
 			Title:    "[全局]页面底部",
-			Identify: conf.AdsPositionGlobalFooter,
+			Identify: constant.AdsPositionGlobalFooter,
 		},
 		{
 			IsMobile: false,
 			Title:    "[友链]顶部",
-			Identify: conf.AdsPositionBeforeFriendLink,
+			Identify: constant.AdsPositionBeforeFriendLink,
 		},
 		{
 			IsMobile: false,
 			Title:    "[首页]最新推荐下方",
-			Identify: conf.AdsPositionUnderLatestRecommend,
+			Identify: constant.AdsPositionUnderLatestRecommend,
 		},
 		{
 			IsMobile: false,
 			Title:    "[搜索页]搜索结果右侧",
-			Identify: conf.AdsPositionSearchRight,
+			Identify: constant.AdsPositionSearchRight,
 		},
 		{
 			IsMobile: false,
 			Title:    "[搜索页]搜索结果上方",
-			Identify: conf.AdsPositionSearchTop,
+			Identify: constant.AdsPositionSearchTop,
 		},
 		{
 			IsMobile: false,
 			Title:    "[搜索页]搜索结果下方",
-			Identify: conf.AdsPositionSearchBottom,
+			Identify: constant.AdsPositionSearchBottom,
 		},
 		{
 			IsMobile: false,
 			Title:    "[书籍介绍页]书籍名称下方",
-			Identify: conf.AdsPositionUnderBookName,
+			Identify: constant.AdsPositionUnderBookName,
 		},
 		{
 			IsMobile: false,
 			Title:    "[书籍介绍页]文档概述上方",
-			Identify: conf.AdsPositionBeforeMenu,
+			Identify: constant.AdsPositionBeforeMenu,
 		},
 		{
 			IsMobile: false,
 			Title:    "[书籍介绍页]相关书籍上方",
-			Identify: conf.AdsPositionBeforeRelatedBooks,
+			Identify: constant.AdsPositionBeforeRelatedBooks,
 		},
 		{
 			IsMobile: false,
 			Title:    "[内容阅读页]内容上方",
-			Identify: conf.AdsPositionContentTop,
+			Identify: constant.AdsPositionContentTop,
 		},
 		{
 			IsMobile: false,
 			Title:    "[内容阅读页]内容下方",
-			Identify: conf.AdsPositionContentBottom,
+			Identify: constant.AdsPositionContentBottom,
 		},
 		{
 			IsMobile: false,
 			Title:    "[发现页]导航栏下方",
-			Identify: conf.AdsPositionUnderExploreNav,
+			Identify: constant.AdsPositionUnderExploreNav,
 		},
 		{
 			IsMobile: false,
 			Title:    "[发现页]分页上方",
-			Identify: conf.AdsPositionBeforeExplorePagination,
+			Identify: constant.AdsPositionBeforeExplorePagination,
 		},
 		{
 			IsMobile: false,
 			Title:    "[发现页]分页下方",
-			Identify: conf.AdsPositionUnderExplorePagination,
+			Identify: constant.AdsPositionUnderExplorePagination,
 		},
 		{
 			IsMobile: true,
 			Title:    "[全局]页面底部",
-			Identify: conf.AdsPositionGlobalFooter,
+			Identify: constant.AdsPositionGlobalFooter,
 		},
 		{
 			IsMobile: true,
 			Title:    "[友链]顶部",
-			Identify: conf.AdsPositionBeforeFriendLink,
+			Identify: constant.AdsPositionBeforeFriendLink,
 		},
 		{
 			IsMobile: true,
 			Title:    "[首页]最新推荐下方",
-			Identify: conf.AdsPositionUnderLatestRecommend,
+			Identify: constant.AdsPositionUnderLatestRecommend,
 		},
 		{
 			IsMobile: true,
 			Title:    "[搜索页]搜索结果上方",
-			Identify: conf.AdsPositionSearchTop,
+			Identify: constant.AdsPositionSearchTop,
 		},
 		{
 			IsMobile: true,
 			Title:    "[搜索页]搜索结果下方",
-			Identify: conf.AdsPositionSearchBottom,
+			Identify: constant.AdsPositionSearchBottom,
 		},
 		{
 			IsMobile: true,
 			Title:    "[书籍介绍页]书籍名称下方",
-			Identify: conf.AdsPositionUnderBookName,
+			Identify: constant.AdsPositionUnderBookName,
 		},
 		{
 			IsMobile: true,
 			Title:    "[书籍介绍页]文档概述上方",
-			Identify: conf.AdsPositionBeforeMenu,
+			Identify: constant.AdsPositionBeforeMenu,
 		},
 		{
 			IsMobile: true,
 			Title:    "[书籍介绍页]相关书籍上方",
-			Identify: conf.AdsPositionBeforeRelatedBooks,
+			Identify: constant.AdsPositionBeforeRelatedBooks,
 		},
 		{
 			IsMobile: true,
 			Title:    "[发现页]导航栏下方",
-			Identify: conf.AdsPositionUnderExploreNav,
+			Identify: constant.AdsPositionUnderExploreNav,
 		},
 		{
 			IsMobile: true,
 			Title:    "[发现页]分页上方",
-			Identify: conf.AdsPositionBeforeExplorePagination,
+			Identify: constant.AdsPositionBeforeExplorePagination,
 		},
 		{
 			IsMobile: true,
 			Title:    "[发现页]分页下方",
-			Identify: conf.AdsPositionUnderExplorePagination,
+			Identify: constant.AdsPositionUnderExplorePagination,
 		},
 		{
 			IsMobile: true,
 			Title:    "[内容阅读页]内容上方",
-			Identify: conf.AdsPositionContentTop,
+			Identify: constant.AdsPositionContentTop,
 		},
 		{
 			IsMobile: true,
 			Title:    "[内容阅读页]内容下方",
-			Identify: conf.AdsPositionContentBottom,
+			Identify: constant.AdsPositionContentBottom,
 		},
 	}
 	o := orm.NewOrm()

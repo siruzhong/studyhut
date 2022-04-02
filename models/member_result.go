@@ -1,10 +1,10 @@
 package models
 
 import (
+	"programming-learning-platform/constant"
 	"time"
 
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/conf"
 )
 
 // MemberRelationshipResult
@@ -49,11 +49,11 @@ func (m *MemberRelationshipResult) FromMember(member *Member) *MemberRelationshi
 
 // ResolveRoleName 角色名称
 func (m *MemberRelationshipResult) ResolveRoleName() *MemberRelationshipResult {
-	if m.RoleId == conf.BookAdmin {
+	if m.RoleId == constant.BookAdmin {
 		m.RoleName = "管理者"
-	} else if m.RoleId == conf.BookEditor {
+	} else if m.RoleId == constant.BookEditor {
 		m.RoleName = "编辑者"
-	} else if m.RoleId == conf.BookObserver {
+	} else if m.RoleId == constant.BookObserver {
 		m.RoleName = "观察者"
 	}
 	return m

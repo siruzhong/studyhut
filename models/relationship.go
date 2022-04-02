@@ -2,11 +2,12 @@ package models
 
 import (
 	"errors"
+	"programming-learning-platform/constant"
+	"programming-learning-platform/utils"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/conf"
 )
 
 // Relationship 关联关系
@@ -24,7 +25,7 @@ func (m *Relationship) TableName() string {
 
 // TableNameWithPrefix 获取带前缀带数据表名
 func (m *Relationship) TableNameWithPrefix() string {
-	return conf.GetDatabasePrefix() + m.TableName()
+	return utils.GetDatabasePrefix() + m.TableName()
 }
 
 // TableUnique 联合唯一键
@@ -68,7 +69,7 @@ func (m *Relationship) UpdateRoleId(bookId, memberId, roleId int) (*Relationship
 		m.RoleId = roleId
 	} else if err != nil {
 		return m, err
-	} else if m.RoleId == conf.BookFounder {
+	} else if m.RoleId == constant.BookFounder {
 		return m, errors.New("不能变更创始人的权限")
 	}
 	m.RoleId = roleId
@@ -116,7 +117,7 @@ func (m *Relationship) DeleteByBookIdAndMemberId(bookId, memberId int) error {
 	if err == orm.ErrNoRows {
 		return errors.New("用户未参与该书籍")
 	}
-	if m.RoleId == conf.BookFounder {
+	if m.RoleId == constant.BookFounder {
 		return errors.New("不能删除创始人")
 	}
 	_, err = o.Delete(m)
@@ -139,7 +140,7 @@ func (m *Relationship) Transfer(bookId, founderId, receiveId int) error {
 	if err != nil {
 		return err
 	}
-	if founder.RoleId != conf.BookFounder {
+	if founder.RoleId != constant.BookFounder {
 		return errors.New("转让者不是创始人")
 	}
 	receive := NewRelationship()
@@ -151,10 +152,10 @@ func (m *Relationship) Transfer(bookId, founderId, receiveId int) error {
 	}
 	o.Begin()
 
-	founder.RoleId = conf.BookAdmin
+	founder.RoleId = constant.BookAdmin
 
 	receive.MemberId = receiveId
-	receive.RoleId = conf.BookFounder
+	receive.RoleId = constant.BookFounder
 	receive.BookId = bookId
 
 	if err := founder.Update(); err != nil {

@@ -1,7 +1,8 @@
-package models
+package constant
 
 import "errors"
 
+// 错误类型
 var (
 	ErrMemberNoExist             = errors.New("用户不存在")
 	ErrMemberExist               = errors.New("用户已存在")

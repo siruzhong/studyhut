@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"net/url"
 	"path/filepath"
+	"programming-learning-platform/constant"
 	"programming-learning-platform/utils/store"
 	"strings"
 
 	"github.com/astaxie/beego"
-	"programming-learning-platform/conf"
 	"programming-learning-platform/models"
 	"programming-learning-platform/utils"
 )
@@ -115,13 +115,13 @@ func (this *StaticController) isMedia(path string) (yes bool) {
 func (this *StaticController) isBookOwner() (yes bool) {
 	memberID := 0
 	// 从session中获取用户信息
-	if member, ok := this.GetSession(conf.LoginSessionName).(models.Member); ok {
+	if member, ok := this.GetSession(constant.LoginSessionName).(models.Member); ok {
 		memberID = member.MemberId
 	}
 
 	if memberID <= 0 {
 		// 如果Cookie中存在登录信息，从cookie中获取用户信息
-		if cookie, ok := this.GetSecureCookie(conf.GetAppKey(), "login"); ok {
+		if cookie, ok := this.GetSecureCookie(utils.GetAppKey(), "login"); ok {
 			var remember CookieRemember
 			if err := utils.Decode(cookie, &remember); err == nil {
 				memberID = remember.MemberId

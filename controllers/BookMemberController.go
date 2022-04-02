@@ -2,10 +2,10 @@ package controllers
 
 import (
 	"errors"
+	"programming-learning-platform/constant"
 
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/conf"
 	"programming-learning-platform/models"
 )
 
@@ -73,7 +73,7 @@ func (this *BookMemberController) ChangeRole() {
 
 	book, err := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
 	if err != nil {
-		if err == models.ErrPermissionDenied {
+		if err == constant.ErrPermissionDenied {
 			this.JsonResult(403, "权限不足")
 		}
 		if err == orm.ErrNoRows {
@@ -126,7 +126,7 @@ func (this *BookMemberController) RemoveMember() {
 	book, err := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
 
 	if err != nil {
-		if err == models.ErrPermissionDenied {
+		if err == constant.ErrPermissionDenied {
 			this.JsonResult(403, "权限不足")
 		}
 		if err == orm.ErrNoRows {
@@ -135,7 +135,7 @@ func (this *BookMemberController) RemoveMember() {
 		this.JsonResult(6002, err.Error())
 	}
 	//如果不是创始人也不是管理员则不能操作
-	if book.RoleId != conf.BookFounder && book.RoleId != conf.BookAdmin {
+	if book.RoleId != constant.BookFounder && book.RoleId != constant.BookAdmin {
 		this.JsonResult(403, "权限不足")
 	}
 
@@ -151,7 +151,7 @@ func (this *BookMemberController) IsPermission() (*models.BookResult, error) {
 	book, err := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
 
 	if err != nil {
-		if err == models.ErrPermissionDenied {
+		if err == constant.ErrPermissionDenied {
 			return book, errors.New("权限不足")
 		}
 		if err == orm.ErrNoRows {
@@ -159,7 +159,7 @@ func (this *BookMemberController) IsPermission() (*models.BookResult, error) {
 		}
 		return book, err
 	}
-	if book.RoleId != conf.BookAdmin && book.RoleId != conf.BookFounder {
+	if book.RoleId != constant.BookAdmin && book.RoleId != constant.BookFounder {
 		return book, errors.New("权限不足")
 	}
 	return book, nil

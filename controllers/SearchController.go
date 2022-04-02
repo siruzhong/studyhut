@@ -2,11 +2,11 @@ package controllers
 
 import (
 	"fmt"
+	"programming-learning-platform/constant"
 	"strings"
 	"time"
 
 	"github.com/astaxie/beego"
-	"programming-learning-platform/conf"
 	"programming-learning-platform/models"
 	"programming-learning-platform/utils"
 )
@@ -95,7 +95,7 @@ func (this *SearchController) Result() {
 			totalRows = 1000
 		}
 		urlSuffix := fmt.Sprintf("&tab=%v&wd=%v", tab, wd)
-		html := utils.NewPaginations(conf.RollPage, totalRows, size, page, beego.URLFor("SearchController.Result"), urlSuffix)
+		html := utils.NewPaginations(constant.RollPage, totalRows, size, page, beego.URLFor("SearchController.Result"), urlSuffix)
 		this.Data["PageHtml"] = html
 	} else {
 		this.Data["PageHtml"] = ""

@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"os"
+	"programming-learning-platform/constant"
 	"programming-learning-platform/utils/store"
 	"strconv"
 	"strings"
@@ -11,25 +12,11 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/conf"
 	"programming-learning-platform/utils"
 )
 
 // BookOrder 定义书籍排序类型
 type BookOrder string
-
-// 排序类型
-const (
-	OrderRecommend       BookOrder = "recommend"        // 推荐
-	OrderPopular         BookOrder = "popular"          // 热门
-	OrderLatest          BookOrder = "latest"           // 最新
-	OrderNew             BookOrder = "new"              // 最新
-	OrderScore           BookOrder = "score"            // 评分
-	OrderComment         BookOrder = "comment"          // 评论
-	OrderStar            BookOrder = "star"             // 收藏
-	OrderView            BookOrder = "vcnt"             // 浏览
-	OrderLatestRecommend BookOrder = "latest-recommend" // 最新推荐
-)
 
 // Book 书籍
 type Book struct {
@@ -75,7 +62,7 @@ func (m *Book) TableName() string {
 
 // TableNameWithPrefix 获取带前缀带数据表名
 func (m *Book) TableNameWithPrefix() string {
-	return conf.GetDatabasePrefix() + m.TableName()
+	return utils.GetDatabasePrefix() + m.TableName()
 }
 
 // NewBook 创建书籍
@@ -235,13 +222,13 @@ func (m *Book) FindToPager(pageIndex, pageSize, memberId int, PrivatelyOwned ...
 				books[index].LastModifyText = text.Account + " 于 " + text.ModifyTime.Format("2006-01-02 15:04:05")
 			}
 
-			if book.RoleId == conf.BookFounder {
+			if book.RoleId == constant.BookFounder {
 				book.RoleName = "创始人"
-			} else if book.RoleId == conf.BookAdmin {
+			} else if book.RoleId == constant.BookAdmin {
 				book.RoleName = "管理员"
-			} else if book.RoleId == conf.BookEditor {
+			} else if book.RoleId == constant.BookEditor {
 				book.RoleName = "编辑者"
-			} else if book.RoleId == conf.BookObserver {
+			} else if book.RoleId == constant.BookObserver {
 				book.RoleName = "观察者"
 			}
 		}
@@ -252,7 +239,7 @@ func (m *Book) FindToPager(pageIndex, pageSize, memberId int, PrivatelyOwned ...
 // ThoroughDeleteBook 彻底删除书籍
 func (m *Book) ThoroughDeleteBook(id int) (err error) {
 	if id <= 0 {
-		return ErrInvalidParameter
+		return constant.ErrInvalidParameter
 	}
 
 	o := orm.NewOrm()
@@ -355,23 +342,23 @@ func (m *Book) HomeData(pageIndex, pageSize int, orderType BookOrder, lang strin
 		fields = append(fields, "pin")
 	}
 	switch orderType {
-	case OrderRecommend: // 推荐
+	case constant.OrderRecommend: // 推荐
 		cond = append(cond, "order_index>0")
 		order = "pin desc,order_index desc"
-	case OrderLatestRecommend: // 最新推荐
+	case constant.OrderLatestRecommend: // 最新推荐
 		cond = append(cond, "order_index>=0")
 		order = "release_time desc"
-	case OrderPopular: // 受欢迎
+	case constant.OrderPopular: // 受欢迎
 		order = "pin desc,star desc,vcnt desc"
-	case OrderLatest, OrderNew: // 最新发布
+	case constant.OrderLatest, constant.OrderNew: // 最新发布
 		order = "pin desc,release_time desc"
-	case OrderScore: // 评分
+	case constant.OrderScore: // 评分
 		order = "pin desc,score desc"
-	case OrderComment: // 评论
+	case constant.OrderComment: // 评论
 		order = "pin desc,cnt_comment desc"
-	case OrderStar: // 收藏
+	case constant.OrderStar: // 收藏
 		order = "pin desc,star desc"
-	case OrderView: // 查看
+	case constant.OrderView: // 查看
 		order = "pin desc,vcnt desc"
 	}
 	if len(cond) > 0 {
@@ -413,20 +400,20 @@ func (m *Book) homeData(pageIndex, pageSize int, orderType BookOrder, lang strin
 		fields = append(fields, "book_id", "book_name", "identify", "cover", "order_index")
 	}
 	switch orderType {
-	case OrderRecommend: //推荐
+	case constant.OrderRecommend: //推荐
 		cond = append(cond, "b.order_index>0")
 		order = "b.order_index desc"
-	case OrderPopular: //受欢迎
+	case constant.OrderPopular: //受欢迎
 		order = "b.star desc,b.vcnt desc"
-	case OrderLatest, OrderNew: //最新发布
+	case constant.OrderLatest, constant.OrderNew: //最新发布
 		order = "b.release_time desc"
-	case OrderScore: //评分
+	case constant.OrderScore: //评分
 		order = "b.score desc"
-	case OrderComment: //评论
+	case constant.OrderComment: //评论
 		order = "b.cnt_comment desc"
-	case OrderStar: //收藏
+	case constant.OrderStar: //收藏
 		order = "b.star desc"
-	case OrderView: //收藏
+	case constant.OrderView: //收藏
 		order = "b.vcnt desc"
 	}
 	if cid > 0 {

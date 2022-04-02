@@ -7,6 +7,7 @@ import (
 	"programming-learning-platform/models"
 )
 
+// RecordController 阅读记录控制器
 type RecordController struct {
 	BaseController
 }

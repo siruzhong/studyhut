@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"programming-learning-platform/constant"
 	"programming-learning-platform/utils/store"
 	"regexp"
 	"strconv"
@@ -18,7 +19,6 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/conf"
 	"programming-learning-platform/models"
 	"programming-learning-platform/utils"
 )
@@ -122,13 +122,13 @@ func (this *ManagerController) Users() {
 		"keywords":    "用户管理",
 		"description": this.Sitename + "专注于文档在线写作、协作、分享、阅读与托管，让每个人更方便地发布、分享和获得知识。",
 	})
-	members, totalCount, err := models.NewMember().FindToPager(pageIndex, conf.PageSize, wd, role)
+	members, totalCount, err := models.NewMember().FindToPager(pageIndex, constant.PageSize, wd, role)
 	if err != nil {
 		this.Data["ErrorMessage"] = err.Error()
 		return
 	}
 	if totalCount > 0 {
-		this.Data["PageHtml"] = utils.NewPaginations(conf.RollPage, int(totalCount), conf.PageSize, pageIndex, beego.URLFor("ManagerController.Users"), "")
+		this.Data["PageHtml"] = utils.NewPaginations(constant.RollPage, int(totalCount), constant.PageSize, pageIndex, beego.URLFor("ManagerController.Users"), "")
 	} else {
 		this.Data["PageHtml"] = ""
 	}
@@ -165,7 +165,7 @@ func (this *ManagerController) EditMember() {
 		if password1 != "" && password2 != password1 {
 			this.JsonResult(6001, "确认密码不正确")
 		}
-		if password1 != "" && member.AuthMethod != conf.AuthMethodLDAP {
+		if password1 != "" && member.AuthMethod != constant.AuthMethodLDAP {
 			member.Password = password1
 		}
 		if err := member.Valid(password1 == ""); err != nil {
@@ -204,7 +204,7 @@ func (this *ManagerController) CreateMember() {
 	email := strings.TrimSpace(this.GetString("email"))
 	phone := strings.TrimSpace(this.GetString("phone"))
 	role, _ := this.GetInt("role", 1)
-	if ok, err := regexp.MatchString(conf.RegexpAccount, account); account == "" || !ok || err != nil {
+	if ok, err := regexp.MatchString(constant.RegexpAccount, account); account == "" || !ok || err != nil {
 		this.JsonResult(6001, "账号只能由英文字母数字组成，且在3-50个字符")
 	}
 	if l := strings.Count(nickname, "") - 1; l < 2 || l > 20 {
@@ -216,7 +216,7 @@ func (this *ManagerController) CreateMember() {
 	if password1 != password2 {
 		this.JsonResult(6003, "确认密码不正确")
 	}
-	if ok, err := regexp.MatchString(conf.RegexpEmail, email); !ok || err != nil || email == "" {
+	if ok, err := regexp.MatchString(constant.RegexpEmail, email); !ok || err != nil || email == "" {
 		this.JsonResult(6004, "邮箱格式不正确")
 	}
 	if role != 0 && role != 1 && role != 2 {
@@ -229,7 +229,7 @@ func (this *ManagerController) CreateMember() {
 	member.Account = account
 	member.Password = password1
 	member.Role = role
-	member.Avatar = conf.GetDefaultAvatar()
+	member.Avatar = utils.GetDefaultAvatar()
 	member.CreateAt = this.Member.MemberId
 	member.Email = email
 	member.Nickname = nickname
@@ -254,7 +254,7 @@ func (this *ManagerController) DeleteMember() {
 		beego.Error(err)
 		this.JsonResult(500, "用户不存在")
 	}
-	if member.Role == conf.MemberSuperRole {
+	if member.Role == constant.MemberSuperRole {
 		this.JsonResult(500, "不能删除超级管理员")
 	}
 	superMember, err := models.NewMember().FindByFieldFirst("role", 0)
@@ -287,7 +287,7 @@ func (this *ManagerController) UpdateMemberStatus() {
 	if member.MemberId == this.Member.MemberId {
 		this.JsonResult(6004, "不能变更自己的状态")
 	}
-	if member.Role == conf.MemberSuperRole {
+	if member.Role == constant.MemberSuperRole {
 		this.JsonResult(6005, "不能变更超级管理员的状态")
 	}
 	member.Status = status
@@ -316,7 +316,7 @@ func (this *ManagerController) UpdateMemberNoRank() {
 	if member.MemberId == this.Member.MemberId {
 		this.JsonResult(6004, "不能变更自己的状态")
 	}
-	if member.Role == conf.MemberSuperRole {
+	if member.Role == constant.MemberSuperRole {
 		this.JsonResult(6005, "不能变更超级管理员的状态")
 	}
 	member.NoRank = noRank
@@ -334,7 +334,7 @@ func (this *ManagerController) ChangeMemberRole() {
 	if memberId <= 0 {
 		this.JsonResult(6001, "参数错误")
 	}
-	if role != conf.MemberAdminRole && role != conf.MemberGeneralRole && role != conf.MemberEditorRole {
+	if role != constant.MemberAdminRole && role != constant.MemberGeneralRole && role != constant.MemberEditorRole {
 		this.JsonResult(6001, "用户权限不正确")
 	}
 	member := models.NewMember()
@@ -344,7 +344,7 @@ func (this *ManagerController) ChangeMemberRole() {
 	if member.MemberId == this.Member.MemberId {
 		this.JsonResult(6004, "不能变更自己的权限")
 	}
-	if member.Role == conf.MemberSuperRole {
+	if member.Role == constant.MemberSuperRole {
 		this.JsonResult(6005, "不能变更超级管理员的权限")
 	}
 	member.Role = role
@@ -361,10 +361,10 @@ func (this *ManagerController) Books() {
 	pageIndex, _ := this.GetInt("page", 1)
 	private, _ := this.GetInt("private")
 	wd := this.GetString("wd")
-	size := conf.PageSize
+	size := constant.PageSize
 	books, totalCount, _ := models.NewBookResult().FindToPager(pageIndex, size, private, wd)
 	if totalCount > 0 {
-		this.Data["PageHtml"] = utils.NewPaginations(conf.RollPage, totalCount, size, pageIndex, beego.URLFor("ManagerController.Books"), fmt.Sprintf("&private=%v&wd=%v", private, wd))
+		this.Data["PageHtml"] = utils.NewPaginations(constant.RollPage, totalCount, size, pageIndex, beego.URLFor("ManagerController.Books"), fmt.Sprintf("&private=%v&wd=%v", private, wd))
 	} else {
 		this.Data["PageHtml"] = ""
 	}
@@ -653,7 +653,7 @@ func (this *ManagerController) CreateToken() {
 		if book.PrivatelyOwned == 0 {
 			this.JsonResult(6001, "公开书籍不能创建阅读令牌")
 		}
-		book.PrivateToken = string(utils.Krand(conf.GetTokenSize(), conf.KC_RAND_KIND_ALL))
+		book.PrivateToken = string(utils.Krand(utils.GetTokenSize(), constant.KC_RAND_KIND_ALL))
 		if err := book.Update(); err != nil {
 			logs.Error("生成阅读令牌失败 => ", err)
 			this.JsonResult(6003, "生成阅读令牌失败")
@@ -698,12 +698,12 @@ func (this *ManagerController) Setting() {
 // AttachList 附件列表
 func (this *ManagerController) AttachList() {
 	pageIndex, _ := this.GetInt("page", 1)
-	attachList, totalCount, err := models.NewAttachment().FindToPager(pageIndex, conf.PageSize)
+	attachList, totalCount, err := models.NewAttachment().FindToPager(pageIndex, constant.PageSize)
 	if err != nil {
 		this.Abort("404")
 	}
 	if totalCount > 0 {
-		html := utils.GetPagerHtml(this.Ctx.Request.RequestURI, pageIndex, conf.PageSize, int(totalCount))
+		html := utils.GetPagerHtml(this.Ctx.Request.RequestURI, pageIndex, constant.PageSize, int(totalCount))
 		this.Data["PageHtml"] = html
 	} else {
 		this.Data["PageHtml"] = ""
@@ -770,7 +770,7 @@ func (this *ManagerController) Tags() {
 		return
 	}
 	if totalCount > 0 {
-		this.Data["PageHtml"] = utils.NewPaginations(conf.RollPage, int(totalCount), size, pageIndex, beego.URLFor("ManagerController.Tags"), "")
+		this.Data["PageHtml"] = utils.NewPaginations(constant.RollPage, int(totalCount), size, pageIndex, beego.URLFor("ManagerController.Tags"), "")
 	} else {
 		this.Data["PageHtml"] = ""
 	}
@@ -1162,7 +1162,7 @@ func (this *ManagerController) SubmitBook() {
 	size, _ := this.GetInt("size", 100)
 	books, total, _ := m.Lists(page, size)
 	if total > 0 {
-		this.Data["PageHtml"] = utils.NewPaginations(conf.RollPage, int(total), size, page, beego.URLFor("ManagerController.SubmitBook"), "")
+		this.Data["PageHtml"] = utils.NewPaginations(constant.RollPage, int(total), size, page, beego.URLFor("ManagerController.SubmitBook"), "")
 	} else {
 		this.Data["PageHtml"] = ""
 	}

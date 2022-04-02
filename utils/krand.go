@@ -2,14 +2,14 @@ package utils
 
 import (
 	"math/rand"
-	"programming-learning-platform/conf"
+	"programming-learning-platform/constant"
 	"time"
 )
 
 // Krand 随机字符串
 func Krand(size int, kind int) []byte {
 	ikind, kinds, result := kind, [][]int{[]int{10, 48}, []int{26, 97}, []int{26, 65}}, make([]byte, size)
-	isAll := kind > conf.KC_RAND_KIND_UPPER || kind < conf.KC_RAND_KIND_NUM
+	isAll := kind > constant.KC_RAND_KIND_UPPER || kind < constant.KC_RAND_KIND_NUM
 	rand.Seed(time.Now().UnixNano())
 	for i := 0; i < size; i++ {
 		if isAll { // random ikind

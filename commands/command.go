@@ -16,7 +16,6 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/lifei6671/gocaptcha"
 	"programming-learning-platform/commands/migrate"
-	"programming-learning-platform/conf"
 	"programming-learning-platform/models"
 	"programming-learning-platform/utils"
 )
@@ -60,7 +59,7 @@ func RegisterDataBase() {
 
 // RegisterModel 注册Model
 func RegisterModel() {
-	orm.RegisterModelWithPrefix(conf.GetDatabasePrefix(),
+	orm.RegisterModelWithPrefix(utils.GetDatabasePrefix(),
 		new(models.Member),
 		new(models.Book),
 		new(models.Relationship),

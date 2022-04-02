@@ -2,11 +2,11 @@ package controllers
 
 import (
 	"math"
+	"programming-learning-platform/constant"
 	"strconv"
 	"strings"
 
 	"github.com/astaxie/beego"
-	"programming-learning-platform/conf"
 	"programming-learning-platform/models"
 	"programming-learning-platform/utils"
 )
@@ -68,7 +68,7 @@ func (this *HomeController) Index() {
 			urlSuffix = urlSuffix + "&cid=" + strconv.Itoa(cid)
 		}
 		urlSuffix = urlSuffix + "&lang=" + lang
-		html := utils.NewPaginations(conf.RollPage, totalCount, pageSize, pageIndex, urlPrefix, urlSuffix)
+		html := utils.NewPaginations(constant.RollPage, totalCount, pageSize, pageIndex, urlPrefix, urlSuffix)
 		this.Data["PageHtml"] = html
 	} else {
 		this.Data["PageHtml"] = ""

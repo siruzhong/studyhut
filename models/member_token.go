@@ -1,10 +1,10 @@
 package models
 
 import (
+	"programming-learning-platform/utils"
 	"time"
 
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/conf"
 )
 
 // MemberToken 用户token
@@ -24,7 +24,7 @@ func (m *MemberToken) TableName() string {
 }
 
 func (m *MemberToken) TableNameWithPrefix() string {
-	return conf.GetDatabasePrefix() + m.TableName()
+	return utils.GetDatabasePrefix() + m.TableName()
 }
 
 // NewMemberToken 创建用户token

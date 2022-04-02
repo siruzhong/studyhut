@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"programming-learning-platform/constant"
 	"time"
 
 	"github.com/astaxie/beego/orm"
@@ -61,7 +62,7 @@ func (r *ReadingTime) GetReadingTime(uid int, prd period) int {
 	o := orm.NewOrm()
 	sqlSum := "select sum(duration) sum_val from reading_time where uid = ? and day>=? and day<=? limit 1"
 	now := time.Now()
-	if prd == PeriodAll {
+	if prd == constant.PeriodAll {
 		m := NewMember()
 		o.QueryTable(m).Filter("member_id", uid).One(m, "total_reading_time")
 		return m.TotalReadingTime

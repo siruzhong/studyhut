@@ -2,11 +2,11 @@ package models
 
 import (
 	"errors"
+	"programming-learning-platform/utils"
 	"sync/atomic"
 	"time"
 
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/conf"
 )
 
 var loggerQueue = &logQueue{channel: make(chan *Logger, 100), isRunning: 0}
@@ -36,7 +36,7 @@ func (m *Logger) TableName() string {
 }
 
 func (m *Logger) TableNameWithPrefix() string {
-	return conf.GetDatabasePrefix() + m.TableName()
+	return utils.GetDatabasePrefix() + m.TableName()
 }
 
 func NewLogger() *Logger {

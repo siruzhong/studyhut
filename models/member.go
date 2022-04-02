@@ -4,6 +4,7 @@ package models
 import (
 	"errors"
 	"fmt"
+	"programming-learning-platform/constant"
 	"regexp"
 	"strings"
 	"time"
@@ -12,7 +13,6 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	ldap "gopkg.in/ldap.v2"
-	"programming-learning-platform/conf"
 	"programming-learning-platform/utils"
 )
 
@@ -49,7 +49,7 @@ func (m *Member) TableName() string {
 }
 
 func (m *Member) TableNameWithPrefix() string {
-	return conf.GetDatabasePrefix() + m.TableName()
+	return utils.GetDatabasePrefix() + m.TableName()
 }
 
 func NewMember() *Member {
@@ -76,7 +76,7 @@ func (m *Member) Login(account string, password string) (*Member, error) {
 			logs.Info("转入LDAP登陆")
 			return member.ldapLogin(account, password)
 		}
-		return member, ErrMemberNoExist
+		return member, constant.ErrMemberNoExist
 	}
 
 	switch member.AuthMethod {
@@ -90,26 +90,26 @@ func (m *Member) Login(account string, password string) (*Member, error) {
 	case "ldap":
 		return member.ldapLogin(account, password)
 	default:
-		return member, ErrMemberAuthMethodInvalid
+		return member, constant.ErrMemberAuthMethodInvalid
 	}
 
-	return member, ErrorMemberPasswordError
+	return member, constant.ErrorMemberPasswordError
 }
 
 // ldapLogin 通过LDAP登陆
 func (m *Member) ldapLogin(account string, password string) (*Member, error) {
 	if beego.AppConfig.DefaultBool("ldap_enable", false) == false {
-		return m, ErrMemberAuthMethodInvalid
+		return m, constant.ErrMemberAuthMethodInvalid
 	}
 	var err error
 	lc, err := ldap.Dial("tcp", fmt.Sprintf("%s:%d", beego.AppConfig.String("ldap_host"), beego.AppConfig.DefaultInt("ldap_port", 3268)))
 	if err != nil {
-		return m, ErrLDAPConnect
+		return m, constant.ErrLDAPConnect
 	}
 	defer lc.Close()
 	err = lc.Bind(beego.AppConfig.String("ldap_user"), beego.AppConfig.String("ldap_password"))
 	if err != nil {
-		return m, ErrLDAPFirstBind
+		return m, constant.ErrLDAPFirstBind
 	}
 	searchRequest := ldap.NewSearchRequest(
 		beego.AppConfig.String("ldap_base"),
@@ -121,15 +121,15 @@ func (m *Member) ldapLogin(account string, password string) (*Member, error) {
 	)
 	searchResult, err := lc.Search(searchRequest)
 	if err != nil {
-		return m, ErrLDAPSearch
+		return m, constant.ErrLDAPSearch
 	}
 	if len(searchResult.Entries) != 1 {
-		return m, ErrLDAPUserNotFoundOrTooMany
+		return m, constant.ErrLDAPUserNotFoundOrTooMany
 	}
 	userdn := searchResult.Entries[0].DN
 	err = lc.Bind(userdn, password)
 	if err != nil {
-		return m, ErrorMemberPasswordError
+		return m, constant.ErrorMemberPasswordError
 	}
 	if m.Account == "" {
 		m.Account = account
@@ -142,7 +142,7 @@ func (m *Member) ldapLogin(account string, password string) (*Member, error) {
 		err = m.Add()
 		if err != nil {
 			logs.Error("自动注册LDAP用户错误", err)
-			return m, ErrorMemberPasswordError
+			return m, constant.ErrorMemberPasswordError
 		}
 		m.ResolveRoleName()
 	}
@@ -153,13 +153,13 @@ func (m *Member) ldapLogin(account string, password string) (*Member, error) {
 func (m *Member) Add() error {
 	o := orm.NewOrm()
 
-	if ok, err := regexp.MatchString(conf.RegexpAccount, m.Account); m.Account == "" || !ok || err != nil {
+	if ok, err := regexp.MatchString(constant.RegexpAccount, m.Account); m.Account == "" || !ok || err != nil {
 		return errors.New("用户名只能由英文字母数字组成，且在3-50个字符")
 	}
 	if m.Email == "" {
 		return errors.New("邮箱不能为空")
 	}
-	if ok, err := regexp.MatchString(conf.RegexpEmail, m.Email); !ok || err != nil || m.Email == "" {
+	if ok, err := regexp.MatchString(constant.RegexpEmail, m.Email); !ok || err != nil || m.Email == "" {
 		return errors.New("邮箱格式不正确")
 	}
 
@@ -183,9 +183,9 @@ func (m *Member) Add() error {
 
 	// 这里必需设置为读者，避免采坑：普通用户注册的时候注册成了管理员...
 	if m.Account == "admin" {
-		m.Role = conf.MemberSuperRole
+		m.Role = constant.MemberSuperRole
 	} else {
-		m.Role = conf.MemberGeneralRole
+		m.Role = constant.MemberGeneralRole
 	}
 
 	hash, err := utils.PasswordHash(m.Password)
@@ -238,13 +238,13 @@ func (m *Member) FindByNickname(nickname string, cols ...string) (user Member) {
 
 func (m *Member) ResolveRoleName() {
 	switch m.Role {
-	case conf.MemberSuperRole:
+	case constant.MemberSuperRole:
 		m.RoleName = "超级管理员"
-	case conf.MemberAdminRole:
+	case constant.MemberAdminRole:
 		m.RoleName = "管理员"
-	case conf.MemberGeneralRole:
+	case constant.MemberGeneralRole:
 		m.RoleName = "读者"
-	case conf.MemberEditorRole:
+	case constant.MemberEditorRole:
 		m.RoleName = "作者"
 	}
 }
@@ -319,35 +319,35 @@ func (m *Member) Valid(isHashPassword bool) error {
 
 	//邮箱不能为空
 	if m.Email == "" {
-		return ErrMemberEmailEmpty
+		return constant.ErrMemberEmailEmpty
 	}
 	//用户描述必须小于500字
 	if strings.Count(m.Description, "") > 500 {
-		return ErrMemberDescriptionTooLong
+		return constant.ErrMemberDescriptionTooLong
 	}
-	if m.Role != conf.MemberGeneralRole && m.Role != conf.MemberSuperRole && m.Role != conf.MemberAdminRole {
-		return ErrMemberRoleError
+	if m.Role != constant.MemberGeneralRole && m.Role != constant.MemberSuperRole && m.Role != constant.MemberAdminRole {
+		return constant.ErrMemberRoleError
 	}
 	if m.Status != 0 && m.Status != 1 {
 		m.Status = 0
 	}
 	//邮箱格式校验
-	if ok, err := regexp.MatchString(conf.RegexpEmail, m.Email); !ok || err != nil || m.Email == "" {
-		return ErrMemberEmailFormatError
+	if ok, err := regexp.MatchString(constant.RegexpEmail, m.Email); !ok || err != nil || m.Email == "" {
+		return constant.ErrMemberEmailFormatError
 	}
 	//如果是未加密密码，需要校验密码格式
 	if !isHashPassword {
 		if l := strings.Count(m.Password, ""); m.Password == "" || l > 50 || l < 6 {
-			return ErrMemberPasswordFormatError
+			return constant.ErrMemberPasswordFormatError
 		}
 	}
 	//校验邮箱是否呗使用
 	if member, err := NewMember().FindByFieldFirst("email", m.Account); err == nil && member.MemberId > 0 {
 		if m.MemberId > 0 && m.MemberId != member.MemberId {
-			return ErrMemberEmailExist
+			return constant.ErrMemberEmailExist
 		}
 		if m.MemberId <= 0 {
-			return ErrMemberEmailExist
+			return constant.ErrMemberEmailExist
 		}
 	}
 
@@ -358,12 +358,12 @@ func (m *Member) Valid(isHashPassword bool) error {
 		}
 	} else {
 		//校验账号格式是否正确
-		if ok, err := regexp.MatchString(conf.RegexpAccount, m.Account); m.Account == "" || !ok || err != nil {
-			return ErrMemberAccountFormatError
+		if ok, err := regexp.MatchString(constant.RegexpAccount, m.Account); m.Account == "" || !ok || err != nil {
+			return constant.ErrMemberAccountFormatError
 		}
 		//校验账号是否被使用
 		if member, err := NewMember().FindByAccount(m.Account); err == nil && member.MemberId > 0 {
-			return ErrMemberExist
+			return constant.ErrMemberExist
 		}
 	}
 

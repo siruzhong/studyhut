@@ -1,10 +1,10 @@
 package models
 
 import (
+	"programming-learning-platform/utils"
 	"time"
 
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/conf"
 )
 
 type Migration struct {
@@ -22,7 +22,7 @@ func (m *Migration) TableName() string {
 }
 
 func (m *Migration) TableNameWithPrefix() string {
-	return conf.GetDatabasePrefix() + m.TableName()
+	return utils.GetDatabasePrefix() + m.TableName()
 }
 
 func NewMigration() *Migration {

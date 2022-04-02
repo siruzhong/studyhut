@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"programming-learning-platform/constant"
 	"programming-learning-platform/utils/store"
 	"strconv"
 	"strings"
@@ -12,7 +13,6 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/conf"
 	"programming-learning-platform/models"
 	"programming-learning-platform/utils"
 )
@@ -61,7 +61,7 @@ func (this *SettingController) Index() {
 // Password 修改密码
 func (this *SettingController) Password() {
 	if this.Ctx.Input.IsPost() {
-		if this.Member.AuthMethod == conf.AuthMethodLDAP {
+		if this.Member.AuthMethod == constant.AuthMethodLDAP {
 			this.JsonResult(6009, "当前用户不支持修改密码")
 		}
 		password1 := this.GetString("password1")
@@ -117,10 +117,10 @@ func (this *SettingController) Star() {
 	}
 	sort := this.GetString("sort", "read")
 
-	cnt, books, _ := new(models.Star).List(this.Member.MemberId, page, conf.PageSize, cid, sort)
+	cnt, books, _ := new(models.Star).List(this.Member.MemberId, page, constant.PageSize, cid, sort)
 	if cnt > 1 {
 		//this.Data["PageHtml"] = utils.GetPagerHtml(this.Ctx.Request.RequestURI, page, listRows, int(cnt))
-		this.Data["PageHtml"] = utils.NewPaginations(conf.RollPage, int(cnt), conf.PageSize, page, beego.URLFor("SettingController.Star"), "")
+		this.Data["PageHtml"] = utils.NewPaginations(constant.RollPage, int(cnt), constant.PageSize, page, beego.URLFor("SettingController.Star"), "")
 	}
 	this.Data["Pid"] = 0
 

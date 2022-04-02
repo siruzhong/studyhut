@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"programming-learning-platform/constant"
 	"strconv"
 	"strings"
 	"time"
@@ -52,7 +53,7 @@ func (*BookCounter) TableUnique() [][]string {
 
 func (*BookCounter) Increase(bookId int, isPV bool) {
 	sc := NewBookCounter()
-	today, _ := strconv.Atoi(time.Now().Format(dateFormat))
+	today, _ := strconv.Atoi(time.Now().Format(constant.DateFormat))
 	o := orm.NewOrm()
 	o.QueryTable(sc).Filter("bid", bookId).Filter("day", today).One(sc)
 	if sc.Id == 0 {
@@ -78,7 +79,7 @@ func (*BookCounter) Increase(bookId int, isPV bool) {
 
 func (*BookCounter) Decrease(bookId int, isPV bool) {
 	sc := NewBookCounter()
-	today, _ := strconv.Atoi(time.Now().Format(dateFormat))
+	today, _ := strconv.Atoi(time.Now().Format(constant.DateFormat))
 	o := orm.NewOrm()
 	o.QueryTable(sc).Filter("bid", bookId).Filter("day", today).One(sc)
 	if sc.Id == 0 {
@@ -120,7 +121,7 @@ func (*BookCounter) _sort(prd period, limit int, orderField string, withCache ..
 		field = "star" // 收藏
 	}
 
-	if prd == PeriodAll {
+	if prd == constant.PeriodAll {
 		books2 := NewBook().Sorted(limit, field)
 		for _, book := range books2 {
 			cnt := book.Vcnt
@@ -171,6 +172,5 @@ func (*BookCounter) _sort(prd period, limit int, orderField string, withCache ..
 		b, _ = json.Marshal(books)
 		ioutil.WriteFile(file, b, os.ModePerm)
 	}
-
 	return
 }

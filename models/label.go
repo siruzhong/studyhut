@@ -1,10 +1,10 @@
 package models
 
 import (
+	"programming-learning-platform/utils"
 	"strings"
 
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/conf"
 )
 
 // Label 标签
@@ -20,7 +20,7 @@ func (m *Label) TableName() string {
 }
 
 func (m *Label) TableNameWithPrefix() string {
-	return conf.GetDatabasePrefix() + m.TableName()
+	return utils.GetDatabasePrefix() + m.TableName()
 }
 
 func NewLabel() *Label {

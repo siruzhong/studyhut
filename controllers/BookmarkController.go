@@ -8,6 +8,7 @@ import (
 	"programming-learning-platform/models"
 )
 
+// BookmarkController 书签控制器
 type BookmarkController struct {
 	BaseController
 }
@@ -25,7 +26,6 @@ func (this *BookmarkController) Bookmark() {
 	if docId <= 0 {
 		this.JsonResult(1, "收藏失败，文档id参数错误")
 	}
-
 	insert, err := new(models.Bookmark).InsertOrDelete(this.Member.MemberId, docId)
 	if err != nil {
 		beego.Error(err.Error())
@@ -34,7 +34,6 @@ func (this *BookmarkController) Bookmark() {
 		}
 		this.JsonResult(1, "移除书签失败", insert)
 	}
-
 	if insert {
 		this.JsonResult(0, "添加书签成功", insert)
 	}
@@ -47,18 +46,15 @@ func (this *BookmarkController) List() {
 	if bookId <= 0 {
 		this.JsonResult(1, "获取书签列表失败：参数错误")
 	}
-
 	bl, rows, err := new(models.Bookmark).List(this.Member.MemberId, bookId)
 	if err != nil {
 		beego.Error(err.Error())
 		this.JsonResult(1, "获取书签列表失败")
 	}
-
 	var (
 		book  = new(models.Book)
 		lists []map[string]interface{}
 	)
-
 	orm.NewOrm().QueryTable(book).Filter("book_id", bookId).One(book, "identify")
 	for _, item := range bl {
 		var list = make(map[string]interface{})
@@ -69,7 +65,6 @@ func (this *BookmarkController) List() {
 		list["time"] = time.Unix(int64(item.CreateAt), 0).Format("01-02 15:04")
 		lists = append(lists, list)
 	}
-
 	this.JsonResult(0, "获取书签列表成功", map[string]interface{}{
 		"count":   rows,
 		"book_id": bookId,

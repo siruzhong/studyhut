@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"programming-learning-platform/constant"
 	"programming-learning-platform/utils/store"
 	"regexp"
 	"strconv"
@@ -24,7 +25,6 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/russross/blackfriday"
-	"programming-learning-platform/conf"
 	"programming-learning-platform/models"
 	"programming-learning-platform/utils"
 	"programming-learning-platform/utils/html2md"
@@ -61,9 +61,9 @@ func (this *BookController) Index() {
 	private, _ := this.GetInt("private", 0) // 是否是私有文档
 	this.Data["Private"] = private
 	pageIndex, _ := this.GetInt("page", 1)
-	books, totalCount, _ := models.NewBook().FindToPager(pageIndex, conf.PageSize, this.Member.MemberId, private)
+	books, totalCount, _ := models.NewBook().FindToPager(pageIndex, constant.PageSize, this.Member.MemberId, private)
 	if totalCount > 0 {
-		this.Data["PageHtml"] = utils.NewPaginations(conf.RollPage, totalCount, conf.PageSize, pageIndex, beego.URLFor("BookController.Index"), fmt.Sprintf("&private=%v", private))
+		this.Data["PageHtml"] = utils.NewPaginations(constant.RollPage, totalCount, constant.PageSize, pageIndex, beego.URLFor("BookController.Index"), fmt.Sprintf("&private=%v", private))
 	} else {
 		this.Data["PageHtml"] = ""
 	}
@@ -115,7 +115,7 @@ func (this *BookController) Dashboard() {
 	book, err := models.NewBookResult().FindByIdentify(key, this.Member.MemberId)
 	if err != nil {
 		beego.Error(err)
-		if err == models.ErrPermissionDenied {
+		if err == constant.ErrPermissionDenied {
 			this.Abort("404")
 		}
 		this.Abort("404")
@@ -136,13 +136,13 @@ func (this *BookController) Setting() {
 		if err == orm.ErrNoRows {
 			this.Abort("404")
 		}
-		if err == models.ErrPermissionDenied {
+		if err == constant.ErrPermissionDenied {
 			this.Abort("404")
 		}
 		this.Abort("404")
 	}
 	//如果当前用户不是创始人也不是管理员则不能操作
-	if book.RoleId != conf.BookFounder && book.RoleId != conf.BookAdmin {
+	if book.RoleId != constant.BookFounder && book.RoleId != constant.BookAdmin {
 		this.Abort("404")
 	}
 	// 如果书籍为私有
@@ -255,7 +255,7 @@ func (this *BookController) PrivatelyOwned() {
 		this.JsonResult(6001, err.Error())
 	}
 	// 只有创始人才能变更私有状态
-	if bookResult.RoleId != conf.BookFounder {
+	if bookResult.RoleId != constant.BookFounder {
 		this.JsonResult(6002, "权限不足")
 	}
 	if _, err = orm.NewOrm().QueryTable("books").Filter("book_id", bookResult.BookId).Update(orm.Params{
@@ -378,7 +378,7 @@ func (this *BookController) UploadCover() {
 		this.JsonResult(6001, "保存图片失败")
 	}
 	// 如果原封面不是默认封面则删除
-	if oldCover != conf.GetDefaultCover() {
+	if oldCover != utils.GetDefaultCover() {
 		os.Remove("." + oldCover)
 		switch utils.StoreType {
 		case utils.StoreOss:
@@ -414,7 +414,7 @@ func (this *BookController) Users() {
 	}
 	book, err := models.NewBookResult().FindByIdentify(key, this.Member.MemberId)
 	if err != nil {
-		if err == models.ErrPermissionDenied {
+		if err == constant.ErrPermissionDenied {
 			this.Abort("404")
 		}
 		this.Abort("404")
@@ -444,7 +444,7 @@ func (this *BookController) Users() {
 // Create 创建书籍
 func (this *BookController) Create() {
 	if opt, err := models.NewOption().FindByName("ALL_CAN_WRITE_BOOK"); err == nil {
-		if opt.OptionValue == "false" && this.Member.Role == conf.MemberGeneralRole { // 读者无权限创建书籍
+		if opt.OptionValue == "false" && this.Member.Role == constant.MemberGeneralRole { // 读者无权限创建书籍
 			this.JsonResult(1, "普通读者无法创建书籍，如需创建书籍，请向管理员申请成为作者")
 		}
 	}
@@ -497,7 +497,7 @@ func (this *BookController) Create() {
 	book.MemberId = this.Member.MemberId
 	book.CommentCount = 0
 	book.Version = time.Now().Unix()
-	book.Cover = conf.GetDefaultCover()
+	book.Cover = utils.GetDefaultCover()
 	book.Editor = "markdown"
 	book.Theme = "default"
 	book.Score = 40 //默认评分，40即表示4星
@@ -525,7 +525,7 @@ func (this *BookController) CreateToken() {
 	action := this.GetString("action")
 	bookResult, err := this.IsPermission()
 	if err != nil {
-		if err == models.ErrPermissionDenied {
+		if err == constant.ErrPermissionDenied {
 			this.JsonResult(403, "权限不足")
 		}
 		if err == orm.ErrNoRows {
@@ -542,7 +542,7 @@ func (this *BookController) CreateToken() {
 		if bookResult.PrivatelyOwned == 0 {
 			this.JsonResult(6001, "公开书籍不能创建阅读令牌")
 		}
-		book.PrivateToken = string(utils.Krand(conf.GetTokenSize(), conf.KC_RAND_KIND_ALL))
+		book.PrivateToken = string(utils.Krand(utils.GetTokenSize(), constant.KC_RAND_KIND_ALL))
 		if err := book.Update(); err != nil {
 			logs.Error("生成阅读令牌失败 => ", err)
 			this.JsonResult(6003, "生成阅读令牌失败")
@@ -566,7 +566,7 @@ func (this *BookController) Delete() {
 	if err != nil {
 		this.JsonResult(6001, err.Error())
 	}
-	if bookResult.RoleId != conf.BookFounder {
+	if bookResult.RoleId != constant.BookFounder {
 		this.JsonResult(6002, "只有创始人才能删除书籍")
 	}
 	// 用户密码
@@ -605,7 +605,7 @@ func (this *BookController) Release() {
 	} else {
 		book, err := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
 		if err != nil {
-			if err == models.ErrPermissionDenied {
+			if err == constant.ErrPermissionDenied {
 				this.JsonResult(6001, "权限不足")
 			}
 			if err == orm.ErrNoRows {
@@ -614,7 +614,7 @@ func (this *BookController) Release() {
 			beego.Error(err)
 			this.JsonResult(6003, "未知错误")
 		}
-		if book.RoleId != conf.BookAdmin && book.RoleId != conf.BookFounder && book.RoleId != conf.BookEditor {
+		if book.RoleId != constant.BookAdmin && book.RoleId != constant.BookFounder && book.RoleId != constant.BookEditor {
 			this.JsonResult(6003, "权限不足")
 		}
 		bookId = book.BookId
@@ -633,7 +633,7 @@ func (this *BookController) Release() {
 func (this *BookController) Generate() {
 	identify := this.GetString(":key")
 
-	if !models.NewBook().HasProjectAccess(identify, this.Member.MemberId, conf.BookAdmin) {
+	if !models.NewBook().HasProjectAccess(identify, this.Member.MemberId, constant.BookAdmin) {
 		this.JsonResult(1, "您没有操作权限，只有书籍创始人和书籍管理员才有权限")
 	}
 	book, err := models.NewBook().FindByIdentify(identify)
@@ -671,7 +671,7 @@ func (this *BookController) SaveSort() {
 			beego.Error("DocumentController.Edit => ", err)
 			this.Abort("404")
 		}
-		if bookResult.RoleId == conf.BookObserver {
+		if bookResult.RoleId == constant.BookObserver {
 			this.JsonResult(6002, "书籍不存在或权限不足")
 		}
 		bookId = bookResult.BookId
@@ -704,7 +704,7 @@ func (this *BookController) IsPermission() (*models.BookResult, error) {
 	identify := this.GetString("identify")
 	book, err := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
 	if err != nil {
-		if err == models.ErrPermissionDenied {
+		if err == constant.ErrPermissionDenied {
 			return book, errors.New("权限不足")
 		}
 		if err == orm.ErrNoRows {
@@ -712,7 +712,7 @@ func (this *BookController) IsPermission() (*models.BookResult, error) {
 		}
 		return book, err
 	}
-	if book.RoleId != conf.BookAdmin && book.RoleId != conf.BookFounder {
+	if book.RoleId != constant.BookAdmin && book.RoleId != constant.BookFounder {
 		return book, errors.New("权限不足")
 	}
 	return book, nil
@@ -758,7 +758,7 @@ func (this *BookController) GitPull() {
 	//2、解压zip到当前目录，然后移除非图片文件
 	//3、将文件夹移动到uploads目录下
 	identify := this.GetString("identify")
-	if !models.NewBook().HasProjectAccess(identify, this.Member.MemberId, conf.BookEditor) {
+	if !models.NewBook().HasProjectAccess(identify, this.Member.MemberId, constant.BookEditor) {
 		this.JsonResult(1, "无操作权限")
 	}
 	book, _ := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
@@ -785,7 +785,7 @@ func (this *BookController) UploadProject() {
 	//2、解压zip到当前目录，然后移除非图片文件
 	//3、将文件夹移动到uploads目录下
 	identify := this.GetString("identify")
-	if !models.NewBook().HasProjectAccess(identify, this.Member.MemberId, conf.BookEditor) {
+	if !models.NewBook().HasProjectAccess(identify, this.Member.MemberId, constant.BookEditor) {
 		this.JsonResult(1, "无操作权限")
 	}
 	book, _ := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)

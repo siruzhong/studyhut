@@ -1,11 +1,11 @@
 package models
 
 import (
+	"programming-learning-platform/utils"
 	"strings"
 	"sync"
 
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/conf"
 )
 
 // Option 配置项
@@ -41,7 +41,7 @@ func (m *Option) TableName() string {
 
 // TableNameWithPrefix 获取带前缀对数据表名
 func (m *Option) TableNameWithPrefix() string {
-	return conf.GetDatabasePrefix() + m.TableName()
+	return utils.GetDatabasePrefix() + m.TableName()
 }
 
 // Init 初始化配置项

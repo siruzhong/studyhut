@@ -1,10 +1,10 @@
 package models
 
 import (
+	"programming-learning-platform/utils"
 	"time"
 
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/conf"
 )
 
 type DocumentHistory struct {
@@ -38,7 +38,7 @@ func (m *DocumentHistory) TableName() string {
 }
 
 func (m *DocumentHistory) TableNameWithPrefix() string {
-	return conf.GetDatabasePrefix() + m.TableName()
+	return utils.GetDatabasePrefix() + m.TableName()
 }
 
 func NewDocumentHistory() *DocumentHistory {

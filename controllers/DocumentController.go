@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"programming-learning-platform/constant"
 	"regexp"
 	"strconv"
 	"strings"
@@ -21,7 +22,6 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/qr"
-	"programming-learning-platform/conf"
 	"programming-learning-platform/models"
 	"programming-learning-platform/utils"
 	"programming-learning-platform/utils/html2md"
@@ -466,7 +466,7 @@ func (this *DocumentController) Edit() {
 			this.Abort("404")
 		}
 
-		if bookResult.RoleId == conf.BookObserver {
+		if bookResult.RoleId == constant.BookObserver {
 			this.JsonResult(6002, "书籍不存在或权限不足")
 		}
 	}
@@ -563,7 +563,7 @@ func (this *DocumentController) Create() {
 	} else {
 		bookResult, err := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
 
-		if err != nil || bookResult.RoleId == conf.BookObserver {
+		if err != nil || bookResult.RoleId == constant.BookObserver {
 			beego.Error("FindByIdentify => ", err)
 			this.JsonResult(6002, "书籍不存在或权限不足")
 		}
@@ -710,7 +710,7 @@ func (this *DocumentController) Upload() {
 			this.JsonResult(6001, err.Error())
 		}
 		//如果没有编辑权限
-		if book.RoleId != conf.BookEditor && book.RoleId != conf.BookAdmin && book.RoleId != conf.BookFounder {
+		if book.RoleId != constant.BookEditor && book.RoleId != constant.BookAdmin && book.RoleId != constant.BookFounder {
 			this.JsonResult(6006, "权限不足")
 		}
 		bookId = book.BookId
@@ -828,7 +828,7 @@ func (this *DocumentController) DownloadAttachment() {
 			this.Abort("404")
 		}
 		//如果不是超级管理员则判断权限
-		if this.Member == nil || this.Member.Role != conf.MemberSuperRole {
+		if this.Member == nil || this.Member.Role != constant.MemberSuperRole {
 			//如果书籍是私有的，并且token不正确
 			if (book.PrivatelyOwned == 1 && token == "") || (book.PrivatelyOwned == 1 && book.PrivateToken != token) {
 				this.Abort("404")
@@ -877,13 +877,13 @@ func (this *DocumentController) RemoveAttachment() {
 		this.JsonResult(6003, "文档不存在")
 	}
 
-	if this.Member.Role != conf.MemberSuperRole {
+	if this.Member.Role != constant.MemberSuperRole {
 		rel, err := models.NewRelationship().FindByBookIdAndMemberId(document.BookId, this.Member.MemberId)
 		if err != nil {
 			beego.Error(err)
 			this.JsonResult(6004, "权限不足")
 		}
-		if rel.RoleId == conf.BookObserver {
+		if rel.RoleId == constant.BookObserver {
 			this.JsonResult(6004, "权限不足")
 		}
 	}
@@ -914,7 +914,7 @@ func (this *DocumentController) Delete() {
 		bookId = book.BookId
 	} else {
 		bookResult, err := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
-		if err != nil || bookResult.RoleId == conf.BookObserver {
+		if err != nil || bookResult.RoleId == constant.BookObserver {
 			beego.Error("FindByIdentify => ", err)
 			this.JsonResult(6002, "书籍不存在或权限不足")
 		}
@@ -975,7 +975,7 @@ func (this *DocumentController) Content() {
 	} else {
 		bookResult, err := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
 
-		if err != nil || bookResult.RoleId == conf.BookObserver {
+		if err != nil || bookResult.RoleId == constant.BookObserver {
 			beego.Error("FindByIdentify => ", err)
 			this.JsonResult(6002, "书籍不存在或权限不足")
 		}
@@ -1334,7 +1334,7 @@ func (this *DocumentController) History() {
 	} else {
 		bookResult, err := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
 
-		if err != nil || bookResult.RoleId == conf.BookObserver {
+		if err != nil || bookResult.RoleId == constant.BookObserver {
 			beego.Error("FindByIdentify => ", err)
 			this.Data["ErrorMessage"] = "书籍不存在或权限不足"
 			return
@@ -1361,7 +1361,7 @@ func (this *DocumentController) History() {
 		return
 	}
 
-	histories, totalCount, err := models.NewDocumentHistory().FindToPager(docId, pageIndex, conf.PageSize)
+	histories, totalCount, err := models.NewDocumentHistory().FindToPager(docId, pageIndex, constant.PageSize)
 	if err != nil {
 		beego.Error("FindToPager => ", err)
 		this.Data["ErrorMessage"] = "获取历史失败"
@@ -1373,7 +1373,7 @@ func (this *DocumentController) History() {
 	this.Data["Document"] = doc
 
 	if totalCount > 0 {
-		html := utils.GetPagerHtml(this.Ctx.Request.RequestURI, pageIndex, conf.PageSize, totalCount)
+		html := utils.GetPagerHtml(this.Ctx.Request.RequestURI, pageIndex, constant.PageSize, totalCount)
 		this.Data["PageHtml"] = html
 	}
 }
@@ -1402,7 +1402,7 @@ func (this *DocumentController) DeleteHistory() {
 	} else {
 		bookResult, err := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
 
-		if err != nil || bookResult.RoleId == conf.BookObserver {
+		if err != nil || bookResult.RoleId == constant.BookObserver {
 			beego.Error("FindByIdentify => ", err)
 			this.JsonResult(6002, "书籍不存在或权限不足")
 		}
@@ -1456,7 +1456,7 @@ func (this *DocumentController) RestoreHistory() {
 		bookId = book.BookId
 	} else {
 		bookResult, err := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
-		if err != nil || bookResult.RoleId == conf.BookObserver {
+		if err != nil || bookResult.RoleId == constant.BookObserver {
 			beego.Error("FindByIdentify => ", err)
 			this.JsonResult(6002, "书籍不存在或权限不足")
 		}
@@ -1505,7 +1505,7 @@ func (this *DocumentController) Compare() {
 	} else {
 		bookResult, err := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
 
-		if err != nil || bookResult.RoleId == conf.BookObserver {
+		if err != nil || bookResult.RoleId == constant.BookObserver {
 			beego.Error("FindByIdentify => ", err)
 			this.Abort("404")
 			return

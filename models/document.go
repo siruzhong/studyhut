@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"programming-learning-platform/constant"
 	"programming-learning-platform/utils/store"
 	"strings"
 	"time"
@@ -19,7 +20,6 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/httplib"
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/conf"
 	"programming-learning-platform/utils"
 )
 
@@ -48,7 +48,7 @@ func (m *Document) TableName() string {
 }
 
 func (m *Document) TableNameWithPrefix() string {
-	return conf.GetDatabasePrefix() + m.TableName()
+	return utils.GetDatabasePrefix() + m.TableName()
 }
 
 // NewDocument 创建文档
@@ -61,14 +61,14 @@ func NewDocument() *Document {
 // Find 根据文档ID查询指定文档
 func (m *Document) Find(id int) (doc *Document, err error) {
 	if id <= 0 {
-		return m, ErrInvalidParameter
+		return m, constant.ErrInvalidParameter
 	}
 
 	o := orm.NewOrm()
 
 	err = o.QueryTable(m.TableNameWithPrefix()).Filter("document_id", id).One(m)
 	if err == orm.ErrNoRows {
-		return m, ErrDataNotExist
+		return m, constant.ErrDataNotExist
 	}
 
 	return m, nil

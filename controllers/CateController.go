@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/astaxie/beego"
+	"programming-learning-platform/constant"
 	"programming-learning-platform/models"
 )
 
@@ -33,7 +34,7 @@ func (this *CateController) List() {
 	})
 	this.Data["IsCate"] = true
 	this.Data["Friendlinks"] = new(models.FriendLink).GetList(false)
-	this.Data["Recommends"], _, _ = models.NewBook().HomeData(1, 12, models.OrderLatestRecommend, "", 0)
+	this.Data["Recommends"], _, _ = models.NewBook().HomeData(1, 12, constant.OrderLatestRecommend, "", 0)
 	this.Data["SHOW_CATEGORY_INDEX"] = "true"
 	this.Data["Cates"], _ = models.NewCategory().GetAllCategory(-1, -1)
 	this.TplName = "cates/list.html"

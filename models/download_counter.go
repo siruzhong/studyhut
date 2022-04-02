@@ -1,6 +1,7 @@
 package models
 
 import (
+	"programming-learning-platform/constant"
 	"strconv"
 	"time"
 
@@ -52,7 +53,7 @@ func (m *DownloadCounter) DoesICanDownload(uid int) (times int, min int) {
 	}
 
 	// 查询用户今日阅读时长
-	seconds := NewReadingTime().GetReadingTime(uid, PeriodDay)
+	seconds := NewReadingTime().GetReadingTime(uid, constant.PeriodDay)
 	times = seconds / (min * 60) // 可下载次数
 
 	if times == 0 {

@@ -2,26 +2,23 @@ package routers
 
 import (
 	"encoding/json"
+	"programming-learning-platform/constant"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
-	"programming-learning-platform/conf"
 	"programming-learning-platform/models"
 	"programming-learning-platform/utils"
 )
 
 func init() {
 	var FilterUser = func(ctx *context.Context) {
-		_, ok := ctx.Input.Session(conf.LoginSessionName).(models.Member)
-
+		_, ok := ctx.Input.Session(constant.LoginSessionName).(models.Member)
 		if !ok {
 			if ctx.Input.IsAjax() {
 				jsonData := make(map[string]interface{}, 3)
-
 				jsonData["errcode"] = 403
 				jsonData["message"] = "请登录后再操作"
 				returnJSON, _ := json.Marshal(jsonData)
-
 				ctx.ResponseWriter.Write(returnJSON)
 			} else {
 				ctx.Redirect(302, beego.URLFor("AccountController.Login"))

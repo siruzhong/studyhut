@@ -11,23 +11,11 @@ import (
 	"github.com/TruthHun/gotil/sitemap"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
+	"programming-learning-platform/constant"
 )
 
 // 时间段
 type period string
-
-// 时间段类型常量
-const (
-	PeriodDay      period = "day"        // 天
-	PeriodWeek     period = "week"       // 周
-	PeriodLastWeek period = "last-week"  // 上周
-	PeriodMonth    period = "month"      // 月
-	PeriodLastMoth period = "last-month" // 上个月
-	PeriodAll      period = "all"        // 所有
-	PeriodYear     period = "year"       // 年
-)
-
-const dateFormat = "20060102"
 
 var cacheTime = beego.AppConfig.DefaultFloat("CacheTime", 60) // 1 分钟
 
@@ -51,7 +39,7 @@ func Init() {
 	}()
 }
 
-//设置增减
+// SetIncreAndDecre 设置增减
 //@param            table           需要处理的数据表
 //@param            field           字段
 //@param            condition       条件
@@ -78,7 +66,7 @@ type SitemapDocs struct {
 	BookId       int
 }
 
-//站点地图数据
+// SitemapData 站点地图数据
 func SitemapData(page, listRows int) (totalRows int64, sitemaps []SitemapDocs) {
 	//获取公开的书籍
 	var (
@@ -115,6 +103,7 @@ func SitemapData(page, listRows int) (totalRows int64, sitemaps []SitemapDocs) {
 	return
 }
 
+// SitemapUpdate 更新站点地图
 func SitemapUpdate(domain string) {
 	var (
 		files   []string
@@ -240,24 +229,24 @@ func CountCategory() {
 // getTimeRange 获取时间范围
 func getTimeRange(t time.Time, prd period) (start, end string) {
 	switch prd {
-	case PeriodWeek:
+	case constant.PeriodWeek:
 		start, end = getWeek(t)
-	case PeriodLastWeek:
+	case constant.PeriodLastWeek:
 		start, end = getWeek(t.AddDate(0, 0, -7))
-	case PeriodMonth:
+	case constant.PeriodMonth:
 		start, end = getMonth(t)
-	case PeriodLastMoth:
+	case constant.PeriodLastMoth:
 		start, end = getMonth(t.AddDate(0, -1, 0))
-	case PeriodAll:
+	case constant.PeriodAll:
 		start = "20060102"
 		end = "20401231"
-	case PeriodDay:
-		start = t.Format(dateFormat)
+	case constant.PeriodDay:
+		start = t.Format(constant.DateFormat)
 		end = start
-	case PeriodYear:
+	case constant.PeriodYear:
 		start, end = getYear(t.AddDate(-1, 0, 0))
 	default:
-		start = t.Format(dateFormat)
+		start = t.Format(constant.DateFormat)
 		end = start
 	}
 	return
@@ -266,12 +255,12 @@ func getTimeRange(t time.Time, prd period) (start, end string) {
 // getWeek 获取周时间
 func getWeek(t time.Time) (start, end string) {
 	if t.Weekday() == 0 {
-		start = t.Add(-7 * 24 * time.Hour).Format(dateFormat)
-		end = t.Format(dateFormat)
+		start = t.Add(-7 * 24 * time.Hour).Format(constant.DateFormat)
+		end = t.Format(constant.DateFormat)
 	} else {
 		s := t.Add(-time.Duration(t.Weekday()-1) * 24 * time.Hour)
-		start = s.Format(dateFormat)
-		end = s.Add(6 * 24 * time.Hour).Format(dateFormat)
+		start = s.Format(constant.DateFormat)
+		end = s.Add(6 * 24 * time.Hour).Format(constant.DateFormat)
 	}
 	return
 }
@@ -279,15 +268,15 @@ func getWeek(t time.Time) (start, end string) {
 // getYear 获取年时间
 func getYear(t time.Time) (start, end string) {
 	month := time.Date(t.Year(), 1, 1, 0, 0, 0, 0, time.Local)
-	start = month.Format(dateFormat)
-	end = month.AddDate(0, 12, 0).Add(-24 * time.Hour).Format(dateFormat)
+	start = month.Format(constant.DateFormat)
+	end = month.AddDate(0, 12, 0).Add(-24 * time.Hour).Format(constant.DateFormat)
 	return
 }
 
 // getMonth 获取月时间
 func getMonth(t time.Time) (start, end string) {
 	month := time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.Local)
-	start = month.Format(dateFormat)
-	end = month.AddDate(0, 1, 0).Add(-24 * time.Hour).Format(dateFormat)
+	start = month.Format(constant.DateFormat)
+	end = month.AddDate(0, 1, 0).Add(-24 * time.Hour).Format(constant.DateFormat)
 	return
 }

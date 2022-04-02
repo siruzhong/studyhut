@@ -2,13 +2,13 @@ package models
 
 import (
 	"fmt"
+	"programming-learning-platform/constant"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/conf"
 )
 
 type BookResult struct {
@@ -57,7 +57,7 @@ func NewBookResult() *BookResult {
 // 根据书籍标识查询书籍以及指定用户权限的信息.
 func (m *BookResult) FindByIdentify(identify string, memberId int) (result *BookResult, err error) {
 	if identify == "" || memberId <= 0 {
-		return result, ErrInvalidParameter
+		return result, constant.ErrInvalidParameter
 	}
 	o := orm.NewOrm()
 
@@ -77,10 +77,10 @@ func (m *BookResult) FindByIdentify(identify string, memberId int) (result *Book
 
 	var relationship2 Relationship
 
-	err = o.QueryTable(relationship.TableNameWithPrefix()).Filter("book_id", book.BookId).Filter("role_id", conf.BookFounder).One(&relationship2)
+	err = o.QueryTable(relationship.TableNameWithPrefix()).Filter("book_id", book.BookId).Filter("role_id", constant.BookFounder).One(&relationship2)
 	if err != nil {
 		logs.Error("根据书籍标识查询书籍以及指定用户权限的信息 => ", err)
-		return result, ErrPermissionDenied
+		return result, constant.ErrPermissionDenied
 	}
 
 	member, err := NewMember().Find(relationship2.MemberId)
@@ -96,13 +96,13 @@ func (m *BookResult) FindByIdentify(identify string, memberId int) (result *Book
 	result.RelationshipId = relationship.RelationshipId
 
 	switch result.RoleId {
-	case conf.BookFounder:
+	case constant.BookFounder:
 		result.RoleName = "创始人"
-	case conf.BookAdmin:
+	case constant.BookAdmin:
 		result.RoleName = "管理员"
-	case conf.BookEditor:
+	case constant.BookEditor:
 		result.RoleName = "编辑者"
-	case conf.BookObserver:
+	case constant.BookObserver:
 		result.RoleName = "观察者"
 	}
 
