@@ -25,7 +25,6 @@ test/
 *.test
 *.prof
 .idea
-/conf/app.conf
 *.log
 logs/*
 .DS_Store
