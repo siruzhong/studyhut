@@ -39,7 +39,6 @@ uploads
 bs.zip
 *.xml
 render.jpg
-*.conf
 version_control
 node_modules
 dist
