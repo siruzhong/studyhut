@@ -72,7 +72,6 @@ func (this *BaseController) refreshReferer() {
 // Prepare 预处理函数，该函数会在以下定义的方法前执行，用于用户扩展，可以实现类似用户验证之类)
 func (this *BaseController) Prepare() {
 	this.refreshReferer()
-	this.Data["Version"] = utils.Version
 	this.IsMobile = utils.IsMobile(this.Ctx.Request.UserAgent())
 	this.Data["IsMobile"] = this.IsMobile
 	this.Member = models.NewMember() //初始化
@@ -131,24 +130,15 @@ func (this *BaseController) Prepare() {
 			}
 		}
 	}
-
 	if v, ok := this.Option["CLOSE_OPEN_SOURCE_LINK"]; ok {
 		this.Data["CloseOpenSourceLink"] = v == "true"
 	}
-
 	if v, ok := this.Option["HIDE_TAG"]; ok {
 		this.Data["HideTag"] = v == "true"
 	}
-
-	if v, ok := this.Option["CLOSE_SUBMIT_ENTER"]; ok {
-		this.Data["CloseSubmitEnter"] = v == "true"
-	}
-
 	this.Data["SiteName"] = this.Sitename
-
 	// 默认显示创建书籍的入口
 	ShowCreateBookEntrance := false
-
 	if this.Member.MemberId > 0 {
 		ShowCreateBookEntrance = true
 		if opt, err := models.NewOption().FindByName("ALL_CAN_WRITE_BOOK"); err == nil {
@@ -158,9 +148,7 @@ func (this *BaseController) Prepare() {
 			}
 		}
 	}
-
 	this.Data["ShowCreateBookEntrance"] = ShowCreateBookEntrance
-
 	if this.Member.MemberId == 0 {
 		if this.EnableAnonymous == false && !this.NoNeedLoginRouter { // 不允许游客访问
 			allowPaths := map[string]bool{
@@ -174,7 +162,6 @@ func (this *BaseController) Prepare() {
 				return
 			}
 		}
-
 		if this.AllowRegister == false { // 不允许用户注册
 			denyPaths := map[string]bool{
 				// 第三方登录，如果是新注册的话，需要绑定信息，这里不让绑定信息就是不让注册
@@ -188,7 +175,6 @@ func (this *BaseController) Prepare() {
 			}
 		}
 	}
-
 }
 
 // SetMember 获取或设置当前登录用户信息,如果 MemberId 小于 0 则标识删除 Session
@@ -232,7 +218,7 @@ func (this *BaseController) JsonResult(errCode int, errMsg string, data ...inter
 	this.StopRun()
 }
 
-// ExecuteViewPathTemplate 执行指定的模板并返回执行结果.
+// ExecuteViewPathTemplate 执行指定的模板并返回执行结果
 func (this *BaseController) ExecuteViewPathTemplate(tplName string, data interface{}) (string, error) {
 	var buf bytes.Buffer
 	viewPath := this.ViewPath
@@ -297,7 +283,6 @@ func (this *BaseController) Sitemap() {
 	} else {
 		this.Data["PageHtml"] = ""
 	}
-	//this.JsonResult(0, "aaa", docs)
 	this.Data["Docs"] = docs
 	this.TplName = "widgets/sitemap.html"
 }
@@ -391,10 +376,8 @@ func (this *BaseController) sortBySummary(bookIdentify, htmlStr string, bookId i
 		}
 
 	}
-
 	// 重置所有之前的文档排序
 	_, _ = qs.Update(orm.Params{"order_sort": 100000})
-
 	doc.Find("a").Each(func(i int, selection *goquery.Selection) {
 		docName := strings.TrimSpace(selection.Text())
 		pid := 0
@@ -438,7 +421,6 @@ func (this *BaseController) sortBySummary(bookIdentify, htmlStr string, bookId i
 		}
 		idx++
 	})
-
 	htmlStr, _ = doc.Find("body").Html()
 	if len(hrefs) > 0 { //如果有新创建的文档，则再调用一遍，用于处理排序
 		htmlStr = this.replaceLinks(bookIdentify, htmlStr, true)
@@ -446,7 +428,7 @@ func (this *BaseController) sortBySummary(bookIdentify, htmlStr string, bookId i
 	return htmlStr
 }
 
-//排序
+// Sort 排序
 type Sort struct {
 	Id        int
 	Pid       int

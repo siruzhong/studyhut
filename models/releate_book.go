@@ -25,7 +25,7 @@ func NewRelateBook() *RelateBook {
 
 // Lists 获取指定书籍的相关书籍列表
 func (r *RelateBook) Lists(bookId int, limit ...int) (books []Book) {
-	day, _ := strconv.Atoi(GetOptionValue("RELATE_BOOK", "0"))
+	day, _ := strconv.Atoi(GetOptionValue("RELATE_BOOK", "1"))
 	if day <= 0 {
 		return
 	}

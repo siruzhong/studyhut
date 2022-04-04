@@ -59,7 +59,6 @@ func InitCreditRule() {
 		{Identify: "donate", Title: "打赏书籍", Intro: "用户打赏书籍消费", CycleType: cycleTypeDay, RewardTimes: 10, Score: 0},          // score 为0，表示隐藏这条积分记录
 		{Identify: "exchange", Title: "积分兑换", Intro: "用户积分兑换奖品", CycleType: cycleTypeMonth, RewardTimes: 20, Score: -10240}, // score 为0，表示隐藏这条积分记录
 
-		{Identify: "submit", Title: "收录奖励", Intro: "提交未被收录的书籍获得的奖励", CycleType: cycleTypeDay, RewardTimes: 10, Score: 5}, // 收录奖励， 0.005 元
 		{Identify: "charge", Title: "充值奖励", Intro: "用户充值", CycleType: cycleTypeDay, RewardTimes: 0, Score: 0},            // 手工充值 0.005 元
 
 		{Identify: "market_value", Title: "网站积分市值", Intro: "整站所产生的积分", CycleType: cycleTypeOnce, RewardTimes: 0, Score: 0}, // 网站积分总市值  0.005 元

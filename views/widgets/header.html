@@ -16,11 +16,11 @@
                     <li><a href="{{urlfor "HomeController.Index"}}" class="visible-xs" title="发现"><i class="fa fa-globe"></i> 发现</a></li>
                     <li><a href="{{urlfor "RankController.Index"}}" class="visible-xs" title="榜单"><i class="fa fa-sort"></i> 榜单</a></li>
                     <li><a href="{{urlfor "LabelController.List"}}" class="visible-xs" title="标签"><i class="fa fa-tags"></i> 标签</a></li>
-                    <li><a href="{{urlfor "SearchController.Search"}}" class="visible-xs visible-sm" title="搜索"><i class="fa fa-search"></i> 搜索</a></li>
+                    <li><a href="{{urlfor "SearchController.Search"}}" class="visible-xs visible-sm visible-md" title="搜索"><i class="fa fa-search"></i> 搜索</a></li>
                     {{if gt .Member.MemberId 0}}
                     <li><a href="{{urlfor "UserController.Index" ":username" $.Member.Account}}" title="个人主页"><i class="fa fa-home" aria-hidden="true"></i> 个人主页  {{if eq $.IsSignedToday false}}<small class="text-red">签到</small>{{end}}</a></li>
                     <li><a href="{{urlfor "SettingController.Index"}}" title="个人设置"><i class="fa fa-cogs" aria-hidden="true"></i> 个人设置</a></li>
-                    <li><a href="{{urlfor "SettingController.Star"}}" title="我的收藏"><i class="fa fa-heart-o" aria-hidden="true"></i> 我的收藏</a></li>
+                    <li><a href="{{urlfor "StarController.List"}}" title="我的收藏"><i class="fa fa-heart-o" aria-hidden="true"></i> 我的收藏</a></li>
                     {{if $.ShowCreateBookEntrance}}
                     <li><a href="{{urlfor "BookController.Index"}}" title="我的书籍"><i class="fa fa-book" aria-hidden="true"></i> 我的书籍</a></li>
                     {{end}}
@@ -47,18 +47,15 @@
                     {{if eq .HideTag false}}
                         <li class="{{if .IsLabel}}active{{end}}"><a href="{{urlfor "LabelController.List" }}" class="hidden-sm" title="标签"><i class="fa fa-tags"></i> 标签</a></li>
                     {{end}}
-                    {{if eq .CloseSubmitEnter false}}
-                        <li class="{{if .IsSubmit}}active{{end}}"><a href="{{urlfor "SubmitController.Index" }}" class="hidden-sm" title="收录"><i class="fa fa-check-square-o"></i> 收录</a></li>
-                    {{end}}
-                    <li><a href="{{urlfor "FriendLinkController.List" }}" title="友情链接"><i class="fa fa-paperclip"></i> 友情链接</a></li>
+                    <li><a href="{{urlfor "FriendLinkController.List" }}" title="友情链接"><i class="fa fa-paperclip"></i> 友链</a></li>
                     <li><a href="{{urlfor "BookController.Index"}}" title="我的书籍"><i class="fa fa-book" aria-hidden="true"></i> 我的书籍</a></li>
-                    <li><a href="{{urlfor "SettingController.Star"}}" title="我的收藏"><i class="fa fa-heart" aria-hidden="true"></i> 我的收藏</a></li>
-                    {{if .IsSearch}}
-                        <li class="active"><a href="{{urlfor "SearchController.Search" }}" title="搜索"><i class="fa fa-search"></i> 搜索</a></li>
+                    <li><a href="{{urlfor "StarController.List"}}" title="我的收藏"><i class="fa fa-heart" aria-hidden="true"></i> 我的收藏</a></li>
+                    {{if .IsSearch}}{{else}}
+                        <li class="active visible-md"><a href="{{urlfor "SearchController.Search" }}" title="搜索"><i class="fa fa-search"></i> 搜索</a></li>
                     {{end}}
                 </ul>
                 {{if .IsSearch}}{{else}}
-                    <div class="searchbar pull-left">
+                    <div class="searchbar pull-left visible-lg">
                         <form class="form-inline" action="{{urlfor "SearchController.Result"}}" method="get">
                             <input class="form-control" name="wd" type="search"  placeholder="书籍搜索..." value="{{.Keyword}}">
                             <button class="search-btn"><i class="fa fa-search"></i></button>
@@ -83,10 +80,6 @@
                     <ul class="dropdown-menu user-info-dropdown" role="menu">
                         <li><a href="{{urlfor "UserController.Index" ":username" $.Member.Account}}" title="个人主页"><i class="fa fa-home" aria-hidden="true"></i> 个人主页  {{if eq $.IsSignedToday false}}<small class="text-red">签到</small>{{end}}</a></li>
                         <li><a href="{{urlfor "SettingController.Index"}}" title="个人设置"><i class="fa fa-cog" aria-hidden="true"></i> 个人设置</a></li>
-<!--                        <li><a href="{{urlfor "SettingController.Star"}}" title="我的收藏"><i class="fa fa-heart" aria-hidden="true"></i> 我的收藏</a></li>-->
-<!--                        {{if $.ShowCreateBookEntrance}}-->
-<!--                            <li><a href="{{urlfor "BookController.Index"}}" title="我的书籍"><i class="fa fa-book" aria-hidden="true"></i> 我的书籍</a></li>-->
-<!--                        {{end}}-->
                         {{if eq .Member.Role 0  1}}
                             <li><a href="{{urlfor "ManagerController.Index"}}" title="管理后台"><i class="fa fa-university" aria-hidden="true"></i> 管理后台</a></li>
                         {{end}}

@@ -76,7 +76,7 @@ func GenerateMediaSign(path string, unixNano int64, expire ...time.Duration) (si
 	return jwtToken.SignedString([]byte(mediaJwtSecret))
 }
 
-// ParseSign 解析jwt token
+// ParseMediaSign 解析jwt token
 func ParseMediaSign(sign string) (path string, err error) {
 	var token = &jwt.Token{}
 	token, err = jwt.ParseWithClaims(sign, &MediaClaims{}, func(token *jwt.Token) (interface{}, error) {

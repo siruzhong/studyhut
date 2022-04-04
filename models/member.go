@@ -48,10 +48,12 @@ func (m *Member) TableName() string {
 	return "members"
 }
 
+// TableNameWithPrefix 获取带前缀的表名
 func (m *Member) TableNameWithPrefix() string {
 	return utils.GetDatabasePrefix() + m.TableName()
 }
 
+// NewMember 新建用户
 func NewMember() *Member {
 	return &Member{}
 }

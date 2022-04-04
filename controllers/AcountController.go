@@ -325,22 +325,19 @@ func (this *AccountController) Bind() {
 		if password1 != password2 {
 			this.JsonResult(6003, "登录密码与确认密码不一致")
 		}
-
 		if ok, err := regexp.MatchString(constant.RegexpAccount, account); account == "" || !ok || err != nil {
 			this.JsonResult(6001, "用户名只能由英文字母数字组成，且在3-50个字符")
 		}
 		if l := strings.Count(password1, ""); password1 == "" || l > 50 || l < 6 {
 			this.JsonResult(6002, "密码必须在6-50个字符之间")
 		}
-
 		if ok, err := regexp.MatchString(constant.RegexpEmail, email); !ok || err != nil || email == "" {
 			this.JsonResult(6004, "邮箱格式不正确")
 		}
 		if l := strings.Count(nickname, "") - 1; l < 2 || l > 20 {
 			this.JsonResult(6004, "用户昵称限制在2-20个字符")
 		}
-
-		//出错或者用户不存在，则重新注册用户，否则直接登录
+		// 出错或者用户不存在，则重新注册用户，否则直接登录
 		member.Account = account
 		member.Nickname = nickname
 		member.Password = password1
@@ -462,7 +459,6 @@ func (this *AccountController) ValidEmail() {
 	password2 := this.GetString("password2")
 	token := this.GetString("token")
 	mail := this.GetString("mail")
-
 	if password1 == "" {
 		this.JsonResult(6001, "密码不能为空")
 	}
@@ -475,22 +471,17 @@ func (this *AccountController) ValidEmail() {
 	if password1 != password2 {
 		this.JsonResult(6003, "确认密码输入不正确")
 	}
-
 	if !cpt.VerifyReq(this.Ctx.Request) {
 		this.JsonResult(6001, "验证码不正确")
 	}
-
 	mailConf := utils.GetMailConfig()
 	memberToken, err := models.NewMemberToken().FindByFieldFirst("token", token)
-
 	if err != nil {
 		beego.Error(err)
 		this.JsonResult(6007, "邮件已失效")
 	}
 	subTime := memberToken.SendTime.Sub(time.Now())
-
 	if !strings.EqualFold(memberToken.Email, mail) || subTime.Minutes() > float64(mailConf.MailExpired) || !memberToken.ValidTime.IsZero() {
-
 		this.JsonResult(6008, "验证码已过期，请重新操作。")
 	}
 	member, err := models.NewMember().Find(memberToken.MemberId)
@@ -499,19 +490,15 @@ func (this *AccountController) ValidEmail() {
 		this.JsonResult(6005, "用户不存在")
 	}
 	hash, err := utils.PasswordHash(password1)
-
 	if err != nil {
 		beego.Error(err)
 		this.JsonResult(6006, "保存密码失败")
 	}
-
 	member.Password = hash
-
 	err = member.Update("password")
 	memberToken.ValidTime = time.Now()
 	memberToken.IsValid = true
 	memberToken.InsertOrUpdate()
-
 	if err != nil {
 		beego.Error(err)
 		this.JsonResult(6006, "保存密码失败")
@@ -522,8 +509,6 @@ func (this *AccountController) ValidEmail() {
 // Logout 退出登录
 func (this *AccountController) Logout() {
 	this.SetMember(models.Member{})
-
 	this.SetSecureCookie(utils.GetAppKey(), "login", "", -3600)
-
 	this.Redirect(beego.URLFor("AccountController.Login"), 302)
 }

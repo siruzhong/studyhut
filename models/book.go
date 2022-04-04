@@ -15,9 +15,6 @@ import (
 	"programming-learning-platform/utils"
 )
 
-// BookOrder 定义书籍排序类型
-type BookOrder string
-
 // Book 书籍
 type Book struct {
 	BookId            int       `orm:"pk;auto;unique;column(book_id)" json:"book_id"`                       // 书籍ID
@@ -55,6 +52,9 @@ type Book struct {
 	Lang              string    `orm:"size(10);index;default(zh)"`                                          // 语言
 }
 
+// BookOrder 定义书籍排序类型
+type BookOrder string
+
 // TableName 获取对应数据库表名
 func (m *Book) TableName() string {
 	return "books"
@@ -70,8 +70,8 @@ func NewBook() *Book {
 	return &Book{}
 }
 
-// HasProjectAccess 是否拥有项目权限
-func (m *Book) HasProjectAccess(identify string, memberId int, minRole int) bool {
+// HasBookAccess 是否拥有书籍权限
+func (m *Book) HasBookAccess(identify string, memberId int, minRole int) bool {
 	book := NewBook()
 	rel := NewRelationship()
 	o := orm.NewOrm()
@@ -127,6 +127,7 @@ func (m *Book) Insert() (err error) {
 	return err
 }
 
+// Find 根据id寻找书籍
 func (m *Book) Find(id int, cols ...string) (book *Book, err error) {
 	if id <= 0 {
 		return
@@ -136,32 +137,29 @@ func (m *Book) Find(id int, cols ...string) (book *Book, err error) {
 	return m, err
 }
 
+// Update 更新书籍
 func (m *Book) Update(cols ...string) (err error) {
 	o := orm.NewOrm()
-
 	temp := NewBook()
 	temp.BookId = m.BookId
-
 	if err = o.Read(temp); err != nil {
 		return err
 	}
-
 	if (m.Label + temp.Label) != "" {
 		go NewLabel().InsertOrUpdateMulti(m.Label + "," + temp.Label)
 	}
-
 	_, err = o.Update(m, cols...)
 	return err
 }
 
-//根据指定字段查询结果集.
+// FindByField 根据指定字段查询书籍集合
 func (m *Book) FindByField(field string, value interface{}) (books []*Book, err error) {
 	o := orm.NewOrm()
 	_, err = o.QueryTable(m.TableNameWithPrefix()).Filter(field, value).All(&books)
 	return
 }
 
-//根据指定字段查询一个结果.
+// FindByFieldFirst 根据指定字段查询一本书籍
 func (m *Book) FindByFieldFirst(field string, value interface{}) (book *Book, err error) {
 	o := orm.NewOrm()
 	err = o.QueryTable(m.TableNameWithPrefix()).Filter(field, value).One(m)
@@ -176,12 +174,9 @@ func (m *Book) FindByIdentify(identify string, cols ...string) (book *Book, err 
 	return
 }
 
-//分页查询指定用户的书籍
-//按照最新的进行排序
+// FindToPager 分页查询指定用户的书籍,按照最新的进行排序
 func (m *Book) FindToPager(pageIndex, pageSize, memberId int, PrivatelyOwned ...int) (books []*BookResult, totalCount int, err error) {
-
 	relationship := NewRelationship()
-
 	o := orm.NewOrm()
 	sql1 := "SELECT COUNT(book.book_id) AS total_count FROM " + m.TableNameWithPrefix() + " AS book LEFT JOIN " +
 		relationship.TableNameWithPrefix() + " AS rel ON book.book_id=rel.book_id AND rel.member_id = ? WHERE rel.relationship_id > 0 "
@@ -192,13 +187,11 @@ func (m *Book) FindToPager(pageIndex, pageSize, memberId int, PrivatelyOwned ...
 	if err != nil {
 		return
 	}
-
 	offset := (pageIndex - 1) * pageSize
 	sql2 := "SELECT book.*,rel.member_id,rel.role_id,m.account as create_name FROM " + m.TableNameWithPrefix() + " AS book" +
 		" LEFT JOIN " + relationship.TableNameWithPrefix() + " AS rel ON book.book_id=rel.book_id AND rel.member_id = ? " +
 		" LEFT JOIN " + NewMember().TableNameWithPrefix() + " AS m ON rel.member_id=m.member_id " +
 		" WHERE rel.relationship_id > 0 %v ORDER BY book.book_id DESC LIMIT " + fmt.Sprintf("%d,%d", offset, pageSize)
-
 	if len(PrivatelyOwned) > 0 {
 		sql2 = fmt.Sprintf(sql2, " and book.privately_owned="+strconv.Itoa(PrivatelyOwned[0]))
 	}
@@ -207,21 +200,17 @@ func (m *Book) FindToPager(pageIndex, pageSize, memberId int, PrivatelyOwned ...
 		logs.Error("分页查询书籍列表 => ", err)
 		return
 	}
-
 	if err == nil && len(books) > 0 {
 		sql := "SELECT m.account,doc.modify_time FROM documents AS doc LEFT JOIN members AS m ON doc.modify_at=m.member_id WHERE book_id = ? ORDER BY doc.modify_time DESC LIMIT 1 "
-
 		for index, book := range books {
 			var text struct {
 				Account    string
 				ModifyTime time.Time
 			}
-
 			err = o.Raw(sql, book.BookId).QueryRow(&text)
 			if err == nil {
 				books[index].LastModifyText = text.Account + " 于 " + text.ModifyTime.Format("2006-01-02 15:04:05")
 			}
-
 			if book.RoleId == constant.BookFounder {
 				book.RoleName = "创始人"
 			} else if book.RoleId == constant.BookAdmin {
@@ -241,29 +230,24 @@ func (m *Book) ThoroughDeleteBook(id int) (err error) {
 	if id <= 0 {
 		return constant.ErrInvalidParameter
 	}
-
 	o := orm.NewOrm()
-
 	m.BookId = id
 	if err = o.Read(m); err != nil {
 		return err
 	}
-
 	var (
 		docs  []Document
 		docId []string
 	)
-
 	o.QueryTable(new(Document)).Filter("book_id", id).Limit(10000).All(&docs, "document_id")
 	if len(docs) > 0 {
 		for _, doc := range docs {
 			docId = append(docId, strconv.Itoa(doc.DocumentId))
 		}
 	}
-
+	// 开启事物操作
 	o.Begin()
-
-	//删除document_store中的文档
+	// 删除document_store中的文档
 	if len(docId) > 0 {
 		sql1 := fmt.Sprintf("delete from document_store where document_id in(%v)", strings.Join(docId, ","))
 		if _, err1 := o.Raw(sql1).Exec(); err1 != nil {
@@ -271,7 +255,6 @@ func (m *Book) ThoroughDeleteBook(id int) (err error) {
 			return err1
 		}
 	}
-
 	sql2 := "DELETE FROM " + NewDocument().TableNameWithPrefix() + " WHERE book_id = ?"
 	_, err = o.Raw(sql2, m.BookId).Exec()
 	if err != nil {
@@ -279,40 +262,36 @@ func (m *Book) ThoroughDeleteBook(id int) (err error) {
 		return err
 	}
 	sql3 := "DELETE FROM " + m.TableNameWithPrefix() + " WHERE book_id = ?"
-
 	_, err = o.Raw(sql3, m.BookId).Exec()
 	if err != nil {
 		o.Rollback()
 		return err
 	}
-
 	sql4 := "DELETE FROM " + NewRelationship().TableNameWithPrefix() + " WHERE book_id = ?"
 	_, err = o.Raw(sql4, m.BookId).Exec()
-
 	if err != nil {
 		o.Rollback()
 		return err
 	}
-
 	if m.Label != "" {
 		NewLabel().InsertOrUpdateMulti(m.Label)
 	}
-
 	if err = o.Commit(); err != nil {
 		return err
 	}
-	//删除oss中书籍对应的文件夹
+	// 删除oss中书籍对应的文件夹
 	switch utils.StoreType {
-	case utils.StoreLocal: //删除本地存储，记得加上uploads
+	case constant.StoreLocal: //删除本地存储，记得加上uploads
 		m.Cover = strings.ReplaceAll(m.Cover, "\\", "/")
 		if m.Cover != beego.AppConfig.DefaultString("cover", "/static/images/book.png") {
 			os.Remove(strings.TrimLeft(m.Cover, "/ ")) //删除封面
 		}
 		go store.ModelStoreLocal.DelFolder("uploads/projects/" + m.Identify)
-	case utils.StoreOss:
+	case constant.StoreOss:
 		go store.ModelStoreOss.DelOssFolder("projects/" + m.Identify)
+	case constant.StoreCos:
+		go store.ModelStoreCos.DelCosFolder("projects/" + m.Identify)
 	}
-
 	// 删除历史记录
 	go func() {
 		history := NewDocumentHistory()
@@ -321,13 +300,10 @@ func (m *Book) ThoroughDeleteBook(id int) (err error) {
 			history.DeleteByDocumentId(idInt)
 		}
 	}()
-
 	return
 }
 
-// HomeData 首页数据
-// 完善根据分类查询数据
-// orderType:排序条件，可选值：recommend(推荐)、latest（）
+// HomeData 首页数据 完善根据分类查询数据 orderType:排序条件，可选值：recommend(推荐)、latest（）
 func (m *Book) HomeData(pageIndex, pageSize int, orderType BookOrder, lang string, cid int, fields ...string) (books []Book, totalCount int, err error) {
 	if cid > 0 { //针对cid>0
 		return m.homeData(pageIndex, pageSize, orderType, lang, cid, fields...)
@@ -364,7 +340,6 @@ func (m *Book) HomeData(pageIndex, pageSize int, orderType BookOrder, lang strin
 	if len(cond) > 0 {
 		condStr = " where " + strings.Join(cond, " and ")
 	}
-
 	lang = strings.ToLower(lang)
 	switch lang {
 	case "zh", "en", "other":
@@ -390,7 +365,7 @@ func (m *Book) HomeData(pageIndex, pageSize int, orderType BookOrder, lang strin
 	return
 }
 
-//针对cid大于0
+// homeData 针对cid大于0
 func (m *Book) homeData(pageIndex, pageSize int, orderType BookOrder, lang string, cid int, fields ...string) (books []Book, totalCount int, err error) {
 	o := orm.NewOrm()
 	order := ""   //排序
@@ -445,15 +420,14 @@ func (m *Book) homeData(pageIndex, pageSize int, orderType BookOrder, lang strin
 	return
 }
 
-//分页查找系统首页数据.
-func (m *Book) FindForHomeToPager(pageIndex, pageSize, member_id int, orderType string) (books []*BookResult, totalCount int, err error) {
+// FindForHomeToPager 分页查找系统首页数据
+func (m *Book) FindForHomeToPager(pageIndex, pageSize, memberId int, orderType string) (books []*BookResult, totalCount int, err error) {
 	o := orm.NewOrm()
-
 	offset := (pageIndex - 1) * pageSize
 	//如果是登录用户
-	if member_id > 0 {
+	if memberId > 0 {
 		sql1 := "SELECT COUNT(*) FROM books AS book LEFT JOIN relationship AS rel ON rel.book_id = book.book_id AND rel.member_id = ? WHERE relationship_id > 0 OR book.privately_owned = 0"
-		err = o.Raw(sql1, member_id).QueryRow(&totalCount)
+		err = o.Raw(sql1, memberId).QueryRow(&totalCount)
 		if err != nil {
 			return
 		}
@@ -464,10 +438,9 @@ func (m *Book) FindForHomeToPager(pageIndex, pageSize, member_id int, orderType 
 			LEFT JOIN members AS member ON rel1.member_id = member.member_id
 			WHERE rel.relationship_id > 0 OR book.privately_owned = 0 ORDER BY order_index DESC ,book.book_id DESC LIMIT ?,?`
 
-		_, err = o.Raw(sql2, member_id, offset, pageSize).QueryRows(&books)
+		_, err = o.Raw(sql2, memberId, offset, pageSize).QueryRows(&books)
 		return
 	}
-
 	count, errCount := o.QueryTable(m.TableNameWithPrefix()).Filter("privately_owned", 0).Count()
 	if errCount != nil {
 		err = errCount
@@ -484,10 +457,9 @@ func (m *Book) FindForHomeToPager(pageIndex, pageSize, member_id int, orderType 
 	return
 }
 
-//分页全局搜索.
+// FindForLabelToPager 分页全局搜索
 func (m *Book) FindForLabelToPager(keyword string, pageIndex, pageSize, memberId int) (books []*BookResult, totalCount int, err error) {
 	o := orm.NewOrm()
-
 	keyword = "%" + keyword + "%"
 	offset := (pageIndex - 1) * pageSize
 	//如果是登录用户
@@ -496,22 +468,18 @@ func (m *Book) FindForLabelToPager(keyword string, pageIndex, pageSize, memberId
 		if err = o.Raw(sql1, memberId, keyword, keyword).QueryRow(&totalCount); err != nil {
 			return
 		}
-
 		sql2 := `SELECT book.*,rel1.*,member.account AS create_name FROM books AS book
 			LEFT JOIN relationship AS rel ON rel.book_id = book.book_id AND rel.member_id = ?
 			LEFT JOIN relationship AS rel1 ON rel1.book_id = book.book_id AND rel1.role_id = 0
 			LEFT JOIN members AS member ON rel1.member_id = member.member_id
 			WHERE (rel.relationship_id > 0 OR book.privately_owned = 0) AND  (book.label LIKE ? or book.book_name like ?) ORDER BY order_index DESC ,book.book_id DESC LIMIT ?,?`
-
 		_, err = o.Raw(sql2, memberId, keyword, keyword, offset, pageSize).QueryRows(&books)
 		return
 	}
-
 	sql1 := "select COUNT(*) from books where privately_owned=0 and (label LIKE ? or book_name like ?) limit 1"
 	if err = o.Raw(sql1, keyword, keyword).QueryRow(&totalCount); err != nil {
 		return
 	}
-
 	sql := `SELECT book.*,rel.*,member.account AS create_name FROM books AS book
 			LEFT JOIN relationship AS rel ON rel.book_id = book.book_id AND rel.role_id = 0
 			LEFT JOIN members AS member ON rel.member_id = member.member_id
@@ -521,6 +489,7 @@ func (m *Book) FindForLabelToPager(keyword string, pageIndex, pageSize, memberId
 	return
 }
 
+// ToBookResult 获得书籍结果
 func (book *Book) ToBookResult() (m *BookResult) {
 	m = &BookResult{}
 	m.BookId = book.BookId
@@ -552,18 +521,16 @@ func (book *Book) ToBookResult() (m *BookResult) {
 	m.AdTitle = book.AdTitle
 	m.AdLink = book.AdLink
 	m.Lang = book.Lang
-
 	if book.Theme == "" {
 		m.Theme = "default"
 	}
-
 	if book.Editor == "" {
 		m.Editor = "markdown"
 	}
 	return m
 }
 
-//重置文档数量
+// ResetDocumentNumber 重置文档数量
 func (m *Book) ResetDocumentNumber(bookId int) {
 	o := orm.NewOrm()
 	totalCount, err := o.QueryTable(NewDocument().TableNameWithPrefix()).Filter("book_id", bookId).Count()
@@ -574,7 +541,7 @@ func (m *Book) ResetDocumentNumber(bookId int) {
 	}
 }
 
-// 内容替换
+// Replace 内容替换
 func (m *Book) Replace(bookId int, src, dst string) {
 	var docs []Document
 	o := orm.NewOrm()
@@ -595,21 +562,17 @@ func (m *Book) Replace(bookId int, src, dst string) {
 	}
 }
 
-// 根据书籍id获取(公开的)书籍
+// GetBooksById 根据书籍id获取(公开的)书籍
 func (m *Book) GetBooksById(id []int, fields ...string) (books []Book, err error) {
-
 	var bs []Book
 	var rows int64
 	var idArr []interface{}
-
 	if len(id) == 0 {
 		return
 	}
-
 	for _, i := range id {
 		idArr = append(idArr, i)
 	}
-
 	rows, err = orm.NewOrm().QueryTable(m).Filter("book_id__in", idArr...).Filter("privately_owned", 0).All(&bs, fields...)
 	if rows > 0 {
 		bookMap := make(map[interface{}]Book)
@@ -622,39 +585,32 @@ func (m *Book) GetBooksById(id []int, fields ...string) (books []Book, err error
 			}
 		}
 	}
-
 	return
 }
 
-// 搜索书籍，这里只返回book_id
+// SearchBook 搜索书籍，这里只返回book_id
 func (n *Book) SearchBook(wd string, page, size int) (books []Book, cnt int, err error) {
 	sqlFmt := "select %v from books where privately_owned=0 and (book_name like ? or label like ? or description like ?) order by star desc"
 	sqlCount := fmt.Sprintf(sqlFmt, "count(book_id) cnt")
 	sql := fmt.Sprintf(sqlFmt, "book_id")
-
 	var count struct{ Cnt int }
 	wd = "%" + wd + "%"
-
 	o := orm.NewOrm()
-
 	err = o.Raw(sqlCount, wd, wd, wd).QueryRow(&count)
 	if count.Cnt > 0 {
 		cnt = count.Cnt
 		_, err = o.Raw(sql+" limit ? offset ?", wd, wd, wd, size, (page-1)*size).QueryRows(&books)
 	}
-
 	return
 }
 
-// search books with labels
+// SearchBookByLabel 通过标签搜索书籍
 func (b *Book) SearchBookByLabel(labels []string, limit int, excludeIds []int) (bookIds []int, err error) {
 	bookIds = []int{}
 	if len(labels) == 0 {
 		return
 	}
-
 	rawRegex := strings.Join(labels, "|")
-
 	excludeClause := ""
 	if len(excludeIds) == 1 {
 		excludeClause = fmt.Sprintf("book_id != %d AND", excludeIds[0])
@@ -662,7 +618,6 @@ func (b *Book) SearchBookByLabel(labels []string, limit int, excludeIds []int) (
 		excludeVal := strings.Replace(strings.Trim(fmt.Sprint(excludeIds), "[]"), " ", ",", -1)
 		excludeClause = fmt.Sprintf("book_id NOT IN (%s) AND", excludeVal)
 	}
-
 	sql := fmt.Sprintf("SELECT book_id FROM books WHERE %v label REGEXP ? ORDER BY star DESC LIMIT ?", excludeClause)
 	o := orm.NewOrm()
 	_, err = o.Raw(sql, rawRegex, limit).QueryRows(&bookIds)

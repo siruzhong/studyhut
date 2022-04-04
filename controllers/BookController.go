@@ -9,8 +9,6 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
-	"programming-learning-platform/constant"
-	"programming-learning-platform/utils/store"
 	"regexp"
 	"strconv"
 	"strings"
@@ -25,9 +23,11 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/russross/blackfriday"
+	"programming-learning-platform/constant"
 	"programming-learning-platform/models"
 	"programming-learning-platform/utils"
 	"programming-learning-platform/utils/html2md"
+	"programming-learning-platform/utils/store"
 )
 
 // BookController 书籍控制器
@@ -54,7 +54,7 @@ func (this *BookController) Replace() {
 	this.JsonResult(0, "替换成功")
 }
 
-// Index 书籍管理
+// Index 书籍列表
 func (this *BookController) Index() {
 	this.Data["SettingBook"] = true
 	this.TplName = "book/index.html"
@@ -346,7 +346,7 @@ func (this *BookController) UploadCover() {
 		logs.Error("", err)
 		this.JsonResult(500, "图片保存失败")
 	}
-	if utils.StoreType != utils.StoreLocal {
+	if utils.StoreType != constant.StoreLocal {
 		defer func(filePath string) {
 			os.Remove(filePath)
 		}(filePath)
@@ -369,9 +369,9 @@ func (this *BookController) UploadCover() {
 		url = string(url[1:])
 	}
 	oldCover := strings.ReplaceAll(book.Cover, "\\", "/")
-	osspath := fmt.Sprintf("projects/%v/%v", book.Identify, strings.TrimLeft(url, "./"))
-	book.Cover = "/" + osspath
-	if utils.StoreType == utils.StoreLocal {
+	osspath := fmt.Sprintf("/projects/%v/%v", book.Identify, strings.TrimLeft(url, "./"))
+	book.Cover = fmt.Sprintf("%s/projects/%v/%v", beego.AppConfig.String("cos::Domain"), book.Identify, strings.TrimLeft(url, "./"))
+	if utils.StoreType == constant.StoreLocal {
 		book.Cover = url
 	}
 	if err := book.Update(); err != nil {
@@ -379,22 +379,33 @@ func (this *BookController) UploadCover() {
 	}
 	// 如果原封面不是默认封面则删除
 	if oldCover != utils.GetDefaultCover() {
-		os.Remove("." + oldCover)
+		if strings.Contains(oldCover, "https://bareth-1305674339.cos.ap-hongkong.myqcloud.com/") {
+			oldCover = strings.Replace(oldCover, "https://bareth-1305674339.cos.ap-hongkong.myqcloud.com/", "", 1)
+		}
+		//os.Remove("." + oldCover)
 		switch utils.StoreType {
-		case utils.StoreOss:
+		case constant.StoreOss:
 			store.ModelStoreOss.DelFromOss(oldCover) //从OSS执行一次删除
-		case utils.StoreLocal:
+		case constant.StoreCos:
+			store.ModelStoreCos.DelFromCos(oldCover) //从COS执行一次删除
+		case constant.StoreLocal:
 			store.ModelStoreLocal.DelFiles(oldCover) //从本地执行一次删除
 		}
 	}
 	switch utils.StoreType {
-	case utils.StoreOss: //oss
+	case constant.StoreOss: //oss
 		if err := store.ModelStoreOss.MoveToOss("."+url, osspath, true, false); err != nil {
 			beego.Error(err.Error())
 		} else {
 			url = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ") + "/" + osspath + "/cover"
 		}
-	case utils.StoreLocal:
+	case constant.StoreCos: //oss
+		if err := store.ModelStoreCos.MoveToCos("."+url, osspath, true, false); err != nil {
+			beego.Error(err.Error())
+		} else {
+			url = strings.TrimRight(beego.AppConfig.String("cos::Domain"), "/ ") + "/" + osspath + "/cover"
+		}
+	case constant.StoreLocal:
 		save := book.Cover
 		if err := store.ModelStoreLocal.MoveToStore("."+url, save); err != nil {
 			beego.Error(err.Error())
@@ -633,7 +644,7 @@ func (this *BookController) Release() {
 func (this *BookController) Generate() {
 	identify := this.GetString(":key")
 
-	if !models.NewBook().HasProjectAccess(identify, this.Member.MemberId, constant.BookAdmin) {
+	if !models.NewBook().HasBookAccess(identify, this.Member.MemberId, constant.BookAdmin) {
 		this.JsonResult(1, "您没有操作权限，只有书籍创始人和书籍管理员才有权限")
 	}
 	book, err := models.NewBook().FindByIdentify(identify)
@@ -758,7 +769,7 @@ func (this *BookController) GitPull() {
 	//2、解压zip到当前目录，然后移除非图片文件
 	//3、将文件夹移动到uploads目录下
 	identify := this.GetString("identify")
-	if !models.NewBook().HasProjectAccess(identify, this.Member.MemberId, constant.BookEditor) {
+	if !models.NewBook().HasBookAccess(identify, this.Member.MemberId, constant.BookEditor) {
 		this.JsonResult(1, "无操作权限")
 	}
 	book, _ := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
@@ -785,7 +796,7 @@ func (this *BookController) UploadProject() {
 	//2、解压zip到当前目录，然后移除非图片文件
 	//3、将文件夹移动到uploads目录下
 	identify := this.GetString("identify")
-	if !models.NewBook().HasProjectAccess(identify, this.Member.MemberId, constant.BookEditor) {
+	if !models.NewBook().HasBookAccess(identify, this.Member.MemberId, constant.BookEditor) {
 		this.JsonResult(1, "无操作权限")
 	}
 	book, _ := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
@@ -847,11 +858,11 @@ func (this *BookController) unzipToData(bookId int, identify, zipFile, originFil
 				ext := strings.ToLower(filepath.Ext(file.Path))
 				if ok, _ := imgMap[ext]; ok { //图片，录入oss
 					switch utils.StoreType {
-					case utils.StoreOss:
+					case constant.StoreOss:
 						if err := store.ModelStoreOss.MoveToOss(file.Path, "projects/"+identify+strings.TrimPrefix(file.Path, projectRoot), false, false); err != nil {
 							beego.Error(err)
 						}
-					case utils.StoreLocal:
+					case constant.StoreLocal:
 						if err := store.ModelStoreLocal.MoveToStore(file.Path, "uploads/projects/"+identify+strings.TrimPrefix(file.Path, projectRoot)); err != nil {
 							beego.Error(err)
 						}
@@ -931,11 +942,11 @@ func (this *BookController) loadByFolder(bookId int, identify, folder string) {
 			ext := strings.ToLower(filepath.Ext(file.Path))
 			if ok, _ := imgMap[ext]; ok { //图片，录入oss
 				switch utils.StoreType {
-				case utils.StoreOss:
+				case constant.StoreOss:
 					if err := store.ModelStoreOss.MoveToOss(file.Path, "projects/"+identify+strings.TrimPrefix(file.Path, folder), false, false); err != nil {
 						beego.Error(err)
 					}
-				case utils.StoreLocal:
+				case constant.StoreLocal:
 					if err := store.ModelStoreLocal.MoveToStore(file.Path, "uploads/projects/"+identify+strings.TrimPrefix(file.Path, folder)); err != nil {
 						beego.Error(err)
 					}
@@ -997,9 +1008,11 @@ func (this *BookController) getProjectRoot(fl []filetil.FileList) (root string) 
 func (this *BookController) replaceToAbs(projectRoot string, identify string) {
 	imgBaseUrl := "/uploads/projects/" + identify
 	switch utils.StoreType {
-	case utils.StoreLocal:
+	case constant.StoreLocal:
 		imgBaseUrl = "/uploads/projects/" + identify
-	case utils.StoreOss:
+	case constant.StoreCos:
+		imgBaseUrl = "/projects/" + identify
+	case constant.StoreOss:
 		//imgBaseUrl = this.BaseController.OssDomain + "/projects/" + identify
 		imgBaseUrl = "/projects/" + identify
 	}

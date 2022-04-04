@@ -34,9 +34,10 @@ func webRouter() {
 	// 标签页
 	beego.Router("/label", &controllers.LabelController{}, "get:List")
 	beego.Router("/label/:key", &controllers.LabelController{}, "get:Index")
-	// 收录页
-	beego.Router("/submit", &controllers.SubmitController{}, "get:Index") // 收录页
-	beego.Router("/submit", &controllers.SubmitController{}, "post:Post") // 提交收录
+	// 友情链接页
+	beego.Router("/friendlink", &controllers.FriendLinkController{}, "*:List")
+	// 我的收藏
+	beego.Router("/star", &controllers.StarController{}, "*:List")
 	// 书籍搜索
 	beego.Router("/search", &controllers.SearchController{}, "get:Search")        // 搜索页
 	beego.Router("/search/result", &controllers.SearchController{}, "get:Result") // 搜索结果
@@ -53,7 +54,6 @@ func webRouter() {
 	beego.Router("/setting", &controllers.SettingController{}, "*:Index")             // 个人设置
 	beego.Router("/setting/password", &controllers.SettingController{}, "*:Password") // 修改密码
 	beego.Router("/setting/upload", &controllers.SettingController{}, "*:Upload")     // 上传图片
-	beego.Router("/setting/star", &controllers.SettingController{}, "*:Star")         // 我的收藏
 	beego.Router("/setting/qrcode", &controllers.SettingController{}, "*:Qrcode")
 
 	// 我的书籍
@@ -81,9 +81,6 @@ func webRouter() {
 	beego.Router("/book/users/create", &controllers.BookMemberController{}, "post:AddMember")    // 添加书籍成员
 	beego.Router("/book/users/change", &controllers.BookMemberController{}, "post:ChangeRole")   // 修改书籍成员角色
 	beego.Router("/book/users/delete", &controllers.BookMemberController{}, "post:RemoveMember") // 删除书籍成员
-
-	// 友链
-	beego.Router("/friendlink/list", &controllers.FriendLinkController{}, "*:List") // 展示所有友情链接
 
 	// 管理后台(管理员用户)
 	beego.Router("/manager", &controllers.ManagerController{}, "*:Index")                                              // 管理后台首页
@@ -131,9 +128,6 @@ func webRouter() {
 	beego.Router("/manager/banners/upload", &controllers.ManagerController{}, "post:UploadBanner")                     // 上传横幅
 	beego.Router("/manager/banners/delete", &controllers.ManagerController{}, "get:DeleteBanner")                      // 删除横幅
 	beego.Router("/manager/banners/update", &controllers.ManagerController{}, "get:UpdateBanner")                      // 更新横幅
-	beego.Router("/manager/submit-book", &controllers.ManagerController{}, "get:SubmitBook")                           // 收录管理
-	beego.Router("/manager/submit-book/update", &controllers.ManagerController{}, "get:UpdateSubmitBook")              // 更新收录书籍
-	beego.Router("/manager/submit-book/delete", &controllers.ManagerController{}, "get:DeleteSubmitBook")              // 删除收录书籍
 
 	// 书签
 	beego.Router("/bookmark/:id", &controllers.BookmarkController{}, "get:Bookmark")

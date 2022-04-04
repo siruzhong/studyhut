@@ -17,21 +17,9 @@ type Option struct {
 	Remark      string `orm:"column(remark);type(text);null" json:"remark"`             // 描述
 }
 
-// optionCache 配置项缓存
-var optionCache sync.Map
-
 // NewOption 创建配置项
 func NewOption() *Option {
 	return &Option{}
-}
-
-// initOptionCache 初始化配置缓存
-func initOptionCache() {
-	opts, _ := NewOption().All()
-	for _, opt := range opts {
-		optionCache.Store(opt.OptionName, opt)
-		optionCache.Store(opt.OptionId, opt)
-	}
 }
 
 // TableName 获取数据表名
@@ -42,6 +30,18 @@ func (m *Option) TableName() string {
 // TableNameWithPrefix 获取带前缀对数据表名
 func (m *Option) TableNameWithPrefix() string {
 	return utils.GetDatabasePrefix() + m.TableName()
+}
+
+// optionCache 配置项缓存
+var optionCache sync.Map
+
+// initOptionCache 初始化配置缓存
+func initOptionCache() {
+	opts, _ := NewOption().All()
+	for _, opt := range opts {
+		optionCache.Store(opt.OptionName, opt)
+		optionCache.Store(opt.OptionId, opt)
+	}
 }
 
 // Init 初始化配置项
@@ -114,17 +114,13 @@ func (m *Option) Init() error {
 			OptionName:  "LOGIN_GITEE",
 			OptionTitle: "是否允许使用码云登录",
 		}, {
-			OptionValue: "0",
+			OptionValue: "1",
 			OptionName:  "RELATE_BOOK",
 			OptionTitle: "是否开始关联书籍",
 		}, {
 			OptionValue: "true",
 			OptionName:  "ALL_CAN_WRITE_BOOK",
 			OptionTitle: "是否都可以创建书籍",
-		}, {
-			OptionValue: "false",
-			OptionName:  "CLOSE_SUBMIT_ENTER",
-			OptionTitle: "是否关闭收录入口",
 		}, {
 			OptionValue: "true",
 			OptionName:  "CLOSE_OPEN_SOURCE_LINK",
@@ -163,7 +159,7 @@ func (m *Option) Init() error {
 			OptionTitle: "用户每次签到基础奖励阅读时长(秒)",
 		}, {
 			OptionValue: "0",
-			OptionName:  "SIGN_CONTINUOUS_REWARD", //
+			OptionName:  "SIGN_CONTINUOUS_REWARD",
 			OptionTitle: "用户连续签到奖励阅读时长(秒)",
 		}, {
 			OptionValue: "0",

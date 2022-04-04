@@ -86,7 +86,6 @@ func RegisterModel() {
 		new(models.ReadCount),
 		new(models.ReadRecord),
 		new(models.Bookmark),
-		new(models.SubmitBooks),
 		new(models.RelateBook),
 		new(models.Auth),
 		new(models.Banner),

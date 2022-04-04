@@ -219,12 +219,16 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 								defer os.Remove(tmpFile)
 								var newSrc string
 								switch utils.StoreType {
-								case utils.StoreLocal:
+								case constant.StoreLocal:
 									newSrc = "/uploads/projects/" + book.Identify + "/" + filepath.Base(tmpFile)
 									err = store.ModelStoreLocal.MoveToStore(tmpFile, strings.TrimPrefix(newSrc, "/"))
-								case utils.StoreOss:
+								case constant.StoreOss:
 									newSrc = "projects/" + book.Identify + "/" + filepath.Base(tmpFile)
 									err = store.ModelStoreOss.MoveToOss(tmpFile, newSrc, true)
+									newSrc = "/" + newSrc
+								case constant.StoreCos:
+									newSrc = "projects/" + book.Identify + "/" + filepath.Base(tmpFile)
+									err = store.ModelStoreCos.MoveToCos(tmpFile, newSrc, true)
 									newSrc = "/" + newSrc
 								}
 								if err != nil {
@@ -405,8 +409,10 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 					if srcLower := strings.ToLower(src); strings.HasPrefix(srcLower, "http://") || strings.HasPrefix(srcLower, "https://") {
 						pic = src
 					} else {
-						if utils.StoreType == utils.StoreOss {
+						if utils.StoreType == constant.StoreOss {
 							pic = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ") + "/" + strings.TrimLeft(src, "./")
+						} else if utils.StoreType == constant.StoreCos {
+							pic = strings.TrimRight(beego.AppConfig.String("cos::Domain"), "/ ") + "/" + strings.TrimLeft(src, "./")
 						} else {
 							pic = baseUrl + src
 						}
@@ -483,12 +489,16 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 
 	//删除旧文件
 	switch utils.StoreType {
-	case utils.StoreOss:
+	case constant.StoreOss:
 		if err := store.ModelStoreOss.DelFromOss(oldBook+".pdf", oldBook+".epub", oldBook+".mobi"); err != nil { //删除旧版
 			beego.Error(err)
 		}
-	case utils.StoreLocal: //本地存储
-		if utils.StoreType == utils.StoreLocal {
+	case constant.StoreCos:
+		if err := store.ModelStoreCos.DelFromCos(oldBook+".pdf", oldBook+".epub", oldBook+".mobi"); err != nil { //删除旧版
+			beego.Error(err)
+		}
+	case constant.StoreLocal: //本地存储
+		if utils.StoreType == constant.StoreLocal {
 			if err = os.RemoveAll(fmt.Sprintf("uploads/projects/%v/books/", book.Identify)); err != nil {
 				beego.Error(err)
 			}
@@ -498,14 +508,19 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 	exts := []string{".pdf", ".epub", ".mobi"}
 	for _, ext := range exts {
 		switch utils.StoreType {
-		case utils.StoreOss:
+		case constant.StoreOss:
 			//不要开启gzip压缩，否则会出现文件损坏的情况
 			if err := store.ModelStoreOss.MoveToOss(folder+"output/book"+ext, newBookFmt+ext, true, false); err != nil {
 				beego.Error(err)
 			} else { //设置下载头
 				store.ModelStoreOss.SetObjectMeta(newBookFmt+ext, book.BookName+ext)
 			}
-		case utils.StoreLocal: //本地存储
+		case constant.StoreCos:
+			//不要开启gzip压缩，否则会出现文件损坏的情况
+			if err := store.ModelStoreCos.MoveToCos(folder+"output/book"+ext, newBookFmt+ext, true, false); err != nil {
+				beego.Error(err)
+			}
+		case constant.StoreLocal: //本地存储
 			store.ModelStoreLocal.MoveToStore(folder+"output/book"+ext, "uploads/"+newBookFmt+ext)
 		}
 	}

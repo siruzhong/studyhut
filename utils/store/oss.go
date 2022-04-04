@@ -4,12 +4,10 @@ import (
 	"bytes"
 	"compress/gzip"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"strings"
 
-	"github.com/PuerkitoBio/goquery"
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"github.com/astaxie/beego"
 )
@@ -129,7 +127,7 @@ func (o *Oss) DelFromOss(object ...string) (err error) {
 	return err
 }
 
-// SetObjectMeta 设置文件的下载名
+// SetObjectMeta 设置文件的元数据
 // @param	obj			文档对象
 // @param	filename	文件名
 func (o *Oss) SetObjectMeta(obj, filename string) {
@@ -137,54 +135,54 @@ func (o *Oss) SetObjectMeta(obj, filename string) {
 	bucket.SetObjectMeta(obj, oss.ContentDisposition(fmt.Sprintf("attachment; filename=%v", filename)))
 }
 
-// HandleContent 处理html中的OSS数据：如果是用于预览的内容，则把img等的链接的相对路径转成绝对路径，否则反之
-// @param	htmlstr		html字符串
-// @param	forPreview	是否是供浏览的页面需求
-// @return	str			处理后返回的字符串
-func (o *Oss) HandleContent(htmlStr string, forPreview bool) (str string) {
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlStr))
-	if err != nil {
-		beego.Error(err.Error())
-		return htmlStr
-	}
-	doc.Find("img").Each(func(i int, s *goquery.Selection) {
-		// For each item found, get the band and title
-		if src, exist := s.Attr("src"); exist {
-			//预览
-			if forPreview {
-				//不存在http开头的图片链接，则更新为绝对链接
-				if !(strings.HasPrefix(src, "http://") || strings.HasPrefix(src, "https://")) {
-					s.SetAttr("src", o.Domain+"/"+strings.TrimLeft(src, "./"))
-				}
-			} else {
-				s.SetAttr("src", strings.TrimPrefix(src, o.Domain))
-			}
-		}
-	})
-	str, _ = doc.Find("body").Html()
-	return
-}
-
-// DelByHtmlPics 从HTML中提取图片文件，并删除
-func (o *Oss) DelByHtmlPics(htmlStr string) {
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlStr))
-	if err != nil {
-		beego.Error(err.Error())
-		return
-	}
-	doc.Find("img").Each(func(i int, s *goquery.Selection) {
-		// For each item found, get the band and title
-		if src, exist := s.Attr("src"); exist {
-			//不存在http开头的图片链接，则更新为绝对链接
-			if !(strings.HasPrefix(src, "http://") || strings.HasPrefix(src, "https://")) {
-				o.DelFromOss(strings.TrimLeft(src, "./")) //删除
-			} else if strings.HasPrefix(src, o.Domain) {
-				o.DelFromOss(strings.TrimPrefix(src, o.Domain)) //删除
-			}
-		}
-	})
-	return
-}
+//// HandleContent 处理html中的OSS数据：如果是用于预览的内容，则把img等的链接的相对路径转成绝对路径，否则反之
+//// @param	htmlstr		html字符串
+//// @param	forPreview	是否是供浏览的页面需求
+//// @return	str			处理后返回的字符串
+//func (o *Oss) HandleContent(htmlStr string, forPreview bool) (str string) {
+//	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlStr))
+//	if err != nil {
+//		beego.Error(err.Error())
+//		return htmlStr
+//	}
+//	doc.Find("img").Each(func(i int, s *goquery.Selection) {
+//		// For each item found, get the band and title
+//		if src, exist := s.Attr("src"); exist {
+//			//预览
+//			if forPreview {
+//				//不存在http开头的图片链接，则更新为绝对链接
+//				if !(strings.HasPrefix(src, "http://") || strings.HasPrefix(src, "https://")) {
+//					s.SetAttr("src", o.Domain+"/"+strings.TrimLeft(src, "./"))
+//				}
+//			} else {
+//				s.SetAttr("src", strings.TrimPrefix(src, o.Domain))
+//			}
+//		}
+//	})
+//	str, _ = doc.Find("body").Html()
+//	return
+//}
+//
+//// DelByHtmlPics 从HTML中提取图片文件，并删除
+//func (o *Oss) DelByHtmlPics(htmlStr string) {
+//	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlStr))
+//	if err != nil {
+//		beego.Error(err.Error())
+//		return
+//	}
+//	doc.Find("img").Each(func(i int, s *goquery.Selection) {
+//		// For each item found, get the band and title
+//		if src, exist := s.Attr("src"); exist {
+//			//不存在http开头的图片链接，则更新为绝对链接
+//			if !(strings.HasPrefix(src, "http://") || strings.HasPrefix(src, "https://")) {
+//				o.DelFromOss(strings.TrimLeft(src, "./")) //删除
+//			} else if strings.HasPrefix(src, o.Domain) {
+//				o.DelFromOss(strings.TrimPrefix(src, o.Domain)) //删除
+//			}
+//		}
+//	})
+//	return
+//}
 
 // DelOssFolder 根据oss文件夹
 func (o *Oss) DelOssFolder(folder string) (err error) {
@@ -208,12 +206,12 @@ func (o *Oss) DelOssFolder(folder string) (err error) {
 	return
 }
 
-func (o *Oss) GetFileReader(objKey string) (reader io.ReadCloser, err error) {
-	var bucket *oss.Bucket
-	bucket, err = o.GetBucket()
-	if err != nil {
-		return
-	}
-	reader, err = bucket.GetObject(objKey)
-	return
-}
+//func (o *Oss) GetFileReader(objKey string) (reader io.ReadCloser, err error) {
+//	var bucket *oss.Bucket
+//	bucket, err = o.GetBucket()
+//	if err != nil {
+//		return
+//	}
+//	reader, err = bucket.GetObject(objKey)
+//	return
+//}

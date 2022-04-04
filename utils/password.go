@@ -22,7 +22,6 @@ const (
 
 // PasswordHash 加密密码
 func PasswordHash(pass string) (string, error) {
-
 	saltSecret, err := saltSecret()
 	if err != nil {
 		return "", err

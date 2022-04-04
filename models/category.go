@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"programming-learning-platform/constant"
 	"programming-learning-platform/utils/store"
 	"strings"
 
@@ -69,9 +70,11 @@ func (this *Category) DelCategory(id int) (err error) {
 	}
 
 	switch utils.StoreType {
-	case utils.StoreOss:
+	case constant.StoreOss:
 		store.ModelStoreOss.DelFromOss(cate.Icon)
-	case utils.StoreLocal:
+	case constant.StoreCos:
+		store.ModelStoreCos.DelFromCos(cate.Icon)
+	case constant.StoreLocal:
 		store.ModelStoreLocal.DelFiles(cate.Icon)
 	}
 	return

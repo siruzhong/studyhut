@@ -7,7 +7,6 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
 	"programming-learning-platform/models"
-	"programming-learning-platform/utils"
 )
 
 func init() {
@@ -35,7 +34,6 @@ func init() {
 
 	var FinishRouter = func(ctx *context.Context) {
 		ctx.ResponseWriter.Header().Add("Application", "BookStack")
-		ctx.ResponseWriter.Header().Add("Version", utils.Version)
 	}
 	beego.InsertFilter("/*", beego.BeforeRouter, FinishRouter, false)
 	beego.SetStaticPath("/sitemap", "sitemap")

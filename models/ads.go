@@ -47,6 +47,7 @@ var (
 	positionCache sync.Map // map[positionIdentify-isMobile]=pid
 )
 
+// InstallAdsPosition 初始化广告位
 func InstallAdsPosition() {
 	positions := []AdsPosition{
 		{

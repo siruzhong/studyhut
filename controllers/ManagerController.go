@@ -745,12 +745,14 @@ func (this *ManagerController) AttachDelete() {
 	}
 	obj := strings.TrimLeft(attach.FilePath, "./")
 	switch utils.StoreType {
-	case utils.StoreOss:
+	case constant.StoreOss:
 		store.ModelStoreOss.DelFromOss(obj)
 		if bucket, err := store.ModelStoreOss.GetBucket(); err == nil {
 			bucket.SetObjectACL(obj, oss.ACLPrivate)
 		}
-	case utils.StoreLocal:
+	case constant.StoreCos:
+		store.ModelStoreCos.DelFromCos(obj)
+	case constant.StoreLocal:
 		os.Remove(obj)
 	}
 	attach.Delete()
@@ -967,11 +969,15 @@ func (this *ManagerController) UpdateCateIcon() {
 		os.MkdirAll(filepath.Dir(tmpFile), os.ModePerm)
 		if err = this.SaveToFile("icon", tmpFile); err == nil {
 			switch utils.StoreType {
-			case utils.StoreOss:
+			case constant.StoreOss:
 				store.ModelStoreOss.MoveToOss(tmpFile, tmpFile, true, false)
 				store.ModelStoreOss.DelFromOss(cate.Icon)
 				data["icon"] = utils.ShowImg(tmpFile)
-			case utils.StoreLocal:
+			case constant.StoreCos:
+				store.ModelStoreCos.MoveToCos(tmpFile, tmpFile, true, false)
+				store.ModelStoreCos.DelFromCos(cate.Icon)
+				data["icon"] = utils.ShowImg(tmpFile)
+			case constant.StoreLocal:
 				store.ModelStoreLocal.DelFiles(cate.Icon)
 				data["icon"] = "/" + tmpFile
 			}
@@ -1057,11 +1063,15 @@ func (this *ManagerController) UpdateFriendLinkIcon() {
 		os.MkdirAll(filepath.Dir(tmpFile), os.ModePerm)
 		if err = this.SaveToFile("pic", tmpFile); err == nil {
 			switch utils.StoreType {
-			case utils.StoreOss:
+			case constant.StoreOss:
 				store.ModelStoreOss.MoveToOss(tmpFile, tmpFile, true, false)
 				store.ModelStoreOss.DelFromOss(friendlink.Pic)
 				data["icon"] = utils.ShowImg(tmpFile)
-			case utils.StoreLocal:
+			case constant.StoreCos:
+				store.ModelStoreCos.MoveToCos(tmpFile, tmpFile, true, false)
+				store.ModelStoreCos.DelFromCos(friendlink.Pic)
+				data["icon"] = utils.ShowImg(tmpFile)
+			case constant.StoreLocal:
 				store.ModelStoreLocal.DelFiles(friendlink.Pic)
 				data["pic"] = "/" + tmpFile
 			}
@@ -1153,38 +1163,4 @@ func (this *ManagerController) UploadBanner() {
 		this.JsonResult(1, err.Error())
 	}
 	this.JsonResult(0, "横幅上传成功")
-}
-
-func (this *ManagerController) SubmitBook() {
-	this.TplName = "manager/submit_book.html"
-	m := models.NewSubmitBooks()
-	page, _ := this.GetInt("page", 1)
-	size, _ := this.GetInt("size", 100)
-	books, total, _ := m.Lists(page, size)
-	if total > 0 {
-		this.Data["PageHtml"] = utils.NewPaginations(constant.RollPage, int(total), size, page, beego.URLFor("ManagerController.SubmitBook"), "")
-	} else {
-		this.Data["PageHtml"] = ""
-	}
-	this.Data["Books"] = books
-	this.Data["IsSubmitBook"] = true
-}
-
-func (this *ManagerController) DeleteSubmitBook() {
-	id, _ := this.GetInt("id")
-	orm.NewOrm().QueryTable(models.NewSubmitBooks()).Filter("id", id).Delete()
-	this.JsonResult(0, "删除成功")
-}
-
-func (this *ManagerController) UpdateSubmitBook() {
-	field := this.GetString("field")
-	value := this.GetString("value")
-	id, _ := this.GetInt("id")
-	if id > 0 {
-		_, err := orm.NewOrm().QueryTable(models.NewSubmitBooks()).Filter("id", id).Update(orm.Params{field: value})
-		if err != nil {
-			this.JsonResult(1, err.Error())
-		}
-	}
-	this.JsonResult(0, "更新成功")
 }

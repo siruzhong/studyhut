@@ -1,6 +1,7 @@
 package models
 
 import (
+	"programming-learning-platform/constant"
 	"strings"
 
 	"github.com/astaxie/beego"
@@ -14,8 +15,12 @@ var (
 )
 
 func initAPI() {
-	if strings.ToLower(utils.StoreType) == utils.StoreOss {
+	if strings.ToLower(utils.StoreType) == constant.StoreOss {
 		staticDomain = strings.TrimSpace(beego.AppConfig.String("oss::Domain"))
+	}
+
+	if strings.ToLower(utils.StoreType) == constant.StoreCos {
+		staticDomain = strings.TrimSpace(beego.AppConfig.String("cos::Domain"))
 	}
 
 	if strings.TrimRight(staticDomain, "/") == "" {

@@ -66,7 +66,7 @@ func (this *StaticController) StaticFile() {
 
 // ProjectsFile 书籍静态文件
 func (this *StaticController) ProjectsFile() {
-	if utils.StoreType != utils.StoreOss {
+	if utils.StoreType != constant.StoreOss {
 		this.Abort("404")
 	}
 
@@ -88,10 +88,6 @@ func (this *StaticController) ProjectsFile() {
 			return
 		}
 	}
-
-	// if utils.IsSignUsed(sign) {
-	// 	this.Abort("404")
-	// }
 
 	if bucket, err := store.ModelStoreOss.GetBucket(); err == nil {
 		object, _ = bucket.SignURL(object, http.MethodGet, utils.MediaDuration)

@@ -98,18 +98,6 @@
                         </div>
 
                         <div class="form-group">
-                            <label>是否隐藏导航栏收录入口</label>
-                            <div class="radio">
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .CLOSE_SUBMIT_ENTER.OptionValue "true"}}checked{{end}} name="CLOSE_SUBMIT_ENTER" value="true">隐藏<span class="text"></span>
-                                </label>
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .CLOSE_SUBMIT_ENTER.OptionValue "false"}}checked{{end}} name="CLOSE_SUBMIT_ENTER" value="false">显示<span class="text"></span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
                             <label>是否隐藏导航栏开源入口</label>
                             <div class="radio">
                                 <label class="radio-inline">
@@ -120,7 +108,6 @@
                                 </label>
                             </div>
                         </div>
-
 
                         <div class="form-group">
                             <label>{{.AUTO_HTTPS.OptionTitle}} ( <span class="text-muted">将图片链接由 http:// 自动替换为 https:// </span>)</label>

@@ -108,41 +108,6 @@ func (this *SettingController) Password() {
 	this.TplName = "setting/password.html"
 }
 
-// Star 我的收藏
-func (this *SettingController) Star() {
-	page, _ := this.GetInt("page")
-	cid, _ := this.GetInt("cid")
-	if page < 1 {
-		page = 1
-	}
-	sort := this.GetString("sort", "read")
-
-	cnt, books, _ := new(models.Star).List(this.Member.MemberId, page, constant.PageSize, cid, sort)
-	if cnt > 1 {
-		//this.Data["PageHtml"] = utils.GetPagerHtml(this.Ctx.Request.RequestURI, page, listRows, int(cnt))
-		this.Data["PageHtml"] = utils.NewPaginations(constant.RollPage, int(cnt), constant.PageSize, page, beego.URLFor("SettingController.Star"), "")
-	}
-	this.Data["Pid"] = 0
-
-	cates := models.NewCategory().CategoryOfUserCollection(this.Member.MemberId)
-	for _, cate := range cates {
-		if cate.Id == cid {
-			if cate.Pid == 0 {
-				this.Data["Pid"] = cate.Id
-			} else {
-				this.Data["Pid"] = cate.Pid
-			}
-		}
-	}
-	this.Data["Books"] = books
-	this.Data["Sort"] = sort
-	this.Data["SettingStar"] = true
-	this.Data["SeoTitle"] = "我的收藏 - " + this.Sitename
-	this.TplName = "setting/star.html"
-	this.Data["Cid"] = cid
-	this.Data["Cates"] = cates
-}
-
 // Qrcode 二维码
 func (this *SettingController) Qrcode() {
 	if this.Ctx.Input.IsPost() {
@@ -167,13 +132,19 @@ func (this *SettingController) Qrcode() {
 		}
 		url := ""
 		switch utils.StoreType {
-		case utils.StoreOss:
+		case constant.StoreOss:
 			if err := store.ModelStoreOss.MoveToOss(savePath, savePath, true, false); err != nil {
 				beego.Error(err.Error())
 			} else {
 				url = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ") + "/" + savePath
 			}
-		case utils.StoreLocal:
+		case constant.StoreCos:
+			if err := store.ModelStoreCos.MoveToCos(savePath, savePath, true, false); err != nil {
+				beego.Error(err.Error())
+			} else {
+				url = strings.TrimRight(beego.AppConfig.String("cos::Domain"), "/ ") + "/" + savePath
+			}
+		case constant.StoreLocal:
 			if err := store.ModelStoreLocal.MoveToStore(savePath, savePath); err != nil {
 				beego.Error(err.Error())
 			} else {
@@ -194,9 +165,11 @@ func (this *SettingController) Qrcode() {
 			}
 			if _, err := o.Update(&member, "wxpay", "alipay"); err == nil {
 				switch utils.StoreType {
-				case utils.StoreOss:
+				case constant.StoreOss:
 					go store.ModelStoreOss.DelFromOss(dels...)
-				case utils.StoreLocal:
+				case constant.StoreCos:
+					go store.ModelStoreCos.DelFromCos(dels...)
+				case constant.StoreLocal:
 					go store.ModelStoreLocal.DelFiles(dels...)
 				}
 			}
@@ -281,13 +254,19 @@ func (this *SettingController) Upload() {
 		this.SetMember(*member)
 	}
 	switch utils.StoreType {
-	case utils.StoreOss: //oss存储
+	case constant.StoreOss: //oss存储
 		if err := store.ModelStoreOss.MoveToOss("."+url, strings.TrimLeft(url, "./"), true, false); err != nil {
 			beego.Error(err.Error())
 		} else {
 			url = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ") + url + "/avatar"
 		}
-	case utils.StoreLocal: //本地存储
+	case constant.StoreCos: //oss存储
+		if err := store.ModelStoreCos.MoveToCos("."+url, strings.TrimLeft(url, "./"), true, false); err != nil {
+			beego.Error(err.Error())
+		} else {
+			url = strings.TrimRight(beego.AppConfig.String("cos::Domain"), "/ ") + url + "/avatar"
+		}
+	case constant.StoreLocal: //本地存储
 		if err := store.ModelStoreLocal.MoveToStore("."+url, strings.TrimLeft(url, "./")); err != nil {
 			beego.Error(err.Error())
 		} else {

@@ -16,6 +16,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"programming-learning-platform/constant"
 	"programming-learning-platform/utils/store"
 	"reflect"
 	"strconv"
@@ -35,15 +36,8 @@ import (
 	"programming-learning-platform/utils/html2md"
 )
 
-// 存储类型(更多存储类型有待扩展)
-const (
-	StoreLocal = "local"
-	StoreOss   = "oss"
-)
-
 // 分词器
 var (
-	Version     = "unknown"
 	StoreType   = beego.AppConfig.String("store_type") //存储类型
 	langs       sync.Map
 	httpTimeout = time.Duration(beego.AppConfig.DefaultInt("http_timeout", 30)) * time.Second
@@ -94,8 +88,8 @@ func SendMail(conf *SmtpConf, subject, email string, body string) error {
 
 // RenderDocumentById 渲染markdown为html并录入数据库
 func RenderDocumentById(id int) {
-	//使用chromium-browser
-	//	chromium-browser --headless --disable-gpu --screenshot --no-sandbox --window-size=320,480 http://www.bookstack.cn
+	// 使用chromium-browser
+	// chromium-browser --headless --disable-gpu --screenshot --no-sandbox --window-size=320,480 http://www.bookstack.cn
 	link := "http://localhost:" + beego.AppConfig.DefaultString("httpport", "8181") + "/local-render?id=" + strconv.Itoa(id)
 	name := beego.AppConfig.DefaultString("chrome", "chromium-browser")
 	args := []string{"--headless", "--disable-gpu", "--screenshot", "--no-sandbox", "--window-size=320,480", link}
@@ -407,12 +401,16 @@ func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence in
 					if err == nil {
 						defer os.Remove(tmpFile) //删除文件
 						switch StoreType {
-						case StoreLocal:
+						case constant.StoreLocal:
 							src = "/uploads/projects/" + project + "/" + filepath.Base(tmpFile)
 							store.ModelStoreLocal.MoveToStore(tmpFile, strings.TrimPrefix(src, "/"))
-						case StoreOss:
+						case constant.StoreOss:
 							src = "projects/" + project + "/" + filepath.Base(tmpFile)
 							store.ModelStoreOss.MoveToOss(tmpFile, src, true)
+							src = "/" + src
+						case constant.StoreCos:
+							src = "projects/" + project + "/" + filepath.Base(tmpFile)
+							store.ModelStoreCos.MoveToCos(tmpFile, src, true)
 							src = "/" + src
 						}
 						imageMap[srcLower] = src
@@ -514,12 +512,16 @@ func HandleSVG(doc *goquery.Document, project string) *goquery.Document {
 		src := ""
 		ioutil.WriteFile(tmpFile, []byte(ret), os.ModePerm)
 		switch StoreType {
-		case StoreLocal:
+		case constant.StoreLocal:
 			src = "/uploads/projects/" + project + "/" + filepath.Base(tmpFile)
 			store.ModelStoreLocal.MoveToStore(tmpFile, strings.TrimPrefix(src, "/"))
-		case StoreOss:
+		case constant.StoreOss:
 			src = "projects/" + project + "/" + filepath.Base(tmpFile)
 			store.ModelStoreOss.MoveToOss(tmpFile, src, true)
+			src = "/" + src
+		case constant.StoreCos:
+			src = "projects/" + project + "/" + filepath.Base(tmpFile)
+			store.ModelStoreCos.MoveToCos(tmpFile, src, true)
 			src = "/" + src
 		}
 		selection.AfterHtml(fmt.Sprintf(`<img src="%v"/>`, src))
@@ -538,13 +540,19 @@ func ShowImg(img string, style ...string) (url string) {
 	}
 	img = "/" + strings.TrimLeft(img, "./")
 	switch StoreType {
-	case StoreOss:
+	case constant.StoreOss:
 		s := ""
 		if len(style) > 0 && strings.TrimSpace(style[0]) != "" {
 			s = "/" + style[0]
 		}
 		url = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ") + img + s
-	case StoreLocal:
+	case constant.StoreCos:
+		s := ""
+		if len(style) > 0 && strings.TrimSpace(style[0]) != "" {
+			s = "/" + style[0]
+		}
+		url = strings.TrimRight(beego.AppConfig.String("cos::Domain"), "/ ") + img + s
+	case constant.StoreLocal:
 		url = img
 	}
 	return
@@ -866,21 +874,28 @@ func DeleteFile(file string) {
 		return
 	}
 	switch StoreType {
-	case StoreLocal:
+	case constant.StoreLocal:
 		go store.ModelStoreLocal.DelFolder(file)
-	case StoreOss:
+	case constant.StoreOss:
 		go store.ModelStoreOss.DelOssFolder(file)
+	case constant.StoreCos:
+		go store.ModelStoreCos.DelFromCos(file)
 	}
 }
 
 func UploadFile(src, dest string) (err error) {
 	switch StoreType {
-	case StoreOss: //oss存储
+	case constant.StoreOss: //oss存储
 		err = store.ModelStoreOss.MoveToOss(src, strings.TrimLeft(dest, "./"), false, false)
 		if err != nil {
 			beego.Error(err.Error())
 		}
-	case StoreLocal: //本地存储
+	case constant.StoreCos: //cos存储
+		err = store.ModelStoreCos.MoveToCos(src, strings.TrimLeft(dest, "./"), false, false)
+		if err != nil {
+			beego.Error(err.Error())
+		}
+	case constant.StoreLocal: //本地存储
 		err = store.ModelStoreLocal.MoveToStore(src, dest)
 		if err != nil {
 			beego.Error(err.Error())

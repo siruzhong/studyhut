@@ -25,7 +25,6 @@ func Install() {
 	initSeo()
 	fmt.Println("Install Successfully!")
 	os.Exit(0)
-
 }
 
 // initialization 初始化数据
@@ -36,7 +35,6 @@ func initialization() {
 		panic(err.Error())
 		os.Exit(1)
 	}
-
 	member, err := models.NewMember().FindByFieldFirst("account", "admin")
 	if err == orm.ErrNoRows {
 		member.Account = "admin"

@@ -257,7 +257,10 @@ func (this *DocumentController) Read() {
 			query.Find("img").Each(func(i int, contentSelection *goquery.Selection) {
 				src, ok := contentSelection.Attr("src")
 				if ok {
-					if utils.StoreType == utils.StoreOss && !(strings.HasPrefix(src, "https://") || strings.HasPrefix(src, "http://")) {
+					if utils.StoreType == constant.StoreOss && !(strings.HasPrefix(src, "https://") || strings.HasPrefix(src, "http://")) {
+						src = this.OssDomain + "/" + strings.TrimLeft(src, "./")
+					}
+					if utils.StoreType == constant.StoreCos && !(strings.HasPrefix(src, "https://") || strings.HasPrefix(src, "http://")) {
 						src = this.OssDomain + "/" + strings.TrimLeft(src, "./")
 					}
 				}
@@ -747,7 +750,7 @@ func (this *DocumentController) Upload() {
 
 	prefix := "uploads"
 	savePath := filepath.Join("projects", bookIdentify, time.Now().Format("200601"), fileName+ext)
-	if utils.StoreType != utils.StoreOss {
+	if utils.StoreType != constant.StoreOss || utils.StoreType != constant.StoreCos {
 		savePath = filepath.Join(prefix, savePath)
 		os.MkdirAll(filepath.Dir(savePath), os.ModePerm)
 		os.Rename(tmpPath, savePath)
@@ -780,7 +783,7 @@ func (this *DocumentController) Upload() {
 		this.JsonResult(6006, "文件保存失败")
 	}
 
-	if utils.StoreType == utils.StoreOss {
+	if utils.StoreType == constant.StoreOss {
 		if err := store.ModelStoreOss.MoveToOss(tmpPath, savePath, true, false); err != nil {
 			beego.Error(err.Error())
 		} else {
@@ -789,6 +792,11 @@ func (this *DocumentController) Upload() {
 					bucket.SetObjectACL(savePath, oss.ACLPrivate)
 				}
 			}
+		}
+	}
+	if utils.StoreType == constant.StoreCos {
+		if err := store.ModelStoreCos.MoveToCos(tmpPath, savePath, true, false); err != nil {
+			beego.Error(err.Error())
 		}
 	}
 
@@ -1196,13 +1204,19 @@ func (this *DocumentController) Export() {
 	obj := fmt.Sprintf("projects/%v/books/%v%v", book.Identify, book.GenerateTime.Unix(), ext)
 	link := ""
 	switch utils.StoreType {
-	case utils.StoreOss:
+	case constant.StoreOss:
 		if err := store.ModelStoreOss.IsObjectExist(obj); err != nil {
 			beego.Error(err, obj)
 			this.JsonResult(1, "下载失败，您要下载的文档当前并未生成可下载文档。")
 		}
 		link = this.OssDomain + "/" + obj
-	case utils.StoreLocal:
+	case constant.StoreCos:
+		if err := store.ModelStoreCos.IsObjectExist(obj); err != nil {
+			beego.Error(err, obj)
+			this.JsonResult(1, "下载失败，您要下载的文档当前并未生成可下载文档。")
+		}
+		link = this.OssDomain + "/" + obj
+	case constant.StoreLocal:
 		obj = "uploads/" + obj
 		if err := store.ModelStoreLocal.IsObjectExist(obj); err != nil {
 			beego.Error(err, obj)

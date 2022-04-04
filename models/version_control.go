@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"programming-learning-platform/constant"
 	"programming-learning-platform/utils/store"
 	"strings"
 	"time"
@@ -24,7 +25,7 @@ type versionControl struct {
 func NewVersionControl(docId int, version int64) *versionControl {
 	t := time.Unix(version, 0).Format("2006/01/02/%v/15/04/05")
 	folder := "./version_control/" + fmt.Sprintf(t, docId)
-	if utils.StoreType == utils.StoreLocal {
+	if utils.StoreType == constant.StoreLocal {
 		os.MkdirAll(folder, os.ModePerm)
 	}
 	return &versionControl{
@@ -37,7 +38,7 @@ func NewVersionControl(docId int, version int64) *versionControl {
 
 // 保存版本数据
 func (v *versionControl) SaveVersion(htmlContent, mdContent string) (err error) {
-	if utils.StoreType == utils.StoreLocal { //本地存储
+	if utils.StoreType == constant.StoreLocal { //本地存储
 		if err = ioutil.WriteFile(v.HtmlFile, []byte(htmlContent), os.ModePerm); err != nil {
 			return err
 		}
@@ -65,7 +66,7 @@ func (v *versionControl) GetVersionContent(isHtml bool) (content string) {
 	if isHtml {
 		file = v.HtmlFile
 	}
-	if utils.StoreType == utils.StoreLocal { //本地存储
+	if utils.StoreType == constant.StoreLocal { //本地存储
 		b, err := ioutil.ReadFile(file)
 		if err == nil {
 			content = string(b)
@@ -87,7 +88,7 @@ func (v *versionControl) GetVersionContent(isHtml bool) (content string) {
 
 // 删除版本文件
 func (v *versionControl) DeleteVersion() (err error) {
-	if utils.StoreType == utils.StoreLocal { //本地存储
+	if utils.StoreType == constant.StoreLocal { //本地存储
 		os.Remove(v.HtmlFile)
 		os.Remove(v.MdFile)
 		os.Remove(filepath.Dir(v.HtmlFile))
