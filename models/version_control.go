@@ -5,13 +5,13 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"programming-learning-platform/constant"
-	"programming-learning-platform/utils/store"
+	"studyhut/constant"
+	"studyhut/utils/store"
 	"strings"
 	"time"
 
 	"github.com/astaxie/beego"
-	"programming-learning-platform/utils"
+	"studyhut/utils"
 )
 
 // 版本控制，文件存储于获取

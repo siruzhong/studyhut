@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/astaxie/beego"
-	"programming-learning-platform/models"
+	"studyhut/models"
 )
 
 // RecordController 阅读记录控制器

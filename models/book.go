@@ -3,8 +3,8 @@ package models
 import (
 	"fmt"
 	"os"
-	"programming-learning-platform/constant"
-	"programming-learning-platform/utils/store"
+	"studyhut/constant"
+	"studyhut/utils/store"
 	"strconv"
 	"strings"
 	"time"
@@ -12,7 +12,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/utils"
+	"studyhut/utils"
 )
 
 // Book 书籍

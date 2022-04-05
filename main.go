@@ -6,9 +6,9 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/kardianos/service"
-	"programming-learning-platform/commands"
-	"programming-learning-platform/commands/daemon"
-	_ "programming-learning-platform/routers"
+	"studyhut/commands"
+	"studyhut/commands/daemon"
+	_ "studyhut/routers"
 )
 
 func main() {

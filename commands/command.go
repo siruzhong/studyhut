@@ -15,9 +15,9 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/lifei6671/gocaptcha"
-	"programming-learning-platform/commands/migrate"
-	"programming-learning-platform/models"
-	"programming-learning-platform/utils"
+	"studyhut/commands/migrate"
+	"studyhut/models"
+	"studyhut/utils"
 )
 
 var (

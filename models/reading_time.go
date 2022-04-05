@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"programming-learning-platform/constant"
+	"studyhut/constant"
 	"time"
 
 	"github.com/astaxie/beego/orm"

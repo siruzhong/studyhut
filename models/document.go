@@ -7,8 +7,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"programming-learning-platform/constant"
-	"programming-learning-platform/utils/store"
+	"studyhut/constant"
+	"studyhut/utils/store"
 	"strings"
 	"time"
 
@@ -20,7 +20,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/httplib"
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/utils"
+	"studyhut/utils"
 )
 
 // Document 文档

@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"github.com/astaxie/beego"
-	"programming-learning-platform/constant"
-	"programming-learning-platform/models"
+	"studyhut/constant"
+	"studyhut/models"
 )
 
 // CateController 分类控制器

@@ -5,13 +5,13 @@ import (
 	"net/http"
 	"net/url"
 	"path/filepath"
-	"programming-learning-platform/constant"
-	"programming-learning-platform/utils/store"
+	"studyhut/constant"
+	"studyhut/utils/store"
 	"strings"
 
 	"github.com/astaxie/beego"
-	"programming-learning-platform/models"
-	"programming-learning-platform/utils"
+	"studyhut/models"
+	"studyhut/utils"
 )
 
 // StaticController 静态文件控制器

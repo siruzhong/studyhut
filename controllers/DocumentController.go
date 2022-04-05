@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"programming-learning-platform/constant"
+	"studyhut/constant"
 	"regexp"
 	"strconv"
 	"strings"
@@ -22,10 +22,10 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/qr"
-	"programming-learning-platform/models"
-	"programming-learning-platform/utils"
-	"programming-learning-platform/utils/html2md"
-	"programming-learning-platform/utils/store"
+	"studyhut/models"
+	"studyhut/utils"
+	"studyhut/utils/html2md"
+	"studyhut/utils/store"
 )
 
 var (

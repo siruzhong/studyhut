@@ -2,7 +2,7 @@ package models
 
 import (
 	"fmt"
-	"programming-learning-platform/constant"
+	"studyhut/constant"
 	"strconv"
 	"strings"
 	"time"

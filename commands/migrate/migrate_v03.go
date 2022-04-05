@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/models"
+	"studyhut/models"
 )
 
 type MigrationVersion03 struct {

@@ -2,11 +2,11 @@ package controllers
 
 import (
 	"errors"
-	"programming-learning-platform/constant"
+	"studyhut/constant"
 
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/models"
+	"studyhut/models"
 )
 
 type BookMemberController struct {

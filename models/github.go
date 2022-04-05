@@ -2,7 +2,7 @@ package models
 
 import (
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/oauth"
+	"studyhut/oauth"
 )
 
 var ModelGithub = new(Github)

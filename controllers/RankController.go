@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"programming-learning-platform/constant"
-	"programming-learning-platform/models"
+	"studyhut/constant"
+	"studyhut/models"
 )
 
 // RankController 榜单控制器

@@ -3,7 +3,7 @@ package models
 import (
 	"fmt"
 	"math/rand"
-	"programming-learning-platform/constant"
+	"studyhut/constant"
 	"sync"
 	"time"
 

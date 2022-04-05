@@ -1,7 +1,7 @@
 package models
 
 import (
-	"programming-learning-platform/utils"
+	"studyhut/utils"
 	"strings"
 	"sync"
 

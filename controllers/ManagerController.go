@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"programming-learning-platform/constant"
-	"programming-learning-platform/utils/store"
+	"studyhut/constant"
+	"studyhut/utils/store"
 	"regexp"
 	"strconv"
 	"strings"
@@ -19,8 +19,8 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/models"
-	"programming-learning-platform/utils"
+	"studyhut/models"
+	"studyhut/utils"
 )
 
 // ManagerController 管理后台controller

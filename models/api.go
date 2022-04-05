@@ -1,12 +1,12 @@
 package models
 
 import (
-	"programming-learning-platform/constant"
+	"studyhut/constant"
 	"strings"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/utils"
+	"studyhut/utils"
 )
 
 var (

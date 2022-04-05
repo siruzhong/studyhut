@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/url"
-	"programming-learning-platform/constant"
+	"studyhut/constant"
 	"strconv"
 	"strings"
 	"time"
@@ -17,8 +17,8 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/models"
-	"programming-learning-platform/utils"
+	"studyhut/models"
+	"studyhut/utils"
 )
 
 // BaseController 基础控制器

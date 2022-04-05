@@ -2,13 +2,13 @@ package controllers
 
 import (
 	"fmt"
-	"programming-learning-platform/constant"
+	"studyhut/constant"
 	"strings"
 	"time"
 
 	"github.com/astaxie/beego"
-	"programming-learning-platform/models"
-	"programming-learning-platform/utils"
+	"studyhut/models"
+	"studyhut/utils"
 )
 
 // SearchController 搜索控制器

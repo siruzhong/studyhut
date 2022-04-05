@@ -3,13 +3,13 @@ package commands
 import (
 	"fmt"
 	"os"
-	"programming-learning-platform/utils"
+	"studyhut/utils"
 	"strings"
 	"time"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/models"
+	"studyhut/models"
 )
 
 // Install 系统安装

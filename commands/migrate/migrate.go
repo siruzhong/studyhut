@@ -21,7 +21,7 @@ import (
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/models"
+	"studyhut/models"
 )
 
 var (

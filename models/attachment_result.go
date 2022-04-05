@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/utils"
+	"studyhut/utils"
 )
 
 

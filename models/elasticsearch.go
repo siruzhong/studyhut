@@ -15,7 +15,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/httplib"
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/utils"
+	"studyhut/utils"
 )
 
 var IsRebuildAllIndex = false // 是否正在创建全量索引

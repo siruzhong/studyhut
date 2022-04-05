@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"programming-learning-platform/constant"
+	"studyhut/constant"
 	"time"
 
 	"github.com/astaxie/beego"
-	"programming-learning-platform/models"
-	"programming-learning-platform/utils"
+	"studyhut/models"
+	"studyhut/utils"
 )
 
 type UserController struct {

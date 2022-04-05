@@ -1,4 +1,4 @@
-module programming-learning-platform
+module studyhut
 
 go 1.13
 

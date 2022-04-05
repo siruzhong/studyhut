@@ -23,11 +23,11 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/russross/blackfriday"
-	"programming-learning-platform/constant"
-	"programming-learning-platform/models"
-	"programming-learning-platform/utils"
-	"programming-learning-platform/utils/html2md"
-	"programming-learning-platform/utils/store"
+	"studyhut/constant"
+	"studyhut/models"
+	"studyhut/utils"
+	"studyhut/utils/html2md"
+	"studyhut/utils/store"
 )
 
 // BookController 书籍控制器

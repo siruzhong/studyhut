@@ -1,4 +1,4 @@
-# programming-learning-platform
+# studyhut
 
 #### 介绍
 通过Beego开发的在线编程学习平台

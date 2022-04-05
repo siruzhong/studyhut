@@ -2,7 +2,7 @@ package models
 
 import (
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/oauth"
+	"studyhut/oauth"
 )
 
 /* Gitee用户的登录流程是这样的:

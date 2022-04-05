@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"github.com/astaxie/beego"
-	"programming-learning-platform/constant"
-	"programming-learning-platform/models"
-	"programming-learning-platform/utils"
+	"studyhut/constant"
+	"studyhut/models"
+	"studyhut/utils"
 )
 
 // StarController 收藏控制器

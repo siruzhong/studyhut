@@ -11,7 +11,7 @@ import (
 	"github.com/TruthHun/gotil/sitemap"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/constant"
+	"studyhut/constant"
 )
 
 // 时间段

@@ -2,7 +2,7 @@ package routers
 
 import (
 	"github.com/astaxie/beego"
-	"programming-learning-platform/controllers"
+	"studyhut/controllers"
 )
 
 func webRouter() {

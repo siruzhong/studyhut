@@ -2,8 +2,8 @@ package models
 
 import (
 	"errors"
-	"programming-learning-platform/constant"
-	"programming-learning-platform/utils"
+	"studyhut/constant"
+	"studyhut/utils"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"

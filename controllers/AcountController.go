@@ -3,7 +3,7 @@ package controllers
 import (
 	"errors"
 	"fmt"
-	"programming-learning-platform/constant"
+	"studyhut/constant"
 	"regexp"
 	"strings"
 	"time"
@@ -12,9 +12,9 @@ import (
 	"github.com/astaxie/beego/cache"
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/utils/captcha"
-	"programming-learning-platform/models"
-	"programming-learning-platform/oauth"
-	"programming-learning-platform/utils"
+	"studyhut/models"
+	"studyhut/oauth"
+	"studyhut/utils"
 )
 
 // AccountController 用户登录与注册

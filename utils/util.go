@@ -16,8 +16,8 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
-	"programming-learning-platform/constant"
-	"programming-learning-platform/utils/store"
+	"studyhut/constant"
+	"studyhut/utils/store"
 	"reflect"
 	"strconv"
 	"strings"
@@ -33,7 +33,7 @@ import (
 	"github.com/astaxie/beego/context"
 	"github.com/disintegration/imaging"
 	"github.com/mssola/user_agent"
-	"programming-learning-platform/utils/html2md"
+	"studyhut/utils/html2md"
 )
 
 // 分词器

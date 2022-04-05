@@ -2,7 +2,7 @@ package models
 
 import (
 	"errors"
-	"programming-learning-platform/utils"
+	"studyhut/utils"
 	"sync/atomic"
 	"time"
 

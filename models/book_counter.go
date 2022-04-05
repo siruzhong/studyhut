@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"programming-learning-platform/constant"
+	"studyhut/constant"
 	"strconv"
 	"strings"
 	"time"

@@ -7,7 +7,7 @@ import (
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/models"
+	"studyhut/models"
 )
 
 // LocalhostController 只有请求头的host为localhost的才能访问

@@ -1,7 +1,7 @@
 package models
 
 import (
-	"programming-learning-platform/constant"
+	"studyhut/constant"
 	"strconv"
 	"time"
 

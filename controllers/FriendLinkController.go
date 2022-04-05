@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"programming-learning-platform/models"
-	"programming-learning-platform/utils"
+	"studyhut/models"
+	"studyhut/utils"
 	"strings"
 )
 

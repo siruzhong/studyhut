@@ -2,7 +2,7 @@ package utils
 
 import (
 	"math/rand"
-	"programming-learning-platform/constant"
+	"studyhut/constant"
 	"time"
 )
 

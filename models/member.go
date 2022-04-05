@@ -4,7 +4,7 @@ package models
 import (
 	"errors"
 	"fmt"
-	"programming-learning-platform/constant"
+	"studyhut/constant"
 	"regexp"
 	"strings"
 	"time"
@@ -13,7 +13,7 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	ldap "gopkg.in/ldap.v2"
-	"programming-learning-platform/utils"
+	"studyhut/utils"
 )
 
 // Member 用户

@@ -2,13 +2,13 @@ package controllers
 
 import (
 	"math"
-	"programming-learning-platform/constant"
+	"studyhut/constant"
 	"strconv"
 	"strings"
 
 	"github.com/astaxie/beego"
-	"programming-learning-platform/models"
-	"programming-learning-platform/utils"
+	"studyhut/models"
+	"studyhut/utils"
 )
 
 type HomeController struct {

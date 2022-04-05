@@ -1,7 +1,7 @@
 package models
 
 import (
-	"programming-learning-platform/utils"
+	"studyhut/utils"
 	"time"
 
 	"github.com/astaxie/beego/orm"

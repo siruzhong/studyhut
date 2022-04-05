@@ -3,12 +3,12 @@ package models
 
 import (
 	"os"
-	"programming-learning-platform/constant"
+	"studyhut/constant"
 	"strings"
 	"time"
 
 	"github.com/astaxie/beego/orm"
-	"programming-learning-platform/utils"
+	"studyhut/utils"
 )
 
 // Attachment 附件

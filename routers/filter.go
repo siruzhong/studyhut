@@ -2,11 +2,11 @@ package routers
 
 import (
 	"encoding/json"
-	"programming-learning-platform/constant"
+	"studyhut/constant"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
-	"programming-learning-platform/models"
+	"studyhut/models"
 )
 
 func init() {
