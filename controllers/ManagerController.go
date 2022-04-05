@@ -975,13 +975,13 @@ func (this *ManagerController) UpdateCateIcon() {
 				data["icon"] = utils.ShowImg(tmpFile)
 			case constant.StoreCos:
 				store.ModelStoreCos.MoveToCos(tmpFile, tmpFile, true, false)
-				store.ModelStoreCos.DelFromCos(cate.Icon)
+				store.ModelStoreCos.DelFromCos(strings.Replace(cate.Icon, "https://bareth-1305674339.cos.ap-hongkong.myqcloud.com/", "", 1))
 				data["icon"] = utils.ShowImg(tmpFile)
 			case constant.StoreLocal:
 				store.ModelStoreLocal.DelFiles(cate.Icon)
 				data["icon"] = "/" + tmpFile
 			}
-			err = model.UpdateByField(cate.Id, "icon", "/"+tmpFile)
+			err = model.UpdateByField(cate.Id, "icon", data["icon"].(string))
 		}
 	}
 	if err != nil {
@@ -1066,16 +1066,16 @@ func (this *ManagerController) UpdateFriendLinkIcon() {
 			case constant.StoreOss:
 				store.ModelStoreOss.MoveToOss(tmpFile, tmpFile, true, false)
 				store.ModelStoreOss.DelFromOss(friendlink.Pic)
-				data["icon"] = utils.ShowImg(tmpFile)
+				data["pic"] = utils.ShowImg(tmpFile)
 			case constant.StoreCos:
 				store.ModelStoreCos.MoveToCos(tmpFile, tmpFile, true, false)
-				store.ModelStoreCos.DelFromCos(friendlink.Pic)
-				data["icon"] = utils.ShowImg(tmpFile)
+				store.ModelStoreCos.DelFromCos(strings.Replace(friendlink.Pic, beego.AppConfig.String("cos::Domain"), "", 1))
+				data["pic"] = utils.ShowImg(tmpFile)
 			case constant.StoreLocal:
 				store.ModelStoreLocal.DelFiles(friendlink.Pic)
 				data["pic"] = "/" + tmpFile
 			}
-			err = model.Update(friendlink.Id, "pic", "/"+tmpFile)
+			err = model.Update(friendlink.Id, "pic", data["pic"].(string))
 		}
 	}
 	if err != nil {

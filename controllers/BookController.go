@@ -370,7 +370,7 @@ func (this *BookController) UploadCover() {
 	}
 	oldCover := strings.ReplaceAll(book.Cover, "\\", "/")
 	osspath := fmt.Sprintf("/projects/%v/%v", book.Identify, strings.TrimLeft(url, "./"))
-	book.Cover = fmt.Sprintf("%s/projects/%v/%v", beego.AppConfig.String("cos::Domain"), book.Identify, strings.TrimLeft(url, "./"))
+	book.Cover = fmt.Sprintf("%sprojects/%v/%v", beego.AppConfig.String("cos::Domain"), book.Identify, strings.TrimLeft(url, "./"))
 	if utils.StoreType == constant.StoreLocal {
 		book.Cover = url
 	}
