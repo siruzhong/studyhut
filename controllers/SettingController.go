@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"studyhut/constant"
-	"studyhut/utils/store"
 	"strconv"
 	"strings"
+	"studyhut/constant"
+	"studyhut/utils/store"
 	"time"
 
 	"github.com/astaxie/beego"
@@ -205,16 +205,14 @@ func (this *SettingController) Upload() {
 	y1, _ := strconv.ParseFloat(this.GetString("y"), 10)
 	w1, _ := strconv.ParseFloat(this.GetString("width"), 10)
 	h1, _ := strconv.ParseFloat(this.GetString("height"), 10)
-
 	x := int(x1)
 	y := int(y1)
 	width := int(w1)
 	height := int(h1)
-
+	// 保存上传的图片
 	fileName := strconv.FormatInt(time.Now().UnixNano(), 16)
 	filePath := filepath.Join("uploads", time.Now().Format("2006/01"), fileName+ext)
-	path := filepath.Dir(filePath)
-	os.MkdirAll(path, os.ModePerm)
+	os.MkdirAll(filepath.Dir(filePath), os.ModePerm)
 	err = this.SaveToFile("image-file", filePath)
 	if err != nil {
 		logs.Error("", err)
@@ -226,8 +224,9 @@ func (this *SettingController) Upload() {
 		logs.Error("ImageCopyFromFile => ", err)
 		this.JsonResult(6001, "头像剪切失败")
 	}
+	// 删除原图片
 	os.Remove(filePath)
-
+	// 保存剪切后的图片
 	filePath = filepath.Join("uploads", time.Now().Format("2006/01"), fileName+ext)
 	utils.ImageResize(subImg, 120, 120)
 	err = utils.SaveImage(filePath, subImg)
@@ -240,31 +239,18 @@ func (this *SettingController) Upload() {
 	if strings.HasPrefix(url, "//") {
 		url = string(url[1:])
 	}
-	if member, err := models.NewMember().Find(this.Member.MemberId); err == nil {
-		avatar := member.Avatar
-		member.Avatar = url
-		err = member.Update()
-		if err != nil {
-			this.JsonResult(60001, "保存头像失败")
-		}
-		avatar = strings.TrimLeft(avatar, "./")
-		if strings.HasPrefix(avatar, "uploads/") {
-			os.Remove(avatar)
-		}
-		this.SetMember(*member)
-	}
 	switch utils.StoreType {
 	case constant.StoreOss: //oss存储
-		if err := store.ModelStoreOss.MoveToOss("."+url, strings.TrimLeft(url, "./"), true, false); err != nil {
+		if err := store.ModelStoreOss.MoveToOss("."+url, strings.TrimLeft(url, "/"), true, false); err != nil {
 			beego.Error(err.Error())
 		} else {
-			url = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ") + url + "/avatar"
+			url = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ") + url
 		}
-	case constant.StoreCos: //oss存储
-		if err := store.ModelStoreCos.MoveToCos("."+url, strings.TrimLeft(url, "./"), true, false); err != nil {
+	case constant.StoreCos: //cos存储
+		if err := store.ModelStoreCos.MoveToCos("."+url, strings.TrimLeft(url, "/"), true, false); err != nil {
 			beego.Error(err.Error())
 		} else {
-			url = strings.TrimRight(beego.AppConfig.String("cos::Domain"), "/ ") + url + "/avatar"
+			url = strings.TrimRight(beego.AppConfig.String("cos::Domain"), "/ ") + url
 		}
 	case constant.StoreLocal: //本地存储
 		if err := store.ModelStoreLocal.MoveToStore("."+url, strings.TrimLeft(url, "./")); err != nil {
@@ -272,6 +258,23 @@ func (this *SettingController) Upload() {
 		} else {
 			url = "/" + strings.TrimLeft(url, "./")
 		}
+	}
+	if member, err := models.NewMember().Find(this.Member.MemberId); err == nil {
+		avatar := member.Avatar
+		member.Avatar = url
+		err = member.Update("avatar")
+		if err != nil {
+			this.JsonResult(60001, "更新头像失败")
+		}
+		avatar = strings.TrimLeft(avatar, "./")
+		if strings.HasPrefix(avatar, beego.AppConfig.String("cos::Domain")) {
+			store.ModelStoreCos.DelFromCos(strings.Replace(avatar, beego.AppConfig.String("cos::Domain"), "", 1)) // cos上删除原头像
+		} else if strings.HasPrefix(avatar, beego.AppConfig.String("oos::Domain")) {
+			store.ModelStoreCos.DelFromCos(strings.Replace(avatar, beego.AppConfig.String("oss::Domain"), "", 1)) // oss上删除原头像
+		} else {
+			os.Remove(avatar) // 本地删除原头像
+		}
+		this.SetMember(*member)
 	}
 	this.JsonResult(0, "ok", url)
 }

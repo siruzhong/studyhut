@@ -33,7 +33,7 @@ func init() {
 	beego.InsertFilter("/api/*", beego.BeforeRouter, FilterUser)
 
 	var FinishRouter = func(ctx *context.Context) {
-		ctx.ResponseWriter.Header().Add("Application", "BookStack")
+		ctx.ResponseWriter.Header().Add("Application", "StudyHut")
 	}
 	beego.InsertFilter("/*", beego.BeforeRouter, FinishRouter, false)
 	beego.SetStaticPath("/sitemap", "sitemap")
