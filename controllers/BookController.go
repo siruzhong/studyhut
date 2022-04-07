@@ -643,7 +643,6 @@ func (this *BookController) Release() {
 // 加锁，防止用户不停地点击生成下载文档造成服务器资源开销.
 func (this *BookController) Generate() {
 	identify := this.GetString(":key")
-
 	if !models.NewBook().HasBookAccess(identify, this.Member.MemberId, constant.BookAdmin) {
 		this.JsonResult(1, "您没有操作权限，只有书籍创始人和书籍管理员才有权限")
 	}
@@ -656,10 +655,8 @@ func (this *BookController) Generate() {
 	if isGenerating := utils.BooksGenerate.Exist(book.BookId); isGenerating {
 		this.JsonResult(1, "上一次下载文档生成任务正在后台执行，请您稍后再执行新的下载文档生成操作")
 	}
-
 	baseUrl := "http://localhost:" + beego.AppConfig.String("httpport")
 	go new(models.Document).GenerateBook(book, baseUrl)
-
 	this.JsonResult(0, "下载文档生成任务已交由后台执行，请您耐心等待。")
 }
 

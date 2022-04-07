@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"io"
 	"net/url"
-	"studyhut/constant"
 	"strconv"
 	"strings"
+	"studyhut/constant"
 	"time"
 	"unicode/utf8"
 
@@ -78,7 +78,12 @@ func (this *BaseController) Prepare() {
 	this.EnableAnonymous = false
 	this.AllowRegister = true
 	this.EnableDocumentHistory = 0
-	this.OssDomain = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ")
+	switch utils.StoreType {
+	case constant.StoreOss:
+		this.OssDomain = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ")
+	case constant.StoreCos:
+		this.OssDomain = strings.TrimRight(beego.AppConfig.String("cos::Domain"), "/ ")
+	}
 	this.Data["OssDomain"] = this.OssDomain
 	this.StaticDomain = strings.Trim(beego.AppConfig.DefaultString("static_domain", ""), "/")
 	this.Data["StaticDomain"] = this.StaticDomain

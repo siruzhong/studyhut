@@ -7,10 +7,12 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"studyhut/constant"
-	"studyhut/utils/store"
 	"strings"
 	"time"
+
+	"studyhut/constant"
+	"studyhut/utils"
+	"studyhut/utils/store"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/TruthHun/converter/converter"
@@ -20,7 +22,6 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/httplib"
 	"github.com/astaxie/beego/orm"
-	"studyhut/utils"
 )
 
 // Document 文档
@@ -47,6 +48,7 @@ func (m *Document) TableName() string {
 	return "documents"
 }
 
+// TableNameWithPrefix 获取带数据库前缀带表名
 func (m *Document) TableNameWithPrefix() string {
 	return utils.GetDatabasePrefix() + m.TableName()
 }
@@ -63,19 +65,15 @@ func (m *Document) Find(id int) (doc *Document, err error) {
 	if id <= 0 {
 		return m, constant.ErrInvalidParameter
 	}
-
 	o := orm.NewOrm()
-
 	err = o.QueryTable(m.TableNameWithPrefix()).Filter("document_id", id).One(m)
 	if err == orm.ErrNoRows {
 		return m, constant.ErrDataNotExist
 	}
-
 	return m, nil
 }
 
-// InsertOrUpdate 插入和更新文档
-// 存在文档id或者文档标识，则表示更新文档内容
+// InsertOrUpdate 插入和更新文档(存在文档id或者文档标识，则表示更新文档内容)
 func (m *Document) InsertOrUpdate(cols ...string) (id int64, err error) {
 	o := orm.NewOrm()
 	id = int64(m.DocumentId)
@@ -302,24 +300,21 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 
 // GenerateBook 离线文档生成
 func (m *Document) GenerateBook(book *Book, baseUrl string) {
-	//将书籍id加入进去，表示正在生成离线文档
+	// 将书籍id加入进去，表示正在生成离线文档
 	utils.BooksGenerate.Set(book.BookId)
-	defer utils.BooksGenerate.Delete(book.BookId) //最后移除
-
-	//公开文档，才生成文档文件
+	defer utils.BooksGenerate.Delete(book.BookId) // 最后移除
+	// 公开文档，才生成文档文件
 	debug := true
 	if beego.AppConfig.String("runmode") == "prod" {
 		debug = false
 	}
 	Nickname := new(Member).GetNicknameByUid(book.MemberId)
-
 	docs, err := NewDocument().FindListByBookId(book.BookId)
-
 	if err != nil {
 		beego.Error(err)
 		return
 	}
-
+	// 导出pdf文档的配置
 	var ExpCfg = converter.Config{
 		Contributor: beego.AppConfig.String("exportCreator"),
 		Cover:       "",
@@ -342,13 +337,11 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 			"--pdf-page-margin-top", beego.AppConfig.DefaultString("exportMarginTop", "72"),
 		},
 	}
-
 	folder := fmt.Sprintf("cache/books/%v/", book.Identify)
 	os.MkdirAll(folder, os.ModePerm)
 	if !debug {
 		defer os.RemoveAll(folder)
 	}
-
 	if beego.AppConfig.DefaultBool("exportCustomCover", false) {
 		// 生成书籍封面
 		if err = utils.RenderCoverByBookIdentify(book.Identify); err != nil {
@@ -361,8 +354,7 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 		// 用相对路径
 		ExpCfg.Cover = cover
 	}
-
-	//生成致谢内容
+	// 生成致谢内容
 	statementFile := "ebook/statement.html"
 	_, err = os.Stat("views/" + statementFile)
 	if err != nil {
@@ -388,12 +380,11 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 	ModelStore := new(DocumentStore)
 	for _, doc := range docs {
 		content := strings.TrimSpace(ModelStore.GetFiledById(doc.DocumentId, "content"))
-		if utils.GetTextFromHtml(content) == "" { //内容为空，渲染文档内容，并再重新获取文档内容
+		if utils.GetTextFromHtml(content) == "" { // 内容为空，渲染文档内容，并再重新获取文档内容
 			utils.RenderDocumentById(doc.DocumentId)
 			orm.NewOrm().Read(doc, "document_id")
 		}
-
-		//将图片链接更换成绝对链接
+		// 将图片链接更换成绝对链接
 		toc := converter.Toc{
 			Id:    doc.DocumentId,
 			Pid:   doc.ParentId,
@@ -401,7 +392,7 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 			Link:  fmt.Sprintf("%v.html", doc.DocumentId),
 		}
 		ExpCfg.Toc = append(ExpCfg.Toc, toc)
-		//图片处理，如果图片路径不是http开头，则表示是相对路径的图片，加上BaseUrl.如果图片是以http开头的，下载下来
+		// 图片处理，如果图片路径不是http开头，则表示是相对路径的图片，加上BaseUrl.如果图片是以http开头的，下载下来
 		if gq, err := goquery.NewDocumentFromReader(strings.NewReader(doc.Release)); err == nil {
 			gq.Find("img").Each(func(i int, s *goquery.Selection) {
 				pic := ""
@@ -417,7 +408,7 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 							pic = baseUrl + src
 						}
 					}
-					//下载图片，放到folder目录下
+					// 下载图片，放到folder目录下
 					ext := ""
 					if picSlice := strings.Split(pic, "?"); len(picSlice) > 0 {
 						ext = filepath.Ext(picSlice[0])
@@ -429,20 +420,18 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 						req.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
 					}
 					req.Header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3298.4 Safari/537.36")
-					if err := req.ToFile(localPic); err == nil { //成功下载图片
+					if err := req.ToFile(localPic); err == nil { // 成功下载图片
 						s.SetAttr("src", filename)
 					} else {
 						beego.Error("错误:", err, filename, pic)
 						s.SetAttr("src", pic)
 					}
-
 				}
 			})
 			gq.Find(".markdown-toc").Remove()
 			doc.Release, _ = gq.Find("body").Html()
 		}
-
-		//生成html
+		// 生成html
 		if htmlStr, err := utils.ExecuteViewPathTemplate("ebook/tpl_export.html", map[string]interface{}{
 			"Model":    book,
 			"Doc":      doc,
@@ -456,16 +445,14 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 		} else {
 			beego.Error(err.Error())
 		}
-
 	}
 
-	//复制css文件到目录
+	// 复制css文件到目录
 	if b, err := ioutil.ReadFile("static/editor.md/css/export-editormd.css"); err == nil {
 		ioutil.WriteFile(folder+"editormd.css", b, os.ModePerm)
 	} else {
 		beego.Error("css样式不存在", err)
 	}
-
 	cfgFile := folder + "config.json"
 	ioutil.WriteFile(cfgFile, []byte(util.InterfaceToJson(ExpCfg)), os.ModePerm)
 	if Convert, err := converter.NewConverter(cfgFile, debug); err == nil {
@@ -476,18 +463,16 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 		beego.Error(err.Error())
 	}
 
-	//将文档移动到oss
-	//将PDF文档移动到oss
-	oldBook := fmt.Sprintf("projects/%v/books/%v", book.Identify, book.GenerateTime.Unix()) //旧书籍的生成时间
-	//最后再更新文档生成时间
+	// 将文档移动到云存储 将PDF文档移动到oss
+	oldBook := fmt.Sprintf("projects/%v/books/%v", book.Identify, book.GenerateTime.Unix()) // 旧书籍的生成时间
+	// 最后再更新文档生成时间
 	book.GenerateTime = time.Now()
 	if _, err = orm.NewOrm().Update(book, "generate_time"); err != nil {
 		beego.Error(err.Error())
 	}
 	orm.NewOrm().Read(book)
 	newBookFmt := fmt.Sprintf("projects/%v/books/%v", book.Identify, book.GenerateTime.Unix())
-
-	//删除旧文件
+	// 删除旧文件
 	switch utils.StoreType {
 	case constant.StoreOss:
 		if err := store.ModelStoreOss.DelFromOss(oldBook+".pdf", oldBook+".epub", oldBook+".mobi"); err != nil { //删除旧版
@@ -504,29 +489,26 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 			}
 		}
 	}
-
 	exts := []string{".pdf", ".epub", ".mobi"}
 	for _, ext := range exts {
 		switch utils.StoreType {
-		case constant.StoreOss:
-			//不要开启gzip压缩，否则会出现文件损坏的情况
+		case constant.StoreOss: // 不要开启gzip压缩，否则会出现文件损坏的情况
 			if err := store.ModelStoreOss.MoveToOss(folder+"output/book"+ext, newBookFmt+ext, true, false); err != nil {
 				beego.Error(err)
 			} else { //设置下载头
 				store.ModelStoreOss.SetObjectMeta(newBookFmt+ext, book.BookName+ext)
 			}
-		case constant.StoreCos:
-			//不要开启gzip压缩，否则会出现文件损坏的情况
+		case constant.StoreCos: // 不要开启gzip压缩，否则会出现文件损坏的情况
 			if err := store.ModelStoreCos.MoveToCos(folder+"output/book"+ext, newBookFmt+ext, true, false); err != nil {
 				beego.Error(err)
 			}
-		case constant.StoreLocal: //本地存储
+		case constant.StoreLocal: // 本地存储
 			store.ModelStoreLocal.MoveToStore(folder+"output/book"+ext, "uploads/"+newBookFmt+ext)
 		}
 	}
 }
 
-// FindListByBookId 根据书籍ID查询文档列表(含文档内容).
+// FindListByBookId 根据书籍ID查询文档列表(含文档内容)
 func (m *Document) FindListByBookId(bookId int, withoutContent ...bool) (docs []*Document, err error) {
 	q := orm.NewOrm().QueryTable(m.TableNameWithPrefix()).Filter("book_id", bookId).OrderBy("order_sort")
 	if len(withoutContent) > 0 && withoutContent[0] {
@@ -539,7 +521,7 @@ func (m *Document) FindListByBookId(bookId int, withoutContent ...bool) (docs []
 	return
 }
 
-// GetMenuTop 根据书籍ID查询文档一级目录.
+// GetMenuTop 根据书籍ID查询文档一级目录
 func (m *Document) GetMenuTop(bookId int) (docs []*Document, err error) {
 	var docsAll []*Document
 	o := orm.NewOrm()
@@ -554,13 +536,14 @@ func (m *Document) GetMenuTop(bookId int) (docs []*Document, err error) {
 	return
 }
 
+// GetParentTitle 获取父标题
 func (m *Document) GetParentTitle(pid int) (title string) {
 	var d Document
 	orm.NewOrm().QueryTable(m).Filter("document_id", pid).One(&d, "document_id", "parent_id", "document_name")
 	return d.DocumentName
 }
 
-//自动生成下一级的内容
+// BookStackAuto 自动生成下一级的内容
 func (m *Document) BookStackAuto(bookId, docId int, isSummary ...bool) (md, cont string) {
 	//自动生成文档内容
 	var docs []Document
@@ -576,10 +559,7 @@ func (m *Document) BookStackAuto(bookId, docId int, isSummary ...bool) (md, cont
 	return
 }
 
-//爬虫批量采集
-//@param		html				html
-//@param		md					markdown内容
-//@return		content,markdown	把链接替换为标识后的内容
+// BookStackCrawl 爬虫批量采集
 func (m *Document) BookStackCrawl(html, md string, bookId, uid int) (content, markdown string, err error) {
 	var gq *goquery.Document
 	content = html
@@ -588,7 +568,7 @@ func (m *Document) BookStackCrawl(html, md string, bookId, uid int) (content, ma
 	if book, err := NewBook().Find(bookId); err == nil {
 		project = book.Identify
 	}
-	//执行采集
+	// 执行采集
 	if gq, err = goquery.NewDocumentFromReader(strings.NewReader(content)); err == nil {
 		//采集模式mode
 		CrawlByChrome := false
@@ -671,6 +651,7 @@ func (m *Document) BookStackCrawl(html, md string, bookId, uid int) (content, ma
 	return
 }
 
+// AutoTitle
 func (m *Document) AutoTitle(identify interface{}, defaultTitle ...string) (title string) {
 	if len(defaultTitle) > 0 {
 		title = defaultTitle[0]

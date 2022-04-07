@@ -115,7 +115,7 @@ func SitemapUpdate(domain string) {
 	)
 	domain = strings.TrimSuffix(domain, "/")
 	os.Mkdir("sitemap", os.ModePerm)
-	//查询公开的书籍
+	// 查询公开的书籍
 	qsBooks := o.QueryTable("books").Filter("privately_owned", 0)
 	limit := 10000
 	for i := 0; i < 10; i++ {

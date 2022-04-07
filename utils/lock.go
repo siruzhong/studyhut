@@ -3,8 +3,8 @@ package utils
 import "sync"
 
 var (
-	BooksRelease  = BooksLock{Books: make(map[int]bool)}
-	BooksGenerate = BooksLock{Books: make(map[int]bool)}
+	BooksRelease  = BooksLock{Books: make(map[int]bool)} // 发布书籍
+	BooksGenerate = BooksLock{Books: make(map[int]bool)} // 生成离线文档
 )
 
 // BooksLock 书籍发布锁和书籍离线文档生成锁

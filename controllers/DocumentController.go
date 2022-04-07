@@ -10,10 +10,10 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"studyhut/constant"
 	"regexp"
 	"strconv"
 	"strings"
+	"studyhut/constant"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -1200,7 +1200,7 @@ func (this *DocumentController) Export() {
 	if book.PrivatelyOwned == 1 && this.Member.MemberId != book.MemberId {
 		this.JsonResult(1, "私有文档，只有文档创建人可导出")
 	}
-	//查询文档是否存在
+	// 查询文档是否存在
 	obj := fmt.Sprintf("projects/%v/books/%v%v", book.Identify, book.GenerateTime.Unix(), ext)
 	link := ""
 	switch utils.StoreType {
@@ -1226,12 +1226,12 @@ func (this *DocumentController) Export() {
 	}
 	if link != "" {
 		// 查询是否可以下载
-		counter := models.NewDownloadCounter()
-		times, min := counter.DoesICanDownload(this.Member.MemberId)
-		if times == 0 {
-			this.JsonResult(1, fmt.Sprintf("下载失败。每天每阅读学习 %v 分钟可下载1个离线文档。请您再阅读学习 %v 分钟", min, min))
-		}
-		counter.Increase(this.Member.MemberId)
+		//counter := models.NewDownloadCounter()
+		//times, min := counter.DoesICanDownload(this.Member.MemberId)
+		//if times == 0 {
+		//	this.JsonResult(1, fmt.Sprintf("下载失败。每天每阅读学习 %v 分钟可下载1个离线文档。请您再阅读学习 %v 分钟", min, min))
+		//}
+		//counter.Increase(this.Member.MemberId)
 		this.JsonResult(0, "获取文档下载链接成功", map[string]interface{}{"url": link})
 	}
 	this.JsonResult(1, "下载失败，您要下载的文档当前并未生成可下载文档。")

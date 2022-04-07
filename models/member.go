@@ -4,9 +4,9 @@ package models
 import (
 	"errors"
 	"fmt"
-	"studyhut/constant"
 	"regexp"
 	"strings"
+	"studyhut/constant"
 	"time"
 
 	"github.com/astaxie/beego"
@@ -461,7 +461,6 @@ func (m *Member) GetNicknameByUid(id interface{}) string {
 	if err := orm.NewOrm().QueryTable("members").Filter("member_id", id).One(&user, "nickname"); err != nil {
 		beego.Error(err.Error())
 	}
-
 	return user.Nickname
 }
 

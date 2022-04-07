@@ -9,11 +9,11 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"studyhut/constant"
-	"studyhut/utils/store"
 	"regexp"
 	"strconv"
 	"strings"
+	"studyhut/constant"
+	"studyhut/utils/store"
 	"time"
 
 	"github.com/astaxie/beego"
@@ -67,7 +67,7 @@ func (this *ManagerController) Index() {
 			Name:        "calibre",
 			IsInstalled: err == nil,
 			Error:       errCalibre,
-			Message:     "calibre 用于将书籍转换成PDF、epub和mobi ==> <a class='text-danger' target='_blank' href='https://www.bookstack.cn/read/help/Ubuntu.md'>安装教程</a>",
+			Message:     "calibre 用于将书籍转换成PDF、epub和mobi ==> <a class='text-danger' target='_blank' href='https://www.studyhut.cn/read/help/Ubuntu.md'>安装教程</a>",
 		})
 		// 判断是否安装Git
 		errGit := "-"

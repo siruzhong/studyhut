@@ -16,11 +16,11 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
-	"studyhut/constant"
-	"studyhut/utils/store"
 	"reflect"
 	"strconv"
 	"strings"
+	"studyhut/constant"
+	"studyhut/utils/store"
 	"sync"
 	"time"
 
@@ -89,7 +89,7 @@ func SendMail(conf *SmtpConf, subject, email string, body string) error {
 // RenderDocumentById 渲染markdown为html并录入数据库
 func RenderDocumentById(id int) {
 	// 使用chromium-browser
-	// chromium-browser --headless --disable-gpu --screenshot --no-sandbox --window-size=320,480 http://www.bookstack.cn
+	// chromium-browser --headless --disable-gpu --screenshot --no-sandbox --window-size=320,480
 	link := "http://localhost:" + beego.AppConfig.DefaultString("httpport", "8181") + "/local-render?id=" + strconv.Itoa(id)
 	name := beego.AppConfig.DefaultString("chrome", "chromium-browser")
 	args := []string{"--headless", "--disable-gpu", "--screenshot", "--no-sandbox", "--window-size=320,480", link}
@@ -150,7 +150,7 @@ async function screenshot() {
 }
 if (url && identify) screenshot();`
 
-// RenderCoverByBookIdentify 生成
+// RenderCoverByBookIdentify 生成书籍封面
 func RenderCoverByBookIdentify(identify string) (err error) {
 	var args []string
 	shotJS := "cover.js"

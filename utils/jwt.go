@@ -18,7 +18,7 @@ type MediaClaims struct {
 }
 
 var (
-	mediaJwtSecret = beego.AppConfig.DefaultString("jwt_secret", "bookstack.cn")
+	mediaJwtSecret = beego.AppConfig.DefaultString("jwt_secret", "studyhut.cn")
 	usedSign       sync.Map
 	MediaDuration  int64 = beego.AppConfig.DefaultInt64("media_duration", 3600*5)
 )
