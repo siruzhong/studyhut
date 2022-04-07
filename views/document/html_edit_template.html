@@ -23,52 +23,21 @@
         window.removeAttachURL = "{{urlfor "DocumentController.RemoveAttachment"}}";
         window.vueApp = null;
     </script>
-    <!-- Bootstrap -->
+
     <link href="{{cdncss "/static/bootstrap/css/bootstrap.min.css"}}" rel="stylesheet">
     <link href="{{cdncss "/static/font-awesome/css/font-awesome.min.css"}}" rel="stylesheet">
     <link href="{{cdncss "/static/jstree/3.3.4/themes/default/style.min.css"}}" rel="stylesheet">
     <link href="{{cdncss "/static/wangEditor/css/wangEditor.min.css"}}" rel="stylesheet">
     <link href="{{cdncss "/static/highlight/styles/zenburn.css"}}" rel="stylesheet">
     <link href="{{cdncss "/static/webuploader/webuploader.css"}}" rel="stylesheet">
-
     <link href="/static/css/jstree.css" rel="stylesheet">
     <link href="/static/css/markdown.css" rel="stylesheet">
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
     <script src="/static/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="/static/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
 </head>
 <body>
 
 <div class="m-manual manual-editor">
-    <!--{{/*<div class="manual-head" id="editormd-tools">
-        <div class="editormd-group">
-            <a href="{{urlfor "BookController.Dashboard" ":key" .Model.Identify}}" data-toggle="tooltip" data-title="返回"><i class="fa fa-chevron-left" aria-hidden="true"></i></a>
-        </div>
-        <div class="editormd-group">
-            <a href="javascript:;" id="markdown-save" data-toggle="tooltip" data-title="保存" class="disabled save"><i class="fa fa-save" aria-hidden="true" name="save"></i></a>
-        </div>
-
-
-        <div class="editormd-group">
-            <a href="javascript:;" data-toggle="tooltip" data-title="修改历史"><i class="fa fa-history item" name="history" aria-hidden="true"></i></a>
-            <a href="javascript:;" data-toggle="tooltip" data-title="边栏"><i class="fa fa-columns item" aria-hidden="true" name="sidebar"></i></a>
-            <a href="javascript:;" data-toggle="tooltip" data-title="使用帮助"><i class="fa fa-question-circle-o last" aria-hidden="true" name="help"></i></a>
-        </div>
-
-        <div class="editormd-group">
-            <a href="javascript:;" data-toggle="tooltip" data-title="发布"><i class="fa fa-cloud-upload" name="release" aria-hidden="true"></i></a>
-        </div>
-
-        <div class="editormd-group">
-            <a href="javascript:;" data-toggle="tooltip" data-title=""></a>
-            <a href="javascript:;" data-toggle="tooltip" data-title=""></a>
-        </div>
-
-        <div class="clearfix"></div>
-    </div>*/}}-->
     <div class="manual-body">
         <div class="manual-category" id="manualCategory" style="top: 0;">
             <div class="manual-nav">

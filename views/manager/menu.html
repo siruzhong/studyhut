@@ -3,7 +3,6 @@
     <li {{if .IsUsers}}class="active"{{end}}><a href="{{urlfor "ManagerController.Users" }}" class="item"><i class="fa fa-users" aria-hidden="true"></i> &nbsp&nbsp用户管理</a> </li>
     <li {{if .IsBooks}}class="active"{{end}}><a href="{{urlfor "ManagerController.Books" }}" class="item"><i class="fa fa-book" aria-hidden="true"></i> &nbsp&nbsp书籍管理</a> </li>
     <li {{if .IsComments}}class="active"{{end}}><a href="{{urlfor "ManagerController.Comments" }}" class="item"><i class="fa fa-comments-o" aria-hidden="true"></i> &nbsp&nbsp评论管理</a> </li>
-    <li {{if .IsBanner}}class="active"{{end}}><a href="{{urlfor "ManagerController.Banners" }}" class="item"><i class="fa fa-image" aria-hidden="true"></i> &nbsp&nbsp横幅管理</a> </li>
     <li {{if .IsSetting}}class="active"{{end}}><a href="{{urlfor "ManagerController.Setting" }}" class="item"><i class="fa fa-cogs" aria-hidden="true"></i> &nbsp&nbsp配置管理</a> </li>
     <li {{if .IsManagerSeo}}class="active"{{end}}><a href="{{urlfor "ManagerController.Seo" }}" class="item"><i class="fa fa-globe" aria-hidden="true"></i> &nbsp&nbspSEO管理</a> </li>
     <li {{if .IsAds}}class="active"{{end}}><a href="{{urlfor "ManagerController.Ads" }}" class="item"><i class="fa fa-adn" aria-hidden="true"></i> &nbsp&nbsp广告管理</a> </li>

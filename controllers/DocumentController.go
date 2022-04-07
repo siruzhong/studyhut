@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"bytes"
-	"container/list"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -222,9 +221,7 @@ func (this *DocumentController) Read() {
 	bookName := bookResult.BookName
 	bookLink := beego.URLFor("DocumentController.Index", ":key", bookResult.Identify)
 	this.TplName = "document/" + bookResult.Theme + "_read.html"
-
 	var err error
-
 	doc := models.NewDocument()
 	if docId, _ := strconv.Atoi(id); docId > 0 {
 		doc, err = doc.Find(docId) //文档id
@@ -242,11 +239,9 @@ func (this *DocumentController) Read() {
 			this.Abort404(bookName, bookLink)
 		}
 	}
-
 	if doc.BookId != bookResult.BookId {
 		this.Abort404(bookName, bookLink)
 	}
-
 	bodyText := ""
 	authHTTPS := strings.ToLower(models.GetOptionValue("AUTO_HTTPS", "false")) == "true"
 	if doc.Release != "" {
@@ -274,7 +269,6 @@ func (this *DocumentController) Read() {
 					contentSelection.SetAttr("alt", doc.DocumentName+" - 图"+fmt.Sprint(i+1))
 				}
 			})
-
 			medias := []string{"video", "audio"}
 			for _, item := range medias {
 				query.Find(item).Each(func(idx int, sel *goquery.Selection) {
@@ -299,7 +293,6 @@ func (this *DocumentController) Read() {
 					}
 				})
 			}
-
 			html, err := query.Find("body").Html()
 			if err != nil {
 				beego.Error(err)
@@ -309,7 +302,6 @@ func (this *DocumentController) Read() {
 		}
 		bodyText = query.Find(".markdown-toc").Text()
 	}
-
 	attach, err := models.NewAttachment().FindListByDocumentId(doc.DocumentId)
 	if err == nil {
 		doc.AttachList = attach
@@ -323,22 +315,20 @@ func (this *DocumentController) Read() {
 			doc.Release += content.String()
 		}
 	}
-
-	//文档阅读人次+1
+	// 文档阅读人次+1
 	if err := models.SetIncreAndDecre("documents", "vcnt",
 		fmt.Sprintf("document_id=%v", doc.DocumentId),
 		true, 1,
 	); err != nil {
 		beego.Error(err.Error())
 	}
-	//书籍阅读人次+1
+	// 书籍阅读人次+1
 	if err := models.SetIncreAndDecre("books", "vcnt",
 		fmt.Sprintf("book_id=%v", doc.BookId),
 		true, 1,
 	); err != nil {
 		beego.Error(err.Error())
 	}
-
 	if this.Member.MemberId > 0 { //增加用户阅读记录
 		if err := new(models.ReadRecord).Add(doc.DocumentId, this.Member.MemberId); err != nil {
 			beego.Error(err.Error())
@@ -350,20 +340,14 @@ func (this *DocumentController) Read() {
 		"keywords":    bookResult.Label,
 		"description": beego.Substr(bodyText+" "+bookResult.Description, 0, 200),
 	}
-
 	if len(parentTitle) > 0 {
 		seo["title"] = parentTitle + " - " + doc.DocumentName + " - 《" + bookResult.BookName + "》"
 	}
-
-	//SEO
+	// SEO
 	this.GetSeoByPage("book_read", seo)
-
 	existBookmark := new(models.Bookmark).Exist(this.Member.MemberId, doc.DocumentId)
-
 	doc.Vcnt = doc.Vcnt + 1
-
 	models.NewBookCounter().Increase(bookResult.BookId, true)
-
 	if this.IsAjax() {
 		var data struct {
 			Id        int    `json:"doc_id"`
@@ -385,14 +369,11 @@ func (this *DocumentController) Read() {
 
 		this.JsonResult(0, "ok", data)
 	}
-
 	tree, err := models.NewDocument().CreateDocumentTreeForHtml(bookResult.BookId, doc.DocumentId)
-
 	if err != nil {
 		beego.Error(err)
 		this.Abort404(bookName, bookLink)
 	}
-
 	// 查询用户哪些文档阅读了
 	var readMap = make(map[string]bool)
 	if this.Member.MemberId > 0 {
@@ -428,7 +409,6 @@ func (this *DocumentController) Read() {
 		menuDoc.Find(".jstree-clicked").Parents().RemoveClass("collapse-hide")
 		tree, _ = menuDoc.Find("body").Html()
 	}
-
 	if wd := this.GetString("wd"); strings.TrimSpace(wd) != "" {
 		this.Data["Keywords"] = models.NewElasticSearchClient().SegWords(wd)
 	}
@@ -905,7 +885,7 @@ func (this *DocumentController) RemoveAttachment() {
 	this.JsonResult(0, "ok", attach)
 }
 
-// Delete 删除文档.
+// Delete 删除文档
 func (this *DocumentController) Delete() {
 
 	identify := this.GetString("identify")
@@ -1447,6 +1427,7 @@ func (this *DocumentController) DeleteHistory() {
 	this.JsonResult(0, "ok")
 }
 
+// RestoreHistory 重存储文档历史
 func (this *DocumentController) RestoreHistory() {
 
 	this.TplName = "document/history.html"
@@ -1506,7 +1487,7 @@ func (this *DocumentController) Compare() {
 	identify := this.Ctx.Input.Param(":key")
 
 	bookId := 0
-	//如果是超级管理员则忽略权限判断
+	// 如果是超级管理员则忽略权限判断
 	if this.Member.IsAdministrator() {
 		book, err := models.NewBook().FindByFieldFirst("identify", identify)
 		if err != nil {
@@ -1549,56 +1530,3 @@ func (this *DocumentController) Compare() {
 	this.Data["HistoryContent"] = vc.GetVersionContent(false)
 	this.Data["Content"] = ModelStore.GetFiledById(doc.DocumentId, "markdown")
 }
-
-//递归生成文档序列数组.
-func RecursiveFun(parentId int, prefix, dpath string, this *DocumentController, book *models.BookResult, docs []*models.Document, paths *list.List) {
-	for _, item := range docs {
-		if item.ParentId == parentId {
-			name := prefix + strconv.Itoa(item.ParentId) + strconv.Itoa(item.OrderSort) + strconv.Itoa(item.DocumentId)
-			fpath := dpath + "/" + name + ".html"
-			paths.PushBack(fpath)
-
-			f, err := os.OpenFile(fpath, os.O_CREATE|os.O_RDWR, 0777)
-
-			if err != nil {
-				beego.Error(err)
-				this.Abort("404")
-			}
-
-			html, err := this.ExecuteViewPathTemplate("document/export.html", map[string]interface{}{"Model": book, "Lists": item, "BaseUrl": this.BaseUrl()})
-			if err != nil {
-				f.Close()
-				beego.Error(err)
-				this.Abort("404")
-			}
-
-			buf := bytes.NewReader([]byte(html))
-			doc, _ := goquery.NewDocumentFromReader(buf)
-			doc.Find("img").Each(func(i int, contentSelection *goquery.Selection) {
-				if src, ok := contentSelection.Attr("src"); ok && strings.HasPrefix(src, "/uploads/") {
-					contentSelection.SetAttr("src", this.BaseUrl()+src)
-				}
-			})
-			html, err = doc.Html()
-
-			if err != nil {
-				f.Close()
-				beego.Error(err)
-				this.Abort("404")
-			}
-			//html = strings.Replace(html, "<img src=\"/uploads", "<img src=\""+this.BaseUrl()+"/uploads", -1)
-
-			f.WriteString(html)
-			f.Close()
-
-			for _, sub := range docs {
-				if sub.ParentId == item.DocumentId {
-					RecursiveFun(item.DocumentId, name, dpath, this, book, docs, paths)
-					break
-				}
-			}
-		}
-	}
-}
-
-//

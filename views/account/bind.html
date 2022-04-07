@@ -2,10 +2,20 @@
 <html lang="zh-cn">
 <head>
     {{template "widgets/head.html" .}}
-        <style>
-            h3{font-weight: normal;margin-bottom: 20px;font-size: 20px;margin-top: 15px;}
-            .bind-options label{font-weight: normal;margin-right: 8px;cursor: pointer;}
-        </style>
+    <style>
+        h3 {
+            font-weight: normal;
+            margin-bottom: 20px;
+            font-size: 20px;
+            margin-top: 15px;
+        }
+
+        .bind-options label {
+            font-weight: normal;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body class="manual-container">
 <header class="navbar navbar-static-top smart-nav navbar-fixed-top manual-header" role="banner">
@@ -103,33 +113,32 @@
                         </form>
                     </div>
         </div>
-        
+
     </div>
     <div class="clearfix"></div>
 </div>
-{{/*<script src="/static/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>*/}}
 <script src="{{$.StaticDomain}}/static/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>
-{{/*<script src="/static/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>*/}}
 <script src="{{$.StaticDomain}}/static/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
 <script src="{{$.StaticDomain}}/static/js/toast.script.js" type="text/javascript"></script>
 <script src="/static/js/main.js?version={{$.Version}}" type="text/javascript"></script>
-{{/*js直接写在这里了*/}}
-<script>$(function () {
-    $(".bind-options label").click(function () {
-        var options=$(this);
-        $.each(options,function () {
-            if($(this).find("input").prop("checked")==true){
-                var btnSubmit=$("form [type=submit]");
-                if ($(this).find("input").val()==1){//绑定已有账号
-                    $(".has-hidden").hide();
-                    btnSubmit.text(btnSubmit.attr("data-has"));
-                }else{//注册新账号
-                    $(".has-hidden").show();
-                    btnSubmit.text(btnSubmit.attr("data-not"));
+<script>
+    $(function () {
+        $(".bind-options label").click(function () {
+            var options = $(this);
+            $.each(options, function () {
+                if ($(this).find("input").prop("checked") == true) {
+                    var btnSubmit = $("form [type=submit]");
+                    if ($(this).find("input").val() == 1) {//绑定已有账号
+                        $(".has-hidden").hide();
+                        btnSubmit.text(btnSubmit.attr("data-has"));
+                    } else {//注册新账号
+                        $(".has-hidden").show();
+                        btnSubmit.text(btnSubmit.attr("data-not"));
+                    }
                 }
-            }
+            })
         })
     })
-})</script>
+</script>
 </body>
 </html>

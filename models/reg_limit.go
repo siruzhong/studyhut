@@ -1,7 +1,6 @@
 package models
 
 import (
-	"strconv"
 	"time"
 
 	"github.com/astaxie/beego"
@@ -15,23 +14,6 @@ type RegLimit struct {
 	DailyRegNum int       `orm:"-"`
 	HourRegNum  int       `orm:"-"`
 	RealIPField string    `orm:"-"`
-}
-
-func NewRegLimit() (rl *RegLimit) {
-	rl = &RegLimit{}
-	var options []Option
-	orm.NewOrm().QueryTable(NewOption()).Filter("option_name__in", "REAL_IP_FIELD", "HOUR_REG_NUM", "DAILY_REG_NUM").All(&options, "option_name", "option_value")
-	for _, item := range options {
-		switch item.OptionName {
-		case "REAL_IP_FIELD":
-			rl.RealIPField = item.OptionValue
-		case "HOUR_REG_NUM":
-			rl.HourRegNum, _ = strconv.Atoi(item.OptionValue)
-		case "DAILY_REG_NUM":
-			rl.DailyRegNum, _ = strconv.Atoi(item.OptionValue)
-		}
-	}
-	return rl
 }
 
 func (rl *RegLimit) CheckIPIsAllowed(ip string) (allowHour, allowDaily bool) {

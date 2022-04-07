@@ -124,11 +124,6 @@ func webRouter() {
 	beego.Router("/manager/update_friendlink", &controllers.ManagerController{}, "get:UpdateFriendLink")               // 更新友链
 	beego.Router("/manager/del_friendlink", &controllers.ManagerController{}, "get:DelFriendLink")                     // 删除友链
 	beego.Router("/manager/rebuild-index", &controllers.ManagerController{}, "get:RebuildAllIndex")                    // 重建全量索引
-	beego.Router("/manager/banners", &controllers.ManagerController{}, "get:Banners")                                  // 横幅管理
-	beego.Router("/manager/banners/upload", &controllers.ManagerController{}, "post:UploadBanner")                     // 上传横幅
-	beego.Router("/manager/banners/delete", &controllers.ManagerController{}, "get:DeleteBanner")                      // 删除横幅
-	beego.Router("/manager/banners/update", &controllers.ManagerController{}, "get:UpdateBanner")                      // 更新横幅
-
 	// 书签
 	beego.Router("/bookmark/:id", &controllers.BookmarkController{}, "get:Bookmark")
 	beego.Router("/bookmark/list/:book_id", &controllers.BookmarkController{}, "get:List")

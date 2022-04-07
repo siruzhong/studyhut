@@ -3,12 +3,7 @@ package utils
 import (
 	"crypto/tls"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"io/ioutil"
-	"net/http"
-	"os"
-	"strings"
 	"time"
 
 	"github.com/astaxie/beego"
@@ -42,37 +37,5 @@ func GetAccessToken() (token *WechatToken) {
 	json.Unmarshal([]byte(resp), token)
 	token.ExpiresIn = now + token.ExpiresIn
 	wechatToken = token
-	return
-}
-
-// GetBookWXACode 获取书籍页面小程序码
-func GetBookWXACode(accessToken string, bookId int) (tmpFile string, err error) {
-	api := fmt.Sprintf("https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=" + accessToken)
-	data := map[string]interface{}{"page": "pages/intro/intro", "scene": fmt.Sprint(bookId), "width": 280}
-	req := httplib.Post(api).SetTimeout(10*time.Second, 10*time.Second).SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
-
-	var resp *http.Response
-	var b []byte
-
-	b, err = json.Marshal(data)
-	if err != nil {
-		return
-	}
-
-	resp, err = req.Body(b).DoRequest()
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-	b, err = ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return
-	}
-	if contentType := strings.ToLower(resp.Header.Get("content-type")); strings.HasPrefix(contentType, "image/") {
-		tmpFile = fmt.Sprintf("book-id-%v.%v", bookId, strings.TrimPrefix(contentType, "image/"))
-		err = ioutil.WriteFile(tmpFile, b, os.ModePerm)
-	} else {
-		err = errors.New(string(b))
-	}
 	return
 }

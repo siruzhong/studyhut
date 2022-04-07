@@ -88,7 +88,6 @@ func RegisterModel() {
 		new(models.Bookmark),
 		new(models.RelateBook),
 		new(models.Auth),
-		new(models.Banner),
 		new(models.Wechat),
 		new(models.RegLimit),
 		new(models.AdsPosition),

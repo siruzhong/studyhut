@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"os"
 
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/kardianos/service"
 	"studyhut/commands"
 	"studyhut/commands/daemon"
+
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/kardianos/service"
 	_ "studyhut/routers"
 )
 

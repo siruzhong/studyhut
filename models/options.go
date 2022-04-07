@@ -1,8 +1,8 @@
 package models
 
 import (
-	"studyhut/utils"
 	"strings"
+	"studyhut/utils"
 	"sync"
 
 	"github.com/astaxie/beego/orm"
@@ -125,14 +125,6 @@ func (m *Option) Init() error {
 			OptionValue: "true",
 			OptionName:  "CLOSE_OPEN_SOURCE_LINK",
 			OptionTitle: "是否关闭开源书籍入口",
-		}, {
-			OptionValue: "0",
-			OptionName:  "HOUR_REG_NUM",
-			OptionTitle: "同一IP每小时允许注册人数",
-		}, {
-			OptionValue: "0",
-			OptionName:  "DAILY_REG_NUM",
-			OptionTitle: "同一IP每天允许注册人数",
 		}, {
 			OptionValue: "X-Real-Ip",
 			OptionName:  "REAL_IP_FIELD",
