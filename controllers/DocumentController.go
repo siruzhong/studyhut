@@ -12,8 +12,13 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"studyhut/constant"
 	"time"
+
+	"studyhut/constant"
+	"studyhut/models"
+	"studyhut/utils"
+	"studyhut/utils/html2md"
+	"studyhut/utils/store"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
@@ -21,10 +26,6 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/qr"
-	"studyhut/models"
-	"studyhut/utils"
-	"studyhut/utils/html2md"
-	"studyhut/utils/store"
 )
 
 var (
@@ -426,16 +427,13 @@ func (this *DocumentController) Read() {
 // Edit 编辑文档
 func (this *DocumentController) Edit() {
 	docId := 0 // 文档id
-
 	identify := this.Ctx.Input.Param(":key")
 	if identify == "" {
 		this.Abort("404")
 	}
-
 	bookResult := models.NewBookResult()
-
 	var err error
-	//如果是超级管理者，则不判断权限
+	// 如果是超级管理者，则不判断权限
 	if this.Member.IsAdministrator() {
 		book, err := models.NewBook().FindByFieldFirst("identify", identify)
 		if err != nil {
@@ -448,22 +446,16 @@ func (this *DocumentController) Edit() {
 			beego.Error("DocumentController.Edit => ", err)
 			this.Abort("404")
 		}
-
 		if bookResult.RoleId == constant.BookObserver {
 			this.JsonResult(6002, "书籍不存在或权限不足")
 		}
 	}
-
-	//根据不同编辑器类型加载编辑器【注：现在只支持markdown】
+	// 根据不同编辑器类型加载编辑器【注：现在只支持markdown】
 	this.TplName = "document/markdown_edit_template.html"
-
 	this.Data["Model"] = bookResult
 	r, _ := json.Marshal(bookResult)
-
 	this.Data["ModelResult"] = template.JS(string(r))
-
 	this.Data["Result"] = template.JS("[]")
-
 	// 编辑的文档
 	if id := this.GetString(":id"); id != "" {
 		if num, _ := strconv.Atoi(id); num > 0 {
@@ -474,7 +466,6 @@ func (this *DocumentController) Edit() {
 			docId = doc.DocumentId
 		}
 	}
-
 	trees, err := models.NewDocument().FindDocumentTree(bookResult.BookId, docId, true)
 	if err != nil {
 		beego.Error("FindDocumentTree => ", err)
@@ -488,7 +479,6 @@ func (this *DocumentController) Edit() {
 		}
 	}
 	this.Data["BaiDuMapKey"] = beego.AppConfig.DefaultString("baidumapkey", "")
-
 }
 
 // Create 创建一个文档
@@ -635,11 +625,9 @@ func (this *DocumentController) Upload() {
 	identify := this.GetString("identify")
 	docId, _ := this.GetInt("doc_id")
 	fileType := this.GetString("type")
-
 	if identify == "" {
 		this.JsonResult(6001, "参数错误")
 	}
-
 	name := "editormd-file-file"
 	if docId == 0 {
 		if fileType != "" && !strings.Contains(fileType, "/") {
@@ -648,7 +636,6 @@ func (this *DocumentController) Upload() {
 			fileType = strings.Split(fileType, "/")[0]
 		}
 	}
-
 	file, moreFile, err := this.GetFile(name)
 	if err == http.ErrMissingFile {
 		name = "editormd-image-file"
@@ -657,25 +644,20 @@ func (this *DocumentController) Upload() {
 			this.JsonResult(6003, "没有发现需要上传的文件")
 		}
 	}
-
 	if err != nil {
 		this.JsonResult(6002, err.Error())
 	}
-
 	defer file.Close()
-
 	ext := filepath.Ext(moreFile.Filename)
 	if ext == "" {
 		this.JsonResult(6003, "无法解析文件的格式")
 	}
-
 	if !utils.IsAllowUploadFileExt(ext, fileType) {
 		this.JsonResult(6004, "不允许的文件类型")
 	}
-
 	bookId := 0
 	bookIdentify := ""
-	//如果是超级管理员，则不判断权限
+	// 如果是超级管理员，则不判断权限
 	if this.Member.IsAdministrator() {
 		book, err := models.NewBook().FindByFieldFirst("identify", identify)
 		if err != nil {
@@ -699,7 +681,6 @@ func (this *DocumentController) Upload() {
 		bookId = book.BookId
 		bookIdentify = book.Identify
 	}
-
 	if docId > 0 {
 		doc, err := models.NewDocument().Find(docId)
 		if err != nil {
@@ -716,18 +697,14 @@ func (this *DocumentController) Upload() {
 		}
 		docId = doc.DocumentId
 	}
-
 	fileName := strconv.FormatInt(time.Now().UnixNano(), 16)
-
 	tmpPath := fmt.Sprintf("cache/%v-%v-%v", bookIdentify, time.Now().Format("200601"), fileName+ext)
 	err = this.SaveToFile(name, tmpPath)
 	if err != nil {
 		beego.Error("SaveToFile => ", err)
 		this.JsonResult(6005, "保存文件失败")
 	}
-
 	defer func() { os.Remove(tmpPath) }()
-
 	prefix := "uploads"
 	savePath := filepath.Join("projects", bookIdentify, time.Now().Format("200601"), fileName+ext)
 	if utils.StoreType != constant.StoreOss || utils.StoreType != constant.StoreCos {
@@ -735,9 +712,7 @@ func (this *DocumentController) Upload() {
 		os.MkdirAll(filepath.Dir(savePath), os.ModePerm)
 		os.Rename(tmpPath, savePath)
 	}
-
 	savePath = strings.ReplaceAll(savePath, "\\", "/")
-
 	attachment := models.NewAttachment()
 	attachment.BookId = bookId
 	attachment.FileName = moreFile.Filename
@@ -746,23 +721,19 @@ func (this *DocumentController) Upload() {
 	attachment.FilePath = "/" + savePath
 	attachment.HttpPath = attachment.FilePath
 	attachment.DocumentId = docId
-
 	// 非附件
 	if name != "editormd-file-file" {
 		attachment.DocumentId = 0
 	}
-
 	if fileInfo, err := os.Stat(savePath); err == nil {
 		attachment.FileSize = float64(fileInfo.Size())
 	}
-
 	// 数据入库
 	if err = attachment.Insert(); err != nil {
 		os.Remove(savePath)
 		beego.Error("Attachment Insert => ", err)
 		this.JsonResult(6006, "文件保存失败")
 	}
-
 	if utils.StoreType == constant.StoreOss {
 		if err := store.ModelStoreOss.MoveToOss(tmpPath, savePath, true, false); err != nil {
 			beego.Error(err.Error())
@@ -779,7 +750,6 @@ func (this *DocumentController) Upload() {
 			beego.Error(err.Error())
 		}
 	}
-
 	result := map[string]interface{}{
 		"errcode":   0,
 		"success":   1,
@@ -952,8 +922,11 @@ func (this *DocumentController) Content() {
 	if err != nil {
 		docId, _ = strconv.Atoi(this.Ctx.Input.Param(":id"))
 	}
+	if docId <= 0 {
+		this.JsonResult(6001, "参数错误")
+	}
 	bookId := 0
-	//如果是超级管理员，则忽略权限
+	// 如果是超级管理员，则忽略权限
 	if this.Member.IsAdministrator() {
 		book, err := models.NewBook().FindByFieldFirst("identify", identify)
 		if err != nil {
@@ -962,23 +935,15 @@ func (this *DocumentController) Content() {
 		bookId = book.BookId
 	} else {
 		bookResult, err := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
-
 		if err != nil || bookResult.RoleId == constant.BookObserver {
 			beego.Error("FindByIdentify => ", err)
 			this.JsonResult(6002, "书籍不存在或权限不足")
 		}
 		bookId = bookResult.BookId
 	}
-
-	if docId <= 0 {
-		this.JsonResult(6001, "参数错误")
-	}
-
 	ModelStore := new(models.DocumentStore)
-
 	if !this.Ctx.Input.IsPost() {
 		doc, err := models.NewDocument().Find(docId)
-
 		if err != nil {
 			this.JsonResult(6003, "文档不存在")
 		}
@@ -986,18 +951,15 @@ func (this *DocumentController) Content() {
 		if err == nil {
 			doc.AttachList = attach
 		}
-
 		//为了减少数据的传输量，这里Release和Content的内容置空，前端会根据markdown文本自动渲染
 		//doc.Release = ""
 		//doc.Content = ""
 		doc.Markdown = ModelStore.GetFiledById(doc.DocumentId, "markdown")
 		this.JsonResult(0, errMsg, doc)
 	}
-
-	//更新文档内容
+	// 更新文档内容
 	markdown := strings.TrimSpace(this.GetString("markdown", ""))
 	content := this.GetString("html")
-
 	// 文档拆分
 	gq, err := goquery.NewDocumentFromReader(strings.NewReader(content))
 	if err == nil {
@@ -1012,12 +974,9 @@ func (this *DocumentController) Content() {
 			}
 		}
 	}
-
 	version, _ := this.GetInt64("version", 0)
 	isCover := this.GetString("cover")
-
 	doc, err := models.NewDocument().Find(docId)
-
 	if err != nil {
 		this.JsonResult(6003, "读取文档错误")
 	}
@@ -1028,7 +987,6 @@ func (this *DocumentController) Content() {
 		beego.Info("%d|", version, doc.Version)
 		this.JsonResult(6005, "文档已被修改确定要覆盖吗？")
 	}
-
 	isSummary := false
 	isAuto := false
 	//替换文档中的url链接

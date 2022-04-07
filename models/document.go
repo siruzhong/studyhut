@@ -151,7 +151,6 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 	// 加锁
 	utils.BooksRelease.Set(bookId)
 	defer utils.BooksRelease.Delete(bookId)
-
 	var (
 		o           = orm.NewOrm()
 		docs        []*Document
@@ -159,11 +158,9 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 		tableBooks  = "books"
 		releaseTime = time.Now() //发布的时间戳
 	)
-
 	qs := o.QueryTable(tableBooks).Filter("book_id", bookId)
 	qs.One(&book)
-
-	//全部重新发布。查询该书籍的所有文档id
+	// 全部重新发布。查询该书籍的所有文档id
 	_, err := o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", bookId).Limit(20000).All(&docs, "document_id", "identify", "modify_time")
 	if err != nil {
 		beego.Error("发布失败 => ", err)
@@ -173,7 +170,6 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 	for _, item := range docs {
 		docMap[item.Identify] = true
 	}
-
 	ModelStore := new(DocumentStore)
 	for _, item := range docs {
 		ds, err := ModelStore.GetById(item.DocumentId)
@@ -181,7 +177,6 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 			beego.Error(err)
 			continue
 		}
-
 		if strings.TrimSpace(utils.GetTextFromHtml(strings.Replace(ds.Markdown, "[TOC]", "", -1))) == "" {
 			// 如果markdown内容为空，则查询下一级目录内容来填充
 			ds.Markdown, ds.Content = item.BookStackAuto(bookId, ds.DocumentId)
@@ -191,7 +186,6 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 			utils.RenderDocumentById(item.DocumentId)
 			ds, _ = ModelStore.GetById(item.DocumentId)
 		}
-
 		item.Release = ds.Content
 		// attachList, err := NewAttachment().FindListByDocumentId(item.DocumentId)
 		// if err == nil && len(attachList) > 0 {
@@ -203,7 +197,6 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 		// 	content.WriteString("</ul></div>")
 		// 	item.Release += content.String()
 		// }
-
 		// 采集图片与稳定内容连接替换
 		if gq, err := goquery.NewDocumentFromReader(strings.NewReader(item.Release)); err == nil {
 			images := gq.Find("img")
@@ -221,13 +214,11 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 									newSrc = "/uploads/projects/" + book.Identify + "/" + filepath.Base(tmpFile)
 									err = store.ModelStoreLocal.MoveToStore(tmpFile, strings.TrimPrefix(newSrc, "/"))
 								case constant.StoreOss:
-									newSrc = "projects/" + book.Identify + "/" + filepath.Base(tmpFile)
+									newSrc = beego.AppConfig.String("oss::Domain") + "projects/" + book.Identify + "/" + filepath.Base(tmpFile)
 									err = store.ModelStoreOss.MoveToOss(tmpFile, newSrc, true)
-									newSrc = "/" + newSrc
 								case constant.StoreCos:
-									newSrc = "projects/" + book.Identify + "/" + filepath.Base(tmpFile)
+									newSrc = beego.AppConfig.String("cos::Domain") + "projects/" + book.Identify + "/" + filepath.Base(tmpFile)
 									err = store.ModelStoreCos.MoveToCos(tmpFile, newSrc, true)
-									newSrc = "/" + newSrc
 								}
 								if err != nil {
 									beego.Error(err.Error())

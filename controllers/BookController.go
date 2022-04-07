@@ -379,8 +379,8 @@ func (this *BookController) UploadCover() {
 	}
 	// 如果原封面不是默认封面则删除
 	if oldCover != utils.GetDefaultCover() {
-		if strings.Contains(oldCover, "https://bareth-1305674339.cos.ap-hongkong.myqcloud.com/") {
-			oldCover = strings.Replace(oldCover, "https://bareth-1305674339.cos.ap-hongkong.myqcloud.com/", "", 1)
+		if strings.Contains(oldCover, beego.AppConfig.String("cos::Domain")) {
+			oldCover = strings.Replace(oldCover, beego.AppConfig.String("cos::Domain"), "", 1)
 		}
 		//os.Remove("." + oldCover)
 		switch utils.StoreType {
@@ -976,11 +976,9 @@ func (this *BookController) loadByFolder(bookId int, identify, folder string) {
 					} else {
 						beego.Error(err.Error())
 					}
-
 				} else {
 					beego.Error("读取文档失败：", file.Path, "错误信息：", err)
 				}
-
 			}
 		}
 	}
@@ -1008,10 +1006,9 @@ func (this *BookController) replaceToAbs(projectRoot string, identify string) {
 	case constant.StoreLocal:
 		imgBaseUrl = "/uploads/projects/" + identify
 	case constant.StoreCos:
-		imgBaseUrl = "/projects/" + identify
+		imgBaseUrl = beego.AppConfig.String("cos::Domain") + "projects/" + identify
 	case constant.StoreOss:
-		//imgBaseUrl = this.BaseController.OssDomain + "/projects/" + identify
-		imgBaseUrl = "/projects/" + identify
+		imgBaseUrl = beego.AppConfig.String("oss:Domain") + "projects/" + identify
 	}
 	files, _ := filetil.ScanFiles(projectRoot)
 	for _, file := range files {
