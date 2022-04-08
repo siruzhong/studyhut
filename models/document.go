@@ -232,7 +232,6 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 					}
 				})
 			}
-
 			links := gq.Find("a")
 			if links.Length() > 0 {
 				links.Each(func(i int, selection *goquery.Selection) {
@@ -272,14 +271,13 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 		}
 		item.ModifyTime = ds.UpdatedAt
 		ModelStore.InsertOrUpdate(ds, fields...)
-
 		_, err = o.Update(item, "release", "modify_time")
 		if err != nil {
 			beego.Error(fmt.Sprintf("发布失败 => %+v", item), err)
 		}
 	}
 
-	//最后再更新时间戳
+	// 最后再更新时间戳
 	if _, err = qs.Update(orm.Params{
 		"release_time": releaseTime,
 	}); err != nil {
