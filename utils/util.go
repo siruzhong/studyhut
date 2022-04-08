@@ -32,7 +32,6 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
 	"github.com/disintegration/imaging"
-	"github.com/mssola/user_agent"
 	"studyhut/utils/html2md"
 )
 
@@ -928,10 +927,6 @@ func GetIP(ctx *context.Context, field string) (ip string) {
 		return slice[0]
 	}
 	return
-}
-
-func IsMobile(userAgent string) bool {
-	return user_agent.New(userAgent).Mobile()
 }
 
 func FormatReadingTime(seconds int, withoutTag ...bool) string {

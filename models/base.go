@@ -8,15 +8,17 @@ import (
 	"strings"
 	"time"
 
+	"studyhut/constant"
+
 	"github.com/TruthHun/gotil/sitemap"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	"studyhut/constant"
 )
 
-// 时间段
+// period 时间段
 type period string
 
+// cacheTime 缓存时间
 var cacheTime = beego.AppConfig.DefaultFloat("CacheTime", 60) // 1 分钟
 
 var (
@@ -40,11 +42,11 @@ func Init() {
 }
 
 // SetIncreAndDecre 设置增减
-//@param            table           需要处理的数据表
-//@param            field           字段
-//@param            condition       条件
-//@param            incre           是否是增长值，true则增加，false则减少
-//@param            step            增或减的步长
+// @param            table           需要处理的数据表
+// @param            field           字段
+// @param            condition       条件
+// @param            incre           是否是增长值，true则增加，false则减少
+// @param            step            增或减的步长
 func SetIncreAndDecre(table string, field string, condition string, incre bool, step ...int) (err error) {
 	mark := "-"
 	if incre {
@@ -59,6 +61,7 @@ func SetIncreAndDecre(table string, field string, condition string, incre bool, 
 	return
 }
 
+// SitemapDocs 站点地图文档
 type SitemapDocs struct {
 	DocumentId   int
 	DocumentName string
@@ -68,15 +71,14 @@ type SitemapDocs struct {
 
 // SitemapData 站点地图数据
 func SitemapData(page, listRows int) (totalRows int64, sitemaps []SitemapDocs) {
-	//获取公开的书籍
 	var (
 		books   []Book
 		docs    []Document
 		maps    = make(map[int]string)
 		booksId []interface{}
 	)
-
 	o := orm.NewOrm()
+	// 获取公开的书籍
 	o.QueryTable("books").Filter("privately_owned", 0).Limit(100000).All(&books, "book_id", "identify")
 	if len(books) > 0 {
 		for _, book := range books {
@@ -172,7 +174,6 @@ func SitemapUpdate(domain string) {
 				Lastmod: time.Now().Format("2006-01-02 15:04:05"),
 			})
 		}
-
 	}
 	Sitemap.CreateSitemapIndex(si, "sitemap.xml")
 }
@@ -185,23 +186,19 @@ type Count struct {
 // CountCategory 统计书籍分类
 func CountCategory() {
 	var count []Count
-
 	o := orm.NewOrm()
 	sql := "select count(bc.id) cnt, bc.category_id from book_category bc left join books b on b.book_id=bc.book_id where b.privately_owned=0 and bc.category_id>0  group by bc.category_id"
 	o.Raw(sql).QueryRows(&count)
 	if len(count) == 0 {
 		return
 	}
-
 	var cates []Category
 	tableCate := "category"
 	o.QueryTable(tableCate).All(&cates, "id", "pid", "cnt")
 	if len(cates) == 0 {
 		return
 	}
-
 	var err error
-
 	o.Begin()
 	defer func() {
 		if err != nil {
@@ -211,7 +208,6 @@ func CountCategory() {
 			o.Commit()
 		}
 	}()
-
 	cateChild := make(map[int]int)
 	if _, err = o.QueryTable(tableCate).Filter("id__gt", 0).Update(orm.Params{"cnt": 0}); err != nil {
 		return

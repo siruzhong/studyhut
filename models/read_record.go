@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"studyhut/constant"
 	"time"
 
 	"github.com/astaxie/beego"
@@ -170,12 +171,12 @@ func (this *ReadRecord) Add(docId, uid int) (err error) {
 		if err != nil {
 			return
 		}
-		o.QueryTable(rt).Filter("uid", uid).Filter("day", now.Format(signDayLayout)).One(rt)
+		o.QueryTable(rt).Filter("uid", uid).Filter("day", now.Format(constant.SignDayLayout)).One(rt)
 		if rt.Id > 0 {
 			rt.Duration += readingTime
 			_, err = o.Update(rt)
 		} else {
-			rt.Day, _ = strconv.Atoi(now.Format(signDayLayout))
+			rt.Day, _ = strconv.Atoi(now.Format(constant.SignDayLayout))
 			rt.Uid = uid
 			rt.Duration = readingTime
 			_, err = o.Insert(rt)

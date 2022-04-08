@@ -3,10 +3,10 @@ package models
 import (
 	"strings"
 
-	"github.com/astaxie/beego/orm"
 	"studyhut/utils"
-)
 
+	"github.com/astaxie/beego/orm"
+)
 
 type AttachmentResult struct {
 	Attachment

@@ -7,26 +7,30 @@ import (
 	"io/ioutil"
 	"os"
 	"strconv"
+	"studyhut/constant"
 	"time"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 )
 
-// Sign 会员签到表
+// Sign 签到
 type Sign struct {
-	Id        int
+	Id        int // 主键id
 	Uid       int `orm:"index"` // 签到的用户id
 	Day       int `orm:"index"` // 签到日期，如20200101
 	Reward    int // 奖励的阅读秒数
-	FromApp   bool
 	CreatedAt time.Time
+}
+
+// NewSign 新建签到实例
+func NewSign() *Sign {
+	return &Sign{}
 }
 
 type Rule struct {
 	BasicReward         int
 	ContinuousReward    int
-	AppReward           int
 	MaxContinuousReward int
 }
 
@@ -34,29 +38,13 @@ var (
 	_rule = &Rule{}
 )
 
-const (
-	signDayLayout       = "20060102"
-	messageSigned       = "您今日已签到"
-	messageNotExistUser = "您的账户不存在"
-	messageSignInnerErr = "签到失败，内部错误"
-)
-
-const (
-	signCacheDir = "cache/rank/sign"
-	signCacheFmt = "cache/rank/sign/%v-%v.json"
-)
-
 func init() {
-	if _, err := os.Stat(signCacheDir); err != nil {
-		err = os.MkdirAll(signCacheDir, os.ModePerm)
+	if _, err := os.Stat(constant.SignCacheDir); err != nil {
+		err = os.MkdirAll(constant.SignCacheDir, os.ModePerm)
 		if err != nil {
 			panic(err)
 		}
 	}
-}
-
-func NewSign() *Sign {
-	return &Sign{}
 }
 
 // 多字段唯一键
@@ -69,7 +57,7 @@ func (m *Sign) TableUnique() [][]string {
 // 今天是否已签到
 func (m *Sign) IsSignToday(uid int) bool {
 	s := &Sign{}
-	orm.NewOrm().QueryTable(m).Filter("uid", uid).Filter("day", time.Now().Format(signDayLayout)).One(s, "id")
+	orm.NewOrm().QueryTable(m).Filter("uid", uid).Filter("day", time.Now().Format(constant.SignDayLayout)).One(s, "id")
 	return s.Id > 0
 }
 
@@ -86,21 +74,21 @@ func (m *Sign) LatestSignTime(uid int) (date int) {
 func (m *Sign) IsContinuousSign(uid int) bool {
 	s := &Sign{}
 	now := time.Now()
-	yesterday := now.Add(-24 * time.Hour).Format(signDayLayout)
+	yesterday := now.Add(-24 * time.Hour).Format(constant.SignDayLayout)
 	orm.NewOrm().QueryTable(m).Filter("uid", uid).Filter("day", yesterday).One(s)
 	return s.Id > 0
 }
 
 // 执行签到。使用事务
-func (m *Sign) Sign(uid int, fromApp bool) (reward int, err error) {
+func (m *Sign) Sign(uid int) (reward int, err error) {
 	s := &Sign{}
 	o := orm.NewOrm()
 	now := time.Now()
-	day, _ := strconv.Atoi(now.Format(signDayLayout))
+	day, _ := strconv.Atoi(now.Format(constant.SignDayLayout))
 	// 1. 检测用户有没有签到
 	o.QueryTable(s).Filter("uid", uid).Filter("day", day).One(s)
 	if m.IsSignToday(uid) {
-		err = errors.New(messageSigned)
+		err = errors.New(constant.MessageSigned)
 		return
 	}
 	isContinuousSign := m.IsContinuousSign(uid) // 昨天有没有断签
@@ -110,7 +98,7 @@ func (m *Sign) Sign(uid int, fromApp bool) (reward int, err error) {
 	cols := []string{"member_id", "total_sign", "total_continuous_sign", "history_total_continuous_sign"}
 	o.QueryTable(user).Filter("member_id", uid).One(user, cols...)
 	if user.MemberId < 0 {
-		err = errors.New(messageNotExistUser)
+		err = errors.New(constant.MessageNotExistUser)
 		return
 	}
 	// 3. 查询奖励规则
@@ -120,7 +108,7 @@ func (m *Sign) Sign(uid int, fromApp bool) (reward int, err error) {
 	defer func() {
 		if err != nil {
 			beego.Error(err)
-			err = errors.New(messageSignInnerErr)
+			err = errors.New(constant.MessageSignInnerErr)
 			o.Rollback()
 		} else {
 			o.Commit()
@@ -130,7 +118,6 @@ func (m *Sign) Sign(uid int, fromApp bool) (reward int, err error) {
 	s.Day = day
 	s.Uid = uid
 	s.CreatedAt = now
-	s.FromApp = fromApp
 
 	//  奖励计算
 	if isContinuousSign { //连续签到
@@ -149,10 +136,6 @@ func (m *Sign) Sign(uid int, fromApp bool) (reward int, err error) {
 		user.HistoryTotalContinuousSign = user.TotalContinuousSign
 	}
 
-	if fromApp {
-		s.Reward = s.Reward + rule.AppReward
-	}
-
 	if _, err = o.Insert(s); err != nil {
 		return
 	}
@@ -164,12 +147,12 @@ func (m *Sign) Sign(uid int, fromApp bool) (reward int, err error) {
 	})
 
 	rt := NewReadingTime()
-	o.QueryTable(rt).Filter("uid", uid).Filter("day", now.Format(signDayLayout)).One(rt)
+	o.QueryTable(rt).Filter("uid", uid).Filter("day", now.Format(constant.SignDayLayout)).One(rt)
 	if rt.Id > 0 {
 		rt.Duration += s.Reward
 		_, err = o.Update(rt)
 	} else {
-		rt.Day, _ = strconv.Atoi(now.Format(signDayLayout))
+		rt.Day, _ = strconv.Atoi(now.Format(constant.SignDayLayout))
 		rt.Uid = uid
 		rt.Duration = s.Reward
 		_, err = o.Insert(rt)
@@ -205,7 +188,7 @@ func (m *Sign) Sorted(limit int, orderField string, withCache ...bool) (members 
 	if len(withCache) > 0 {
 		cache = withCache[0]
 	}
-	file := fmt.Sprintf(signCacheFmt, orderField, limit)
+	file := fmt.Sprintf(constant.SignCacheFmt, orderField, limit)
 	if cache {
 		if info, err := os.Stat(file); err == nil && time.Now().Sub(info.ModTime()).Seconds() <= cacheTime {
 			// 文件存在，且在缓存时间内
@@ -243,7 +226,7 @@ func (m *Sign) SortedByPeriod(limit int, prd period, withCache ...bool) (members
 	if len(withCache) > 0 {
 		cache = withCache[0]
 	}
-	file := fmt.Sprintf(signCacheFmt, "month-"+prd, limit)
+	file := fmt.Sprintf(constant.SignCacheFmt, "month-"+prd, limit)
 	if cache {
 		if info, err := os.Stat(file); err == nil && time.Now().Sub(info.ModTime()).Seconds() <= cacheTime {
 			// 文件存在，且在缓存时间内

@@ -1,14 +1,14 @@
-// Package models 数据库模型
 package models
 
 import (
 	"os"
-	"studyhut/constant"
 	"strings"
 	"time"
 
-	"github.com/astaxie/beego/orm"
+	"studyhut/constant"
 	"studyhut/utils"
+
+	"github.com/astaxie/beego/orm"
 )
 
 // Attachment 附件

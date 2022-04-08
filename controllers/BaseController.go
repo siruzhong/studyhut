@@ -10,15 +10,16 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
-	"studyhut/constant"
 	"time"
 	"unicode/utf8"
+
+	"studyhut/constant"
+	"studyhut/models"
+	"studyhut/utils"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	"studyhut/models"
-	"studyhut/utils"
 )
 
 // BaseController 基础控制器
@@ -30,7 +31,6 @@ type BaseController struct {
 	AllowRegister         bool              // 允许注册
 	EnableDocumentHistory int               // 是否开启文档历史
 	Sitename              string            // 站点名称
-	IsMobile              bool              // 是否是移动端
 	OssDomain             string            // oss域名
 	StaticDomain          string            // 静态文件根地址
 	NoNeedLoginRouter     bool              // 是否开启不需要登陆路由
@@ -72,8 +72,6 @@ func (this *BaseController) refreshReferer() {
 // Prepare 预处理函数，该函数会在以下定义的方法前执行，用于用户扩展，可以实现类似用户验证之类)
 func (this *BaseController) Prepare() {
 	this.refreshReferer()
-	this.IsMobile = utils.IsMobile(this.Ctx.Request.UserAgent())
-	this.Data["IsMobile"] = this.IsMobile
 	this.Member = models.NewMember() //初始化
 	this.EnableAnonymous = false
 	this.AllowRegister = true
@@ -543,7 +541,7 @@ func (this *BaseController) SignToday() {
 	if this.Member == nil || this.Member.MemberId == 0 {
 		this.JsonResult(1, "请先登录")
 	}
-	reward, err := models.NewSign().Sign(this.Member.MemberId, false)
+	reward, err := models.NewSign().Sign(this.Member.MemberId)
 	if err != nil {
 		this.JsonResult(1, "签到失败："+err.Error())
 	}

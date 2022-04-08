@@ -16,7 +16,7 @@ type Migration struct {
 	Version     int64     `orm:"type(bigint);column(version);unique" json:"version"`
 }
 
-// TableName 获取对应数据库表名.
+// TableName 获取对应数据库表名
 func (m *Migration) TableName() string {
 	return "migrations"
 }
