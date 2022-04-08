@@ -131,17 +131,17 @@
                         <span><a href="#" data-target="#ModalShare" data-toggle="modal"><i class="fa fa-share-alt"></i> 分享</a></span>
                         <span class="pull-right hidden-xs tooltips" title="更新时间"><i class="fa fa-clock-o"></i> <i class="updated-at">{{.UpdatedAt}}</i></span>
                     </div>
-                    {{if (ads "content-top" $.IsMobile)}}
+                    {{if (ads "content-top")}}
                         <div class="ap ap-content-top mgb-15px">
-                            {{str2html (ads "content-top" $.IsMobile)}}
+                            {{str2html (ads "content-top")}}
                         </div>
                     {{end}}
                     <article class="article-body  {{if eq .Model.Editor "markdown"}}markdown-body editormd-preview-container{{else}}editor-content{{end}}"  id="page-content">
                     {{.Content}}
                     </article>
-                    {{if (ads "content-bottom" $.IsMobile)}}
+                    {{if (ads "content-bottom")}}
                         <div class="ap ap-content-bottom mgt-15px">
-                            {{str2html (ads "content-bottom" $.IsMobile)}}
+                            {{str2html (ads "content-bottom")}}
                         </div>
                     {{end}}
                     <div class="row hung-read-link">

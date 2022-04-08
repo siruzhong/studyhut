@@ -855,9 +855,8 @@ func (this *ManagerController) Ads() {
 		this.JsonResult(0, "新增广告成功")
 	} else {
 		layout := "2006-01-02"
-		this.Data["Mobile"] = this.GetString("mobile", "0")
 		this.Data["Positions"] = models.NewAdsCont().GetPositions()
-		this.Data["Lists"] = models.NewAdsCont().Lists(this.GetString("mobile", "0") == "1")
+		this.Data["Lists"] = models.NewAdsCont().Lists()
 		this.Data["IsAds"] = true
 		this.Data["Now"] = time.Now().Format(layout)
 		this.Data["Next"] = time.Now().Add(time.Hour * 24 * 730).Format(layout)

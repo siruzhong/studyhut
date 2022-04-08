@@ -34,9 +34,9 @@
                     <a href="{{urlfor "ManagerController.EditBook" ":key" .Book.Identify}}" class="tooltips" title="管理员书籍设置"> &nbsp;<small><i class="fa fa-cogs"></i></small> </a>
                 {{end}}
             </h1>
-            {{if (ads "intro-under-book-name" $.IsMobile)}}
+            {{if (ads "intro-under-book-name")}}
                 <div class="ap ap-intro-under-book-name">
-                    {{str2html (ads "intro-under-book-name" $.IsMobile)}}
+                    {{str2html (ads "intro-under-book-name")}}
                 </div>
             {{end}}
         </div>
@@ -81,9 +81,9 @@
                 </li>
             </ul>
         </div>
-        {{if (ads "intro-before-menu" $.IsMobile)}}
+        {{if (ads "intro-before-menu")}}
             <div class="ap ap-intro-before-menu mgt-15px col-xs-12">
-                {{str2html (ads "intro-before-menu" $.IsMobile)}}
+                {{str2html (ads "intro-before-menu")}}
             </div>
         {{end}}
         <div class="col-xs-12 mgt-15px">
@@ -155,10 +155,10 @@
         </div>
     </div>
 
-    {{if (ads "intro-before-related-books" $.IsMobile)}}
+    {{if (ads "intro-before-related-books")}}
         <div class="row mgt-15px">
             <div class="ap ap-intro-before-related-books col-xs-12">
-                {{str2html (ads "intro-before-related-books" $.IsMobile)}}
+                {{str2html (ads "intro-before-related-books")}}
             </div>
         </div>
     {{end}}

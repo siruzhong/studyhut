@@ -38,9 +38,9 @@
         <div class="row">
             <div class="col-sm-8 col-xs-12 result-list">
                 <div class="help-block"><a style="color: red;" target="_blank" rel="nofollow noreferrer" href="https://www.baidu.com/s?wd={{.SITE_NAME}}">{{.SITE_NAME}}</a> 本次搜索耗时 <span class="text-danger">{{.SpendTime}}</span> 秒，为您找到  <span class="text-success">{{.TotalRows}}</span> 个相关结果.</div>
-                {{if (ads "search-top" $.IsMobile)}}
+                {{if (ads "search-top")}}
                     <div class="ap ap-search-top mgb-15px">
-                        {{str2html (ads "search-top" $.IsMobile)}}
+                        {{str2html (ads "search-top")}}
                     </div>
                 {{end}}
                 <ul class="nav nav-tabs">
@@ -97,17 +97,17 @@
                     </ul>
                 {{end}}
 
-                {{if (ads "search-bottom" $.IsMobile)}}
+                {{if (ads "search-bottom")}}
                     <div class="ap ap-search-bottom">
-                        {{str2html (ads "search-bottom" $.IsMobile)}}
+                        {{str2html (ads "search-bottom")}}
                     </div>
                 {{end}}
 
                 {{.PageHtml}}
             </div>
-            {{if (ads "search-right" $.IsMobile)}}
+            {{if (ads "search-right")}}
                 <div class="col-sm-4 hidden-xs result-right ap ap-search-right">
-                    {{str2html (ads "search-right" $.IsMobile)}}
+                    {{str2html (ads "search-right")}}
                 </div>
             {{end}}
         </div>

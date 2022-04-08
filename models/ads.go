@@ -29,7 +29,6 @@ type AdsPosition struct {
 	Id       int
 	Title    string
 	Identify string `orm:"index;size(32)"`
-	IsMobile bool   `orm:"index"`
 }
 
 // NewAdsPosition 新建广告位
@@ -44,152 +43,73 @@ func NewAdsCont() *AdsCont {
 
 var (
 	adsCache      sync.Map // map[pid][]AdsCont
-	positionCache sync.Map // map[positionIdentify-isMobile]=pid
+	positionCache sync.Map // map[positionIdentify]=pid
 )
 
 // InstallAdsPosition 初始化广告位
 func InstallAdsPosition() {
 	positions := []AdsPosition{
 		{
-			IsMobile: false,
 			Title:    "[全局]页面底部",
 			Identify: constant.AdsPositionGlobalFooter,
 		},
 		{
-			IsMobile: false,
 			Title:    "[友链]顶部",
 			Identify: constant.AdsPositionBeforeFriendLink,
 		},
 		{
-			IsMobile: false,
 			Title:    "[首页]最新推荐下方",
 			Identify: constant.AdsPositionUnderLatestRecommend,
 		},
 		{
-			IsMobile: false,
 			Title:    "[搜索页]搜索结果右侧",
 			Identify: constant.AdsPositionSearchRight,
 		},
 		{
-			IsMobile: false,
 			Title:    "[搜索页]搜索结果上方",
 			Identify: constant.AdsPositionSearchTop,
 		},
 		{
-			IsMobile: false,
 			Title:    "[搜索页]搜索结果下方",
 			Identify: constant.AdsPositionSearchBottom,
 		},
 		{
-			IsMobile: false,
 			Title:    "[书籍介绍页]书籍名称下方",
 			Identify: constant.AdsPositionUnderBookName,
 		},
 		{
-			IsMobile: false,
 			Title:    "[书籍介绍页]文档概述上方",
 			Identify: constant.AdsPositionBeforeMenu,
 		},
 		{
-			IsMobile: false,
 			Title:    "[书籍介绍页]相关书籍上方",
 			Identify: constant.AdsPositionBeforeRelatedBooks,
 		},
 		{
-			IsMobile: false,
 			Title:    "[内容阅读页]内容上方",
 			Identify: constant.AdsPositionContentTop,
 		},
 		{
-			IsMobile: false,
 			Title:    "[内容阅读页]内容下方",
 			Identify: constant.AdsPositionContentBottom,
 		},
 		{
-			IsMobile: false,
 			Title:    "[发现页]导航栏下方",
 			Identify: constant.AdsPositionUnderExploreNav,
 		},
 		{
-			IsMobile: false,
 			Title:    "[发现页]分页上方",
 			Identify: constant.AdsPositionBeforeExplorePagination,
 		},
 		{
-			IsMobile: false,
 			Title:    "[发现页]分页下方",
 			Identify: constant.AdsPositionUnderExplorePagination,
-		},
-		{
-			IsMobile: true,
-			Title:    "[全局]页面底部",
-			Identify: constant.AdsPositionGlobalFooter,
-		},
-		{
-			IsMobile: true,
-			Title:    "[友链]顶部",
-			Identify: constant.AdsPositionBeforeFriendLink,
-		},
-		{
-			IsMobile: true,
-			Title:    "[首页]最新推荐下方",
-			Identify: constant.AdsPositionUnderLatestRecommend,
-		},
-		{
-			IsMobile: true,
-			Title:    "[搜索页]搜索结果上方",
-			Identify: constant.AdsPositionSearchTop,
-		},
-		{
-			IsMobile: true,
-			Title:    "[搜索页]搜索结果下方",
-			Identify: constant.AdsPositionSearchBottom,
-		},
-		{
-			IsMobile: true,
-			Title:    "[书籍介绍页]书籍名称下方",
-			Identify: constant.AdsPositionUnderBookName,
-		},
-		{
-			IsMobile: true,
-			Title:    "[书籍介绍页]文档概述上方",
-			Identify: constant.AdsPositionBeforeMenu,
-		},
-		{
-			IsMobile: true,
-			Title:    "[书籍介绍页]相关书籍上方",
-			Identify: constant.AdsPositionBeforeRelatedBooks,
-		},
-		{
-			IsMobile: true,
-			Title:    "[发现页]导航栏下方",
-			Identify: constant.AdsPositionUnderExploreNav,
-		},
-		{
-			IsMobile: true,
-			Title:    "[发现页]分页上方",
-			Identify: constant.AdsPositionBeforeExplorePagination,
-		},
-		{
-			IsMobile: true,
-			Title:    "[发现页]分页下方",
-			Identify: constant.AdsPositionUnderExplorePagination,
-		},
-		{
-			IsMobile: true,
-			Title:    "[内容阅读页]内容上方",
-			Identify: constant.AdsPositionContentTop,
-		},
-		{
-			IsMobile: true,
-			Title:    "[内容阅读页]内容下方",
-			Identify: constant.AdsPositionContentBottom,
 		},
 	}
 	o := orm.NewOrm()
 	for _, position := range positions {
 		table := &AdsPosition{}
-		o.QueryTable(table).Filter("is_mobile", position.IsMobile).Filter("identify", position.Identify).One(table)
+		o.QueryTable(table).Filter("identify", position.Identify).One(table)
 		if table.Id == 0 {
 			o.Insert(&position)
 		}
@@ -201,7 +121,7 @@ func initAdsCache() {
 	var pos []AdsPosition
 	o.QueryTable(&AdsPosition{}).All(&pos)
 	for _, item := range pos {
-		key := fmt.Sprintf("%v-%v", item.Identify, item.IsMobile)
+		key := fmt.Sprintf("%v", item.Identify)
 		positionCache.Store(key, item.Id)
 	}
 	UpdateAdsCache()
@@ -229,11 +149,11 @@ func UpdateAdsCache() {
 
 func (m *AdsCont) GetPositions() []AdsPosition {
 	var positions []AdsPosition
-	orm.NewOrm().QueryTable(NewAdsPosition()).OrderBy("is_mobile").All(&positions)
+	orm.NewOrm().QueryTable(NewAdsPosition()).All(&positions)
 	return positions
 }
 
-func (m *AdsCont) Lists(isMobile bool, status ...bool) (ads []AdsCont) {
+func (m *AdsCont) Lists(status ...bool) (ads []AdsCont) {
 	var (
 		positions     []AdsPosition
 		pids          []interface{}
@@ -241,7 +161,7 @@ func (m *AdsCont) Lists(isMobile bool, status ...bool) (ads []AdsCont) {
 		tableAds      = NewAdsCont()
 	)
 	o := orm.NewOrm()
-	o.QueryTable(tablePosition).Filter("is_mobile", isMobile).All(&positions)
+	o.QueryTable(tablePosition).All(&positions)
 	for _, p := range positions {
 		pids = append(pids, p.Id)
 	}
@@ -260,11 +180,11 @@ func (m *AdsCont) Lists(isMobile bool, status ...bool) (ads []AdsCont) {
 	return
 }
 
-func GetAdsCode(positionIdentify string, isMobile bool) (code string) {
+func GetAdsCode(positionIdentify string) (code string) {
 	if beego.AppConfig.String("runmode") == "dev" {
-		beego.Debug("getAdsCode", positionIdentify, isMobile)
+		beego.Debug("getAdsCode", positionIdentify)
 	}
-	key := fmt.Sprintf("%v-%v", positionIdentify, isMobile)
+	key := fmt.Sprintf("%v", positionIdentify)
 	pid, ok := positionCache.Load(key)
 	if !ok {
 		return
