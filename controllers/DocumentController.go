@@ -707,7 +707,7 @@ func (this *DocumentController) Upload() {
 	defer func() { os.Remove(tmpPath) }()
 	prefix := "uploads"
 	savePath := filepath.Join("projects", bookIdentify, time.Now().Format("200601"), fileName+ext)
-	if utils.StoreType != constant.StoreOss || utils.StoreType != constant.StoreCos {
+	if utils.StoreType != constant.StoreOss && utils.StoreType != constant.StoreCos {
 		savePath = filepath.Join(prefix, savePath)
 		os.MkdirAll(filepath.Dir(savePath), os.ModePerm)
 		os.Rename(tmpPath, savePath)
