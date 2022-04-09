@@ -42,7 +42,7 @@
                             </ul>
                         </div>
                         <!--编辑书籍-->
-                        <a style="margin-left: 5px;" href="/api/{{.Model.Identify}}/edit" class="btn btn-default btn-sm pull-right">编辑文档</a>
+                        <a style="margin-left: 5px;" href="/document/{{.Model.Identify}}/edit" class="btn btn-default btn-sm pull-right">编辑文档</a>
                         <!--书籍创作者/管理员的操作-->
                         {{if eq .Model.RoleId 0}}
                         <button type="button"  class="btn btn-success btn-sm pull-right" data-toggle="modal" data-target="#transferBookModal">转让书籍</button>

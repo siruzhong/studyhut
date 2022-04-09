@@ -128,7 +128,6 @@
                             <span><i class="fa fa-user-o"></i> <a target="_blank" title="来源" href="{{.Model.AuthorURL}}">来源 {{.Model.Author}}</a></span>
                         {{end}}
                         <span><i class="fa fa-eye"></i> 浏览 <i class="read-count">{{.View}}</i></span>
-                        <span><a href="#" data-target="#ModalShare" data-toggle="modal"><i class="fa fa-share-alt"></i> 分享</a></span>
                         <span class="pull-right hidden-xs tooltips" title="更新时间"><i class="fa fa-clock-o"></i> <i class="updated-at">{{.UpdatedAt}}</i></span>
                     </div>
                     {{if (ads "content-top")}}
@@ -158,9 +157,6 @@
                             <li class="visible-xs visible-sm bars-menu bars-menu-hide"><a href="/" title="首页"><i class="fa fa-home"></i></a></li>
                             <li class="visible-xs visible-sm bars-menu bars-menu-hide">
                                 <a title="下载" href="javascript:" data-toggle="modal" data-target="#ModalDownload"><i class="fa fa-cloud-download"></i></a>
-                            </li>
-                            <li class="visible-xs visible-sm bars-menu bars-menu-hide">
-                                <a title="分享" href="javascript:" data-toggle="modal" data-target="#ModalShare"><i class="fa fa-share-alt"></i></a>
                             </li>
                             <li class="visible-xs visible-sm bars-menu bars-menu-hide">
                                 <a title="阅读记录" class="showModalHistory" href="{{urlfor "RecordController.List" ":book_id" .Model.BookId}}" rel="nofollow"><i class="fa fa-clock-o"></i></a>
@@ -235,8 +231,6 @@
     <!--站点统计代码-->
     {{str2html $.TONGJI}}
 </div>
-
-{{template "widgets/share.html" .}}
 
 {{template "widgets/download.html" .}}
 

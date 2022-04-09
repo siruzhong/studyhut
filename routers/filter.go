@@ -31,7 +31,7 @@ func init() {
 	beego.InsertFilter("/setting/*", beego.BeforeRouter, FilterUser)
 	beego.InsertFilter("/book", beego.BeforeRouter, FilterUser)
 	beego.InsertFilter("/book/*", beego.BeforeRouter, FilterUser)
-	beego.InsertFilter("/api/*", beego.BeforeRouter, FilterUser)
+	beego.InsertFilter("/document/*", beego.BeforeRouter, FilterUser)
 
 	var FinishRouter = func(ctx *context.Context) {
 		ctx.ResponseWriter.Header().Add("Application", "StudyHut")

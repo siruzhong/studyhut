@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"net/url"
 	"path/filepath"
+	"strings"
 	"studyhut/constant"
 	"studyhut/utils/store"
-	"strings"
 
 	"github.com/astaxie/beego"
 	"studyhut/models"
@@ -22,14 +22,6 @@ type StaticController struct {
 
 func (this *StaticController) Prepare() {
 	this.OssDomain = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ")
-}
-
-func (this *StaticController) APP() {
-	link := strings.TrimSpace(models.GetOptionValue("APP_PAGE", ""))
-	if link != "" {
-		this.Redirect(link, 302)
-	}
-	this.Abort("404")
 }
 
 // Uploads 查询上传的静态资源

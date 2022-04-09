@@ -75,7 +75,7 @@
                                         <i class="fa fa-book"></i> 生成下载文档
                                     </a>
                                     <template v-if="item.role_id != 3">
-                                        <a :href="'/api/' + item.identify + '/edit'" title="编辑文档" data-toggle="tooltip" class="btn btn-default btn-sm"><i class="fa fa-edit" aria-hidden="true"></i> 编辑<span class="hidden-xs">文档</span></a>
+                                        <a :href="'/document/' + item.identify + '/edit'" title="编辑文档" data-toggle="tooltip" class="btn btn-default btn-sm"><i class="fa fa-edit" aria-hidden="true"></i> 编辑<span class="hidden-xs">文档</span></a>
                                         <!-- Split button -->
                                         <div class="btn-group">
                                             <button type="button" class="btn btn-default"><i class="fa fa-cloud-upload"></i> 导入书籍</button>

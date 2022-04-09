@@ -1446,6 +1446,7 @@ func (this *DocumentController) RestoreHistory() {
 	this.JsonResult(0, "ok", doc)
 }
 
+// Compare 文档比较
 func (this *DocumentController) Compare() {
 	this.TplName = "document/compare.html"
 	historyId, _ := strconv.Atoi(this.Ctx.Input.Param(":id"))

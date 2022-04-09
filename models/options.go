@@ -130,10 +130,6 @@ func (m *Option) Init() error {
 			OptionName:  "REAL_IP_FIELD",
 			OptionTitle: "request中获取访客真实IP的header",
 		}, {
-			OptionValue: "",
-			OptionName:  "APP_PAGE",
-			OptionTitle: "手机APP下载单页",
-		}, {
 			OptionValue: "false",
 			OptionName:  "HIDE_TAG",
 			OptionTitle: "是否隐藏标签在导航栏显示",

@@ -3,9 +3,9 @@ package controllers
 import (
 	"errors"
 	"fmt"
-	"studyhut/constant"
 	"regexp"
 	"strings"
+	"studyhut/constant"
 	"time"
 
 	"github.com/astaxie/beego"
@@ -280,7 +280,7 @@ func (this *AccountController) Login() {
 }
 
 // Bind 用户注册[移除用户注册，直接叫用户绑定]
-// 注意：如果用户输入的账号密码跟现有的账号密码相一致，则表示绑定账号，否则表示注册新账号。
+	// 注意：如果用户输入的账号密码跟现有的账号密码相一致，则表示绑定账号，否则表示注册新账号。
 func (this *AccountController) Bind() {
 	var err error
 	account := this.GetString("account")
