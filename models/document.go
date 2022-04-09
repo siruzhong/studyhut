@@ -187,80 +187,70 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 			ds, _ = ModelStore.GetById(item.DocumentId)
 		}
 		item.Release = ds.Content
-		// attachList, err := NewAttachment().FindListByDocumentId(item.DocumentId)
-		// if err == nil && len(attachList) > 0 {
-		// 	content := bytes.NewBufferString("<div class=\"attach-list\"><strong>附件</strong><ul>")
-		// 	for _, attach := range attachList {
-		// 		li := fmt.Sprintf("<li><a href=\"%s\" target=\"_blank\" title=\"%s\">%s</a></li>", attach.HttpPath, attach.FileName, attach.FileName)
-		// 		content.WriteString(li)
-		// 	}
-		// 	content.WriteString("</ul></div>")
-		// 	item.Release += content.String()
-		// }
 		// 采集图片与稳定内容连接替换
-		if gq, err := goquery.NewDocumentFromReader(strings.NewReader(item.Release)); err == nil {
-			images := gq.Find("img")
-			if images.Length() > 0 {
-				images.Each(func(i int, selection *goquery.Selection) {
-					if src, ok := selection.Attr("src"); ok {
-						lowerSrc := strings.ToLower(src)
-						if strings.HasPrefix(lowerSrc, "https://") || strings.HasPrefix(lowerSrc, "http://") {
-							tmpFile, err := utils.DownImage(src)
-							if err == nil {
-								defer os.Remove(tmpFile)
-								var newSrc string
-								switch utils.StoreType {
-								case constant.StoreLocal:
-									newSrc = "/uploads/projects/" + book.Identify + "/" + filepath.Base(tmpFile)
-									err = store.ModelStoreLocal.MoveToStore(tmpFile, strings.TrimPrefix(newSrc, "/"))
-								case constant.StoreOss:
-									newSrc = beego.AppConfig.String("oss::Domain") + "projects/" + book.Identify + "/" + filepath.Base(tmpFile)
-									err = store.ModelStoreOss.MoveToOss(tmpFile, newSrc, true)
-								case constant.StoreCos:
-									newSrc = beego.AppConfig.String("cos::Domain") + "projects/" + book.Identify + "/" + filepath.Base(tmpFile)
-									err = store.ModelStoreCos.MoveToCos(tmpFile, newSrc, true)
-								}
-								if err != nil {
-									beego.Error(err.Error())
-								}
-								selection.SetAttr("src", newSrc)
-								ds.Markdown = strings.Replace(ds.Markdown, src, newSrc, -1)
-							} else {
-								beego.Error(err.Error())
-							}
-						}
-					}
-				})
-			}
-			links := gq.Find("a")
-			if links.Length() > 0 {
-				links.Each(func(i int, selection *goquery.Selection) {
-					if href, ok := selection.Attr("href"); ok {
-						lowerHref := strings.ToLower(href)
-						if strings.HasPrefix(lowerHref, "https://") || strings.HasPrefix(lowerHref, "http://") {
-							// 需要区别处理存在#号的链接与不存在#号的链接，并不是存在#号的链接都是锚点，如vue开发的hash模式的url
-							identify := utils.MD5Sub16(strings.Trim(href, "/")) + ".md"
-							if _, ok := docMap[identify]; ok {
-								// 替换markdown中的连接，markdown的链接形式：  [链接名称](xxURL)
-								ds.Markdown = strings.Replace(ds.Markdown, "("+href+")", "($"+identify+")", -1)
-								// 直接identify就好了，比如在 /read/BookIdentify/DocIdentify.md 文档下，xx_identify.md 浏览器会转为 /read/BookIdentify/xx_identify.md
-								selection.SetAttr("href", identify)
-							} else {
-								if strings.Contains(href, "#") {
-									slice := strings.Split(href, "#")
-									identify = utils.MD5Sub16(strings.Trim(slice[0], "/")) + ".md"
-									if _, ok := docMap[identify]; ok {
-										ds.Markdown = strings.Replace(ds.Markdown, "("+slice[0]+"#", "($"+identify+"#", -1)
-										selection.SetAttr("href", slice[0]+"#"+strings.Join(slice[1:], "#"))
-									}
-								}
-							}
-						}
-					}
-				})
-			}
-			item.Release, _ = gq.Find("body").Html()
-		}
+		//if gq, err := goquery.NewDocumentFromReader(strings.NewReader(item.Release)); err == nil {
+		//	images := gq.Find("img")
+		//	if images.Length() > 0 {
+		//		images.Each(func(i int, selection *goquery.Selection) {
+		//			if src, ok := selection.Attr("src"); ok {
+		//				lowerSrc := strings.ToLower(src)
+		//				if strings.HasPrefix(lowerSrc, "https://") || strings.HasPrefix(lowerSrc, "http://") {
+		//					tmpFile, err := utils.DownImage(src)
+		//					if err == nil {
+		//						defer os.Remove(tmpFile)
+		//						var newSrc string
+		//						switch utils.StoreType {
+		//						case constant.StoreLocal:
+		//							newSrc = "/uploads/projects/" + book.Identify + "/" + filepath.Base(tmpFile)
+		//							err = store.ModelStoreLocal.MoveToStore(tmpFile, strings.TrimPrefix(newSrc, "/"))
+		//						case constant.StoreOss:
+		//							newSrc = beego.AppConfig.String("oss::Domain") + "projects/" + book.Identify + "/" + filepath.Base(tmpFile)
+		//							err = store.ModelStoreOss.MoveToOss(tmpFile, newSrc, true)
+		//						case constant.StoreCos:
+		//							newSrc = beego.AppConfig.String("cos::Domain") + "projects/" + book.Identify + "/" + filepath.Base(tmpFile)
+		//							err = store.ModelStoreCos.MoveToCos(tmpFile, newSrc, true)
+		//						}
+		//						if err != nil {
+		//							beego.Error(err.Error())
+		//						}
+		//						selection.SetAttr("src", newSrc)
+		//						ds.Markdown = strings.Replace(ds.Markdown, src, newSrc, -1)
+		//					} else {
+		//						beego.Error(err.Error())
+		//					}
+		//				}
+		//			}
+		//		})
+		//	}
+		//	links := gq.Find("a")
+		//	if links.Length() > 0 {
+		//		links.Each(func(i int, selection *goquery.Selection) {
+		//			if href, ok := selection.Attr("href"); ok {
+		//				lowerHref := strings.ToLower(href)
+		//				if strings.HasPrefix(lowerHref, "https://") || strings.HasPrefix(lowerHref, "http://") {
+		//					// 需要区别处理存在#号的链接与不存在#号的链接，并不是存在#号的链接都是锚点，如vue开发的hash模式的url
+		//					identify := utils.MD5Sub16(strings.Trim(href, "/")) + ".md"
+		//					if _, ok := docMap[identify]; ok {
+		//						// 替换markdown中的连接，markdown的链接形式：  [链接名称](xxURL)
+		//						ds.Markdown = strings.Replace(ds.Markdown, "("+href+")", "($"+identify+")", -1)
+		//						// 直接identify就好了，比如在 /read/BookIdentify/DocIdentify.md 文档下，xx_identify.md 浏览器会转为 /read/BookIdentify/xx_identify.md
+		//						selection.SetAttr("href", identify)
+		//					} else {
+		//						if strings.Contains(href, "#") {
+		//							slice := strings.Split(href, "#")
+		//							identify = utils.MD5Sub16(strings.Trim(slice[0], "/")) + ".md"
+		//							if _, ok := docMap[identify]; ok {
+		//								ds.Markdown = strings.Replace(ds.Markdown, "("+slice[0]+"#", "($"+identify+"#", -1)
+		//								selection.SetAttr("href", slice[0]+"#"+strings.Join(slice[1:], "#"))
+		//							}
+		//						}
+		//					}
+		//				}
+		//			}
+		//		})
+		//	}
+		//	item.Release, _ = gq.Find("body").Html()
+		//}
 		ds.Content = item.Release
 		fields := []string{"markdown", "content"}
 		if ds.UpdatedAt.Unix() < 0 {
