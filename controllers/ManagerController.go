@@ -727,7 +727,15 @@ func (this *ManagerController) AttachDetailed() {
 		}
 		this.Abort("404")
 	}
-	attach.HttpPath = this.BaseUrl() + attach.HttpPath
+	// 图片url地址由存储类型决定
+	switch utils.StoreType {
+	case constant.StoreOss:
+		attach.HttpPath = beego.AppConfig.String("oos::Domain") + attach.FilePath
+	case constant.StoreCos:
+		attach.HttpPath = beego.AppConfig.String("cos::Domain") + attach.FilePath
+	case constant.StoreLocal:
+		attach.HttpPath = attach.FilePath
+	}
 	attach.IsExist = utils.FileExists(attach.FilePath)
 	this.Data["Model"] = attach
 	this.TplName = "manager/attach_detailed.html"

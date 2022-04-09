@@ -6,10 +6,10 @@ import (
 
 	"studyhut/commands"
 	"studyhut/commands/daemon"
+	_ "studyhut/routers"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/kardianos/service"
-	_ "studyhut/routers"
 )
 
 func main() {

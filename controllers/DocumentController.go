@@ -386,7 +386,6 @@ func (this *DocumentController) Read() {
 			}
 		}
 	}
-
 	this.Data["ToggleMenu"] = false
 	if menuDoc, err := goquery.NewDocumentFromReader(strings.NewReader(tree)); err == nil {
 		menuDoc.Find("li").Each(func(i int, selection *goquery.Selection) {
@@ -719,7 +718,15 @@ func (this *DocumentController) Upload() {
 	attachment.CreateAt = this.Member.MemberId
 	attachment.FileExt = ext
 	attachment.FilePath = "/" + savePath
-	attachment.HttpPath = attachment.FilePath
+	// 图片url地址由存储类型决定
+	switch utils.StoreType {
+	case constant.StoreOss:
+		attachment.HttpPath = beego.AppConfig.String("oos::Domain") + savePath
+	case constant.StoreCos:
+		attachment.HttpPath = beego.AppConfig.String("cos::Domain") + savePath
+	case constant.StoreLocal:
+		attachment.HttpPath = attachment.FilePath
+	}
 	attachment.DocumentId = docId
 	// 非附件
 	if name != "editormd-file-file" {
