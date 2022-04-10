@@ -93,7 +93,7 @@ func (this *ManagerController) Index() {
 		})
 		// 判断是否安装Puppeteer
 		errPuppeteer := "-"
-		if err = utils.IsInstalledPuppetter(beego.AppConfig.DefaultInt("httpport", 8181)); err != nil {
+		if err = utils.IsInstalledPuppetter(beego.AppConfig.DefaultInt("httpport", 80)); err != nil {
 			errPuppeteer = err.Error()
 		}
 		installed = append(installed, installedDependency{

@@ -89,7 +89,7 @@ func SendMail(conf *SmtpConf, subject, email string, body string) error {
 func RenderDocumentById(id int) {
 	// 使用chromium-browser
 	// chromium-browser --headless --disable-gpu --screenshot --no-sandbox --window-size=320,480
-	link := "http://localhost:" + beego.AppConfig.DefaultString("httpport", "8181") + "/local-render?id=" + strconv.Itoa(id)
+	link := "http://localhost:" + beego.AppConfig.DefaultString("httpport", "80") + "/local-render?id=" + strconv.Itoa(id)
 	name := beego.AppConfig.DefaultString("chrome", "chromium-browser")
 	args := []string{"--headless", "--disable-gpu", "--screenshot", "--no-sandbox", "--window-size=320,480", link}
 	if ok := beego.AppConfig.DefaultBool("puppeteer", false); ok {
@@ -162,7 +162,7 @@ func RenderCoverByBookIdentify(identify string) (err error) {
 
 	//使用chromium-browser
 	//	chromium-browser --headless --disable-gpu --screenshot --no-sandbox --window-size=320,480 http://www.bookstack.cn
-	link := "http://localhost:" + beego.AppConfig.DefaultString("httpport", "8181") + "/local-render-cover?id=" + identify
+	link := "http://localhost:" + beego.AppConfig.DefaultString("httpport", "80") + "/local-render-cover?id=" + identify
 	name := "node"
 	if ok := beego.AppConfig.DefaultBool("puppeteer", false); ok {
 		args = []string{shotJS, "--identify", identify, "--url", link}
