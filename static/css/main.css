@@ -1901,7 +1901,7 @@ a {
 }
 
 .flink-item-desc {
-    padding: 16px 10px 16px 0;
+    padding: 0 10px 16px 0;
     height: 50px;
     font-size: 0.93em;
 }

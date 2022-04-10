@@ -2,11 +2,12 @@ package controllers
 
 import (
 	"math"
-	"studyhut/constant"
 
-	"github.com/astaxie/beego"
+	"studyhut/constant"
 	"studyhut/models"
 	"studyhut/utils"
+
+	"github.com/astaxie/beego"
 )
 
 type LabelController struct {
