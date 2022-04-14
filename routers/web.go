@@ -6,10 +6,6 @@ import (
 )
 
 func webRouter() {
-	// 基本
-	beego.Router("/crawl", &controllers.BaseController{}, "post:Crawl")
-	beego.Router("/sitemap.html", &controllers.BaseController{}, "get:Sitemap") // 站点地图
-
 	// 静态文件
 	beego.Router("/projects/*", &controllers.StaticController{}, "get:ProjectsFile")
 	beego.Router("/uploads/*", &controllers.StaticController{}, "get:Uploads")
@@ -35,8 +31,9 @@ func webRouter() {
 	beego.Router("/label/:key", &controllers.LabelController{}, "get:Index")
 	// 友情链接页
 	beego.Router("/friendlink", &controllers.FriendLinkController{}, "*:List")
-	// 我的收藏
-	beego.Router("/star", &controllers.StarController{}, "*:List")
+	// 站点地图
+	beego.Router("/sitemap", &controllers.BaseController{}, "get:Sitemap")
+
 	// 书籍搜索
 	beego.Router("/search", &controllers.SearchController{}, "get:Search")        // 搜索页
 	beego.Router("/search/result", &controllers.SearchController{}, "get:Result") // 搜索结果
@@ -54,6 +51,7 @@ func webRouter() {
 
 	// 书籍相关
 	beego.Router("/book", &controllers.BookController{}, "*:Index")                              // 书籍列表
+	beego.Router("/star", &controllers.StarController{}, "*:List")                               // 我的收藏
 	beego.Router("/book/create", &controllers.BookController{}, "post:Create")                   // 添加书籍
 	beego.Router("/book/star/:id", &controllers.BookController{}, "*:Star")                      // 收藏书籍
 	beego.Router("/book/score/:id", &controllers.BookController{}, "*:Score")                    // 书籍评分
@@ -144,4 +142,5 @@ func webRouter() {
 	beego.Router("/export/:key", &controllers.DocumentController{}, "*:Export")                                // 文档导出
 	beego.Router("/qrcode/:key.png", &controllers.DocumentController{}, "get:QrCode")                          // 生成书籍访问的二维码
 	beego.Router("/attach_files/:key/:attach_id", &controllers.DocumentController{}, "get:DownloadAttachment") // 下载附件
+	beego.Router("/crawl", &controllers.BaseController{}, "post:Crawl")                                        // 内容采集
 }

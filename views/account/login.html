@@ -71,11 +71,11 @@
                             <hr>
                             <div class="help-block">您还可以使用以下方式一键登录</div>
                             <div class="login-by-third">
-                                {{if $.LoginQQ}}
-                                <a class="tooltips" href="https://graph.qq.com/oauth2.0/authorize?client_id={{.QQClientId}}&redirect_uri={{.QQCallback}}&response_type=code&state=bookstack.cn{{.RandomStr}}" rel="nofollow" title="使用QQ一键登录">
-                                    <img src="/static/images/qq.png" alt="QQ">
-                                </a>
-                                {{end}}
+<!--                                {{if $.LoginQQ}}-->
+<!--                                <a class="tooltips" href="https://graph.qq.com/oauth2.0/authorize?client_id={{.QQClientId}}&redirect_uri={{.QQCallback}}&response_type=code&state=bookstack.cn{{.RandomStr}}" rel="nofollow" title="使用QQ一键登录">-->
+<!--                                    <img src="/static/images/qq.png" alt="QQ">-->
+<!--                                </a>-->
+<!--                                {{end}}-->
                                 {{if $.LoginGitHub}}
                                     <a class="tooltips" href="https://github.com/login/oauth/authorize?client_id={{.GithubClientId}}&redirect_uri={{.GithubCallback}}" rel="nofollow" title="使用GitHub一键登录">
                                         <img src="/static/images/github.png" alt="GitHub">

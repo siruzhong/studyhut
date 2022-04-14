@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/astaxie/beego"
-	"github.com/kardianos/service"
 	"studyhut/commands"
 	"studyhut/controllers"
 	"studyhut/models"
+
+	"github.com/astaxie/beego"
+	"github.com/kardianos/service"
 )
 
 // Daemon 守护进程
@@ -20,8 +21,8 @@ type Daemon struct {
 // NewDaemon 创建守护进程
 func NewDaemon() *Daemon {
 	config := &service.Config{
-		Name:        "studyhut",         //服务显示名称
-		DisplayName: "studyhut Service", //服务名称
+		Name:        "studyhut",                              //服务显示名称
+		DisplayName: "studyhut Service",                      //服务名称
 		Description: "A document online management program.", //服务描述
 		Arguments:   os.Args[1:],
 	}
