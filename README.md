@@ -3,7 +3,7 @@
 ## 站点介绍
 学习小屋，一个基于Beego开发的在线IT技术资源整合、在线学习、交流分享的站点。每一名用户都是内容的创造者，分享你认为优质的资源，让我们一起学习！一起进步！
 
-**站点地址**：http://studyhut.cn/（目前没有升级为`https`协议）
+**站点地址**：http://studyhut.cn/    目前没有升级为`https`协议
 
 ![image-20220415132404843](https://bareth-1305674339.cos.ap-hongkong.myqcloud.com/img/image-20220415132404843.png)
 
