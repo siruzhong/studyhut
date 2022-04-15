@@ -1,29 +1,39 @@
 # studyhut
 
-#### 介绍
-学习小屋，通过Golang开发的在线编程学习平台
+## 站点介绍
+学习小屋，一个基于Beego开发的在线IT技术资源整合、在线学习、交流分享的站点。每一名用户都是内容的创造者，分享你认为优质的资源，让我们一起学习！一起进步！
 
-#### 软件架构
-软件架构说明
+**站点地址**：http://studyhut.cn/（目前没有升级为`https`协议）
 
+![image-20220415132404843](https://bareth-1305674339.cos.ap-hongkong.myqcloud.com/img/image-20220415132404843.png)
 
-#### 安装教程
+## 安装教程
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1、下载源代码
 
-#### 使用说明
+```shell
+git clone https://gitee.com/bareth/studyhut.git
+```
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+2、修改数据库配置 `conf/app.conf`
 
-#### 参与贡献
+```shell
+vim conf/app.conf
+```
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+3、安装数据库
+
+```shell
+./main install
+```
+
+4、启动项目
+
+```shell
+go run main.go
+```
+
+然后访问本机的80端口即可访问
+
 
 
