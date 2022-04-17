@@ -495,7 +495,7 @@ textarea {
 }
 
 .manual-search-reader .search-head {
-    margin: 10px auto;
+    margin: 20px auto;
     padding-bottom: 15px;
     line-height: 1.5em;
     border-bottom: 1px solid #EEEEEE;
@@ -1872,7 +1872,7 @@ a {
     text-align: center;
 }
 
-.flink-list-item {
+.flink .flink-list > .flink-list-item{
     position: relative;
     float: left;
     overflow: hidden;
@@ -1898,10 +1898,23 @@ a {
     height: 40px;
     font-weight: bold;
     font-size: 1.43em;
+    white-space: nowrap;
 }
 
 .flink-item-desc {
     padding: 0 10px 16px 0;
     height: 50px;
     font-size: 0.93em;
+}
+
+@media screen and (max-width: 1024px) {
+    .flink .flink-list > .flink-list-item {
+        width: calc(50% - 15px) !important;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .flink .flink-list > .flink-list-item {
+        width: calc(100% - 15px) !important;
+    }
 }

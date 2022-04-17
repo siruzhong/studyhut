@@ -7,9 +7,7 @@
 <div class="manual-reader manual-container manual-search-reader">
     {{template "widgets/header.html" .}}
     <div class="container manual-body">
-        <div class="search-head">
-            <strong class="search-title">标签列表</strong>
-        </div>
+        <div class="help-block" style="margin-top: 20px">所有书籍相关的<span class="text-red">标签</span>都在这里集结，点击标签即可实现对应书籍的检索！</div>
         <div class="row">
             {{if gt (.Labels|len) 0}}
             <div class="hide tag-container-outer" style="border: 0;margin-top: 0;padding: 5px 15px;min-height: 200px;">
