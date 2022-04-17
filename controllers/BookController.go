@@ -593,12 +593,14 @@ func (this *BookController) Delete() {
 		logs.Error("删除书籍 => ", err)
 		this.JsonResult(6003, "删除失败")
 	}
+	// 开启另一个协程用于ElasticSearch的索引删除
 	go func() {
 		client := models.NewElasticSearchClient()
 		if errDel := client.DeleteIndex(bookResult.BookId, true); errDel != nil && client.On {
 			beego.Error(errDel.Error())
 		}
 	}()
+	// 开启另一个协程用于重新统计书籍分类
 	go models.CountCategory()
 	this.JsonResult(0, "ok")
 }

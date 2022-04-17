@@ -3,10 +3,10 @@ package models
 import (
 	"fmt"
 	"os"
-	"studyhut/constant"
-	"studyhut/utils/store"
 	"strconv"
 	"strings"
+	"studyhut/constant"
+	"studyhut/utils/store"
 	"time"
 
 	"github.com/astaxie/beego"
@@ -276,6 +276,7 @@ func (m *Book) ThoroughDeleteBook(id int) (err error) {
 	if m.Label != "" {
 		NewLabel().InsertOrUpdateMulti(m.Label)
 	}
+	// 提交事物
 	if err = o.Commit(); err != nil {
 		return err
 	}
