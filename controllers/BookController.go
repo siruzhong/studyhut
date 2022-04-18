@@ -78,6 +78,11 @@ func (this *BookController) Index() {
 	} else {
 		this.Data["Result"] = template.JS(string(b))
 	}
+	this.GetSeoByPage("my_book", map[string]string{
+		"title":       "我的书籍",
+		"keywords":    "我的书籍",
+		"description": "用户个人的书籍列表",
+	})
 }
 
 // Star 收藏书籍

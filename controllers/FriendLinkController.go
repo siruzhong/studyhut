@@ -1,9 +1,9 @@
 package controllers
 
 import (
+	"strings"
 	"studyhut/models"
 	"studyhut/utils"
-	"strings"
 )
 
 // FriendLinkController 友情链接控制器
@@ -22,7 +22,11 @@ func (this *FriendLinkController) List() {
 		}
 		friendlinks[idx] = friendlink
 	}
-	this.Data["SeoTitle"] = "友链列表"
 	this.Data["Friendlinks"] = friendlinks
 	this.TplName = "friendlink/list.html"
+	this.GetSeoByPage("friendlink_list", map[string]string{
+		"title":       "友链列表",
+		"keywords":    "友链列表",
+		"description": "友情链接列表，优质的网站推荐",
+	})
 }

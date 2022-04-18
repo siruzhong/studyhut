@@ -38,8 +38,12 @@ func (this *StarController) List() {
 	this.Data["Books"] = books
 	this.Data["Sort"] = sort
 	this.Data["SettingStar"] = true
-	this.Data["SeoTitle"] = "我的收藏 - " + this.Sitename
 	this.TplName = "setting/star.html"
 	this.Data["Cid"] = cid
 	this.Data["Cates"] = cates
+	this.GetSeoByPage("my_star", map[string]string{
+		"title":       "我的收藏",
+		"keywords":    "我的收藏",
+		"description": "用户个人的收藏列表",
+	})
 }

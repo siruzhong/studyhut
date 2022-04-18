@@ -52,7 +52,7 @@ func (this *ManagerController) Index() {
 	this.TplName = "manager/index.html"
 	this.Data["Model"] = models.NewDashboard().Query()
 	this.GetSeoByPage("manage_dashboard", map[string]string{
-		"title":       "仪表盘 - " + this.Sitename,
+		"title":       "仪表盘",
 		"keywords":    "仪表盘",
 		"description": this.Sitename + "专注于文档在线写作、协作、分享、阅读与托管，让每个人更方便地发布、分享和获得知识。",
 	})
@@ -118,7 +118,7 @@ func (this *ManagerController) Users() {
 	}
 	pageIndex, _ := this.GetInt("page", 0)
 	this.GetSeoByPage("manage_users", map[string]string{
-		"title":       "用户管理 - " + this.Sitename,
+		"title":       "用户管理",
 		"keywords":    "用户管理",
 		"description": this.Sitename + "专注于文档在线写作、协作、分享、阅读与托管，让每个人更方便地发布、分享和获得知识。",
 	})
@@ -186,7 +186,7 @@ func (this *ManagerController) EditMember() {
 		this.JsonResult(0, "ok")
 	}
 	this.GetSeoByPage("manage_users_edit", map[string]string{
-		"title":       "用户编辑 - " + this.Sitename,
+		"title":       "用户编辑",
 		"keywords":    "用户标记",
 		"description": this.Sitename + "专注于文档在线写作、协作、分享、阅读与托管，让每个人更方便地发布、分享和获得知识。",
 	})
@@ -372,7 +372,7 @@ func (this *ManagerController) Books() {
 	this.Data["Wd"] = wd
 	this.Data["IsBooks"] = true
 	this.GetSeoByPage("manage_project_list", map[string]string{
-		"title":       "书籍管理 - " + this.Sitename,
+		"title":       "书籍管理",
 		"keywords":    "书籍管理",
 		"description": this.Sitename + "专注于文档在线写作、协作、分享、阅读与托管，让每个人更方便地发布、分享和获得知识。",
 	})
@@ -440,7 +440,7 @@ func (this *ManagerController) EditBook() {
 	}
 	this.Data["Model"] = book
 	this.GetSeoByPage("manage_project_edit", map[string]string{
-		"title":       "书籍设置 - " + this.Sitename,
+		"title":       "书籍设置",
 		"keywords":    "书籍设置",
 		"description": this.Sitename + "专注于文档在线写作、协作、分享、阅读与托管，让每个人更方便地发布、分享和获得知识。",
 	})
@@ -605,6 +605,7 @@ func (this *ManagerController) Comments() {
 		this.Data["PageHtml"] = html
 	}
 	this.TplName = "manager/comments.html"
+	this.Data["SeoTitle"] = "评论管理"
 }
 
 // ClearComments 清除用户所有评论
@@ -687,12 +688,13 @@ func (this *ManagerController) Setting() {
 		this.JsonResult(0, "ok")
 	}
 	for _, item := range options {
-		this.Data[item.OptionName] = item
+		if item.OptionName != "SITE_NAME" {
+			this.Data[item.OptionName] = item
+		}
 	}
-	this.Data["SITE_TITLE"] = this.Option["SITE_NAME"]
 	this.Data["IsSetting"] = true
-	this.Data["SeoTitle"] = "配置管理"
 	this.TplName = "manager/setting.html"
+	this.Data["SeoTitle"] = "配置管理"
 }
 
 // AttachList 附件列表
@@ -711,6 +713,7 @@ func (this *ManagerController) AttachList() {
 	this.Data["Lists"] = attachList
 	this.Data["IsAttach"] = true
 	this.TplName = "manager/attach_list.html"
+	this.Data["SeoTitle"] = "附件管理"
 }
 
 // AttachDetailed 附件详情
@@ -787,6 +790,7 @@ func (this *ManagerController) Tags() {
 	this.Data["Total"] = totalCount
 	this.Data["Tags"] = tags
 	this.Data["Wd"] = wd
+	this.Data["SeoTitle"] = "标签管理"
 }
 
 // AddTags 添加标签
@@ -830,6 +834,7 @@ func (this *ManagerController) Seo() {
 	this.Data["Lists"] = seos
 	this.Data["IsManagerSeo"] = true
 	this.TplName = "manager/seo.html"
+	this.Data["SeoTitle"] = "SEO管理"
 }
 
 // Ads 广告列表
@@ -870,6 +875,7 @@ func (this *ManagerController) Ads() {
 		this.Data["Next"] = time.Now().Add(time.Hour * 24 * 730).Format(layout)
 		this.TplName = "manager/ads.html"
 	}
+	this.Data["SeoTitle"] = "广告管理"
 }
 
 // UpdateAds 修改广告信息
@@ -931,6 +937,7 @@ func (this *ManagerController) Category() {
 	this.Data["Cates"] = cates
 	this.Data["IsCategory"] = true
 	this.TplName = "manager/category.html"
+	this.Data["SeoTitle"] = "分类管理"
 }
 
 // UpdateCate 更新分类字段内容

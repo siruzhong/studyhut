@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"fmt"
-	"studyhut/constant"
 	"strings"
+	"studyhut/constant"
 	"time"
 
 	"github.com/astaxie/beego"
@@ -104,5 +104,10 @@ func (this *SearchController) Result() {
 	this.Data["Wd"] = wd
 	this.Data["Tab"] = tab
 	this.Data["IsSearch"] = true
+	if tab == "doc" {
+		this.Data["SeoTitle"] = "搜文档-" + wd + "-结果"
+	} else {
+		this.Data["SeoTitle"] = "搜书籍-" + wd + "-结果"
+	}
 	this.TplName = "search/result.html"
 }

@@ -66,7 +66,7 @@ func (m *Option) Init() error {
 			OptionName:  "ENABLE_ANONYMOUS",
 			OptionTitle: "启用匿名访问",
 		}, {
-			OptionValue: "StudyHut",
+			OptionValue: "studyhut.cn",
 			OptionName:  "SITE_NAME",
 			OptionTitle: "站点名称",
 		}, {

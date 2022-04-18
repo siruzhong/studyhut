@@ -52,7 +52,7 @@ func (this *SettingController) Index() {
 		this.SetMember(*member)
 		this.JsonResult(0, "ok")
 	}
-	this.Data["SeoTitle"] = "基本信息 - " + this.Sitename
+	this.Data["SeoTitle"] = "基本信息"
 	this.Data["SettingBasic"] = true
 	this.TplName = "setting/index.html"
 }
@@ -103,7 +103,7 @@ func (this *SettingController) Password() {
 		this.JsonResult(0, "ok")
 	}
 	this.Data["SettingPwd"] = true
-	this.Data["SeoTitle"] = "修改密码 - " + this.Sitename
+	this.Data["SeoTitle"] = "修改密码"
 	this.TplName = "setting/password.html"
 }
 

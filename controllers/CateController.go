@@ -28,9 +28,9 @@ func (this *CateController) List() {
 		beego.Error(err.Error())
 	}
 	this.GetSeoByPage("cate", map[string]string{
-		"title":       "书籍分类",
-		"keywords":    "文档托管,在线创作,文档在线管理,在线知识管理,文档托管平台,在线写书,文档在线转换,在线编辑,在线阅读,开发手册,api手册,文档在线学习,技术文档,在线编辑",
-		"description": this.Sitename + "专注于文档在线写作、协作、分享、阅读与托管，让每个人更方便地发布、分享和获得知识。",
+		"title":       "首页",
+		"keywords":    "IT技术、资源整合、在线学习、交流分享、内容创作",
+		"description": this.Sitename + "一个在线IT技术资源整合、在线学习、交流分享的站点。每一名用户都是内容的创造者，分享你认为优质的资源，让我们一起学习！一起进步！",
 	})
 	this.Data["IsCate"] = true
 	this.Data["Friendlinks"] = new(models.FriendLink).GetList(false)

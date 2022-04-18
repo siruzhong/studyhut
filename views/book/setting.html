@@ -123,9 +123,7 @@
                                 <div class="panel-heading"><h3 class="panel-title">{{$cate.Title}}</h3></div>
                                 <div class="panel-body">
                                     {{range $idx1,$item:=$.Cates}}
-<!--                                    {{if eq $item.Pid $cate.Id}}-->
                                     <label><input type="checkbox"  {{if (inMap $.Maps $item.Id)}}checked{{end}} name="cid" value="{{$item.Id}}">{{$item.Title}}</label>
-<!--                                    {{end}}-->
                                     {{end}}
                                 </div>
                             </div>
@@ -304,9 +302,7 @@
         </form>
     </div>
 </div>
-
 {{template "widgets/pull.html" .}}
-
 
 <script src="/static/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>
 <script src="/static/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>

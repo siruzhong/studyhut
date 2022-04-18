@@ -34,7 +34,6 @@
     <link href="/static/css/markdown.preview.css?version={{$.Version}}" rel="stylesheet">
     <script src="/static/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="/static/respond.js/1.4.2/respond.min.js"></script>
-	<link rel="stylesheet" href="/static/mind-map/mindmap.css"> 	<!-- 脑图 -->
     <style>
         .editormd-preview-container ol.linenums li code, .editormd-html-preview ol.linenums li code{
             line-height: 1.7;
@@ -72,12 +71,10 @@
         <div class="editormd-group">
             <a href="javascript:;" data-toggle="tooltip" data-title="无序列表"><i class="fa fa-list-ul first" name="list-ul" unselectable="on"></i></a>
             <a href="javascript:;" data-toggle="tooltip" data-title="有序列表"><i class="fa fa-list-ol item" name="list-ol" unselectable="on"></i></a>
-            <a href="javascript:;" data-toggle="tooltip" data-title="横线"><i class="fa fa-minus last" name="hr" unselectable="on"></i></a>
-        </div>
-        <div class="editormd-group">
-            <a href="javascript:;" data-toggle="tooltip" data-title="粗体"><i class="fa fa-bold first" name="bold" unselectable="on"></i></a>
-            <a href="javascript:;" data-toggle="tooltip" data-title="斜体"><i class="fa fa-italic item" name="italic" unselectable="on"></i></a>
-            <a href="javascript:;" data-toggle="tooltip" data-title="删除线"><i class="fa fa-strikethrough last" name="del" unselectable="on"></i></a>
+            <a href="javascript:;" data-toggle="tooltip" data-title="横线"><i class="fa fa-minus item" name="hr" unselectable="on"></i></a>
+            <a href="javascript:;" data-toggle="tooltip" data-title="删除线"><i class="fa fa-strikethrough item" name="del" unselectable="on"></i></a>
+            <a href="javascript:;" data-toggle="tooltip" data-title="粗体"><i class="fa fa-bold item" name="bold" unselectable="on"></i></a>
+            <a href="javascript:;" data-toggle="tooltip" data-title="斜体"><i class="fa fa-italic last" name="italic" unselectable="on"></i></a>
         </div>
         <div class="editormd-group">
             <a href="javascript:;" data-toggle="tooltip" data-title="标题一"><i class="fa editormd-bold first" name="h1" unselectable="on">H1</i></a>
@@ -89,21 +86,18 @@
         </div>
         <div class="editormd-group">
             <a href="javascript:;" data-toggle="tooltip" data-title="链接"><i class="fa fa-link first" name="link" unselectable="on"></i></a>
-<!--            <a href="javascript:;" data-toggle="tooltip" data-title="引用链接"><i class="fa fa-anchor item" name="reference-link" unselectable="on"></i></a>-->
+            <a href="javascript:;" data-toggle="tooltip" data-title="引用链接"><i class="fa fa-anchor item" name="reference-link" unselectable="on"></i></a>
             <a href="javascript:;" data-toggle="tooltip" data-title="添加图片"><i class="fa fa-picture-o item" name="image" unselectable="on"></i></a>
             <a href="javascript:;" data-toggle="tooltip" data-title="添加音频"><i class="fa fa-music item" name="audio" unselectable="on"></i></a>
             <a href="javascript:;" data-toggle="tooltip" data-title="添加视频"><i class="fa fa-video-camera item" name="video" unselectable="on"></i></a>
             <a href="javascript:;" data-toggle="tooltip" data-title="行内代码"><i class="fa fa-code item" name="code" unselectable="on"></i></a>
             <a href="javascript:;" data-toggle="tooltip" data-title="代码块" unselectable="on"><i class="fa fa-file-code-o item" name="code-block" unselectable="on"></i></a>
             <a href="javascript:;" data-toggle="tooltip" data-title="添加表格"><i class="fa fa-table item" name="table" unselectable="on"></i></a>
-            <a href="javascript:;" data-toggle="tooltip" data-title="流程图/组织架构图/思维导图"><i class="fa fa-sitemap item" name="mindmap" unselectable="on"></i></a>
             <a href="javascript:;" data-toggle="tooltip" data-title="GFM 任务列表"><i class="fa fa-tasks item" name="tasks" aria-hidden="true"></i></a>
             <a href="javascript:;" data-toggle="tooltip" data-title="引用"><i class="fa fa-quote-right item" name="quote" unselectable="on"></i></a>
 			<a href="javascript:;" data-toggle="tooltip" data-title="附件"><i class="fa fa-paperclip item" aria-hidden="true" name="attachment"></i></a>
-            <a href="javascript:;" data-toggle="tooltip" data-title="模板"><i class="fa fa-tachometer item" name="template"></i></a>
-            <a href="javascript:;" data-toggle="tooltip" data-title="word转换为markdown"><i class="fa  fa-file-word-o item" name="word2md" aria-hidden="true"></i></a>
+            <a href="javascript:;" data-toggle="tooltip" data-title="word转换为markdown"><i class="fa  fa-file-word-o last" name="word2md" aria-hidden="true"></i></a>
 <!--			<a href="javascript:;" data-toggle="tooltip" data-title="从office粘贴转换"><i class="fa  fa-file-excel-o item" name="Pasteoffice" aria-hidden="true"></i></a>-->
-            <a href="javascript:;" data-toggle="tooltip" data-title="使用帮助"><i class="fa fa-question-circle-o last" aria-hidden="true" name="help"></i></a>
         </div>
 
         <div class="editormd-group">
@@ -111,16 +105,20 @@
             <a href="javascript:;" data-toggle="tooltip" data-title="关闭实时预览"><i class="fa fa-eye-slash item" name="watch" unselectable="on"></i></a>
             <a href="javascript:;" data-toggle="tooltip" data-title="查看版本"><i class="fa fa-history item" name="history" aria-hidden="true"></i></a>
 <!--            <a href="javascript:;" data-toggle="tooltip" data-title="添加Git Commit"><i class="fa fa-comments-o item" name="commit" unselectable="on"></i></a>-->
-            <a href="javascript:;" data-toggle="tooltip" data-title="自动生成"><i class="fa fa-tripadvisor item" name="auto" unselectable="on"></i></a>
+<!--            <a href="javascript:;" data-toggle="tooltip" data-title="自动生成"><i class="fa fa-tripadvisor item" name="auto" unselectable="on"></i></a>-->
             <a href="javascript:;" data-toggle="tooltip" data-title="爬虫采集"><i class="fa fa-bug item" name="spider" unselectable="on"></i></a>
-            <a href="javascript:;" data-toggle="tooltip" data-title="全局内容替换"><i class="fa fa-refresh item" name="replace" unselectable="on"></i></a>
-            <a href="javascript:;" data-toggle="tooltip" data-title="目录排序"><i class="fa fa-sort-amount-asc last" name="summary" unselectable="on"></i></a>
+            <a href="javascript:;" data-toggle="tooltip" data-title="全局内容替换"><i class="fa fa-refresh last" name="replace" unselectable="on"></i></a>
+<!--            <a href="javascript:;" data-toggle="tooltip" data-title="目录排序"><i class="fa fa-sort-amount-asc last" name="summary" unselectable="on"></i></a>-->
         </div>
 
         <div class="editormd-group pull-right">
             <a href="javascript:;" data-toggle="tooltip" data-title="生成下载文档"><i class="fa fa-book" name="generate" aria-hidden="true"></i></a>
         </div>
 
+        <div class="editormd-group pull-right">
+            <a href="javascript:;" data-toggle="tooltip" data-title="模板"><i class="fa fa-tachometer first" name="template"></i></a>
+            <a href="javascript:;" data-toggle="tooltip" data-title="使用帮助"><i class="fa fa-question-circle-o last" aria-hidden="true" name="help"></i></a>
+        </div>
         <div class="clearfix"></div>
     </div>
     <div class="manual-body">
@@ -518,27 +516,6 @@
 		</div>
 	</div>
 </div>
-
-<!-- 该div主要用于，点击编辑器时的思维导图按钮时，直接显示一段帮助信息 -->
-<div style="display:none;" id="mindmaphelp">
->[warning]mindmap 参数说明：
-语法：描述写在` ```mindmap` 和` ``` `之间
-各`选项`用“选项名”：“选项值”分开，各选项间用空格分割
-`size:`指定显示流程图的大小,可选值为“mindmap-sm”、“mindmap-md”、“mindmap-lg”
-`Theme:`流程图主题，可选项为：“classic”、“classic-compact”、“fish”、“fresh-blue”、“fresh-blue-compat”、“fresh-green”、“fresh-green-compat”、“fresh-pink”、“fresh-pink-compat”、“fresh-purple”、“fresh-purple-compat”、“fresh-red”、“fresh-red-compat”、“fresh-soil”、“fresh-soil-compat”、“snow”、“snow-compact”、“tianpan”、“tianpan-compact”、“wire”，默认值为“fresh-blue”。
-`Template:`流程图模板，支持“default”、"fresh-blue"、“filetree”、"fish-bone"、“right”、“structure”、“tianpan”，默认值为"fresh-blue"。
-`protocol:`指定的用于解析数据的数据协议（默认内置三种数据协议 “json”、“text” 和 “markdown”的支持),改造后，支持markdown中的“list”写法，如`- 根节点`,一共四种支持。
-`tmpshow`这个参数主要用于显示输入原始数据，建议使用list写法的时候开启，默认隐藏，只支持"true"。
-
-**提示：建议在完成思维导图后，将上述文本删除。**
-
-```mindmap size:mindmap-md  Theme:fresh-blue  Template:default  protocol:markdown  tmpshow:false
-
-
-```
-
-------------
-
 </div>
 
 
@@ -562,10 +539,6 @@
 <script src="/static/js/jquery.form.js" type="text/javascript"></script>
 <script src="/static/js/editor.js?version={{$.Version}}" type="text/javascript"></script>
 <script src="/static/js/markdown.js?version={{$.Version}}" type="text/javascript"></script>
-<!-- 脑图 -->
-<script src="/static/mind-map/kity.min.js" type="text/javascript"></script>
-<script src="/static/mind-map/kityminder.core.min.js" type="text/javascript"></script>
-<script src="/static/mind-map/mindmap.min.js?version={{$.Version}}" type="text/javascript"></script>
 <script src="/static/word2md/turndown.js?version={{$.Version}}"></script>
 <script src="/static/word2md/turndown-plugin-gfm.js?version={{$.Version}}"></script>
 <script src="/static/word2md/mammoth.browser.js?version={{$.Version}}"></script>

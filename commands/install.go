@@ -51,9 +51,9 @@ func initialization() {
 
 		book := models.NewBook()
 		book.MemberId = member.MemberId
-		book.BookName = "StudyHut"
+		book.BookName = "studyhut"
 		book.Status = 0
-		book.Description = "这是一个StudyHut演示书籍，该书籍是由系统初始化时自动创建。"
+		book.Description = "这是一个studyhut演示书籍，该书籍是由系统初始化时自动创建。"
 		book.CommentCount = 0
 		book.PrivatelyOwned = 0
 		book.CommentStatus = "closed"
@@ -80,28 +80,31 @@ func initialization() {
 
 // initSeo 初始化SEO
 func initSeo() {
-	sqlSlice := []string{"insert ignore into `seo`(`id`,`page`,`statement`,`title`,`keywords`,`description`) values ('1','index','发现','学习小屋(StudyHut.CN)_分享，让知识传承更久远','{keywords}','{description}'),",
-		"('2','label_list','标签列表页','{title} - 学习小屋(StudyHut.CN)','{keywords}','{description}'),",
-		"('3','label_content','标签内容页','{title} - 学习小屋(StudyHut.CN)','{keywords}','{description}'),",
-		"('4','book_info','文档信息页','{title} - 学习小屋(StudyHut.CN)','{keywords}','{description}'),",
-		"('5','book_read','文档阅读页','{title} - 学习小屋(StudyHut.CN)','{keywords}','{description}'),",
-		"('6','search_result','搜索结果页','{title} - 学习小屋(StudyHut.CN)','{keywords}','{description}'),",
-		"('7','user_basic','用户基本信息设置页','{title}  - 学习小屋(StudyHut.CN)','{keywords}','{description}'),",
-		"('8','user_pwd','用户修改密码页','{title}  - 学习小屋(StudyHut.CN)','{keywords}','{description}'),",
-		"('9','project_list','书籍列表页','{title}  - 学习小屋(StudyHut.CN)','{keywords}','{description}'),",
-		"('11','login','登录页','{title} - 学习小屋(StudyHut.CN)','{keywords}','{description}'),",
-		"('12','reg','注册页','{title} - 学习小屋(StudyHut.CN)','{keywords}','{description}'),",
-		"('13','findpwd','找回密码','{title} - 学习小屋(StudyHut.CN)','{keywords}','{description}'),",
-		"('14','manage_dashboard','仪表盘','{title} - 学习小屋(StudyHut.CN)','{keywords}','{description}'),",
-		"('15','manage_users','用户管理','{title} - 学习小屋(StudyHut.CN)','{keywords}','{description}'),",
-		"('16','manage_users_edit','用户编辑','{title} - 学习小屋(StudyHut.CN)','{keywords}','{description}'),",
-		"('17','manage_project_list','书籍列表','{title} - 学习小屋(StudyHut.CN)','{keywords}','{description}'),",
-		"('18','manage_project_edit','书籍编辑','{title} - 学习小屋(StudyHut.CN)','{keywords}','{description}'),",
-		"('19','cate','首页','{title} - 学习小屋(StudyHut.CN)','{keywords}','{description}'),",
-		"('20','ucenter-share','用户主页','{title} - 学习小屋(StudyHut.CN)','{keywords}','{description}'),",
-		"('21','ucenter-collection','用户收藏','{title} - 学习小屋(StudyHut.CN)','{keywords}','{description}'),",
-		"('22','ucenter-fans','用户粉丝','{title} - 学习小屋(StudyHut.CN)','{keywords}','{description}'),",
-		"('23','ucenter-follow','用户关注','{title} - 学习小屋(StudyHut.CN)','{keywords}','{description}');",
+	sqlSlice := []string{"insert ignore into `seo`(`id`,`page`,`statement`,`title`,`keywords`,`description`) values ('1','index','发现页','{title}','{keywords}','{description}'),",
+		"('2','label_list','标签列表页','{title}','{keywords}','{description}'),",
+		"('3','label_content','标签内容页','{title}','{keywords}','{description}'),",
+		"('4','book_info','文档信息页','{title}','{keywords}','{description}'),",
+		"('5','book_read','文档阅读页','{title}','{keywords}','{description}'),",
+		"('6','search_result','搜索结果页','{title}','{keywords}','{description}'),",
+		"('7','user_basic','用户基本信息设置页','{title}','{keywords}','{description}'),",
+		"('8','user_pwd','用户修改密码页','{title}','{keywords}','{description}'),",
+		"('9','project_list','书籍列表页','{title}','{keywords}','{description}'),",
+		"('11','login','登录页','{title}','{keywords}','{description}'),",
+		"('12','reg','注册页','{title}','{keywords}','{description}'),",
+		"('13','findpwd','找回密码','{title}','{keywords}','{description}'),",
+		"('14','manage_dashboard','仪表盘','{title}','{keywords}','{description}'),",
+		"('15','manage_users','用户管理','{title}','{keywords}','{description}'),",
+		"('16','manage_users_edit','用户编辑','{title}','{keywords}','{description}'),",
+		"('17','manage_project_list','书籍列表','{title}','{keywords}','{description}'),",
+		"('18','manage_project_edit','书籍编辑','{title}','{keywords}','{description}'),",
+		"('19','cate','首页','{title}','{keywords}','{description}'),",
+		"('20','ucenter-share','用户主页','{title}','{keywords}','{description}'),",
+		"('21','ucenter-collection','用户收藏','{title}','{keywords}','{description}'),",
+		"('22','ucenter-fans','用户粉丝','{title}','{keywords}','{description}'),",
+		"('23','ucenter-follow','用户关注','{title}','{keywords}','{description}');",
+		"('24','friendlink_list','友链列表','{title}','{keywords}','{description}');",
+		"('25','my_book','我的书籍','{title}','{keywords}','{description}');",
+		"('26','my_star','我的收藏','{title}','{keywords}','{description}');",
 	}
 	if _, err := orm.NewOrm().Raw(strings.Join(sqlSlice, "")).Exec(); err != nil {
 		beego.Error(err.Error())
