@@ -66,7 +66,6 @@ func RegisterModel() {
 		new(models.Option),
 		new(models.Document),
 		new(models.Attachment),
-		new(models.Logger),
 		new(models.MemberToken),
 		new(models.DocumentHistory),
 		new(models.Migration),
@@ -88,13 +87,11 @@ func RegisterModel() {
 		new(models.Bookmark),
 		new(models.RelateBook),
 		new(models.Wechat),
-		new(models.RegLimit),
 		new(models.AdsPosition),
 		new(models.AdsCont),
 		new(models.ReadingTime),
 		new(models.Sign),
 		new(models.BookCounter),
-		new(models.DownloadCounter),
 	)
 	migrate.RegisterMigration()
 }

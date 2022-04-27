@@ -26,8 +26,8 @@ type Book struct {
 	Label             string    `orm:"column(label);size(500)" json:"label"`                                // 标签
 	PrivatelyOwned    int       `orm:"column(privately_owned);type(int);default(0)" json:"privately_owned"` // 书籍私有(0公开/1私有)
 	PrivateToken      string    `orm:"column(private_token);size(500);null" json:"private_token"`           // 当书籍是私有时的访问Token.
-	Status            int       `orm:"column(status);type(int);default(0)" json:"status"`                   // 状态/0 正常/1 已删除
-	Editor            string    `orm:"column(editor);size(50)" json:"editor"`                               // 默认的编辑器
+	Status            int       `orm:"column(status);type(int);default(0)" json:"status"`                   // 状态(0正常/1已删除)
+	Editor            string    `orm:"column(editor);size(50)" json:"editor"`                               // 编辑器类型
 	DocCount          int       `orm:"column(doc_count);type(int)" json:"doc_count"`                        // 包含文档数量
 	CommentStatus     string    `orm:"column(comment_status);size(20);default(open)" json:"comment_status"` // 评论设置的状态:open 为允许所有人评论，closed 为不允许评论, group_only 仅允许参与者评论 ,registered_only 仅允许注册者评论.
 	CommentCount      int       `orm:"column(comment_count);type(int)" json:"comment_count"`                // 评论数
@@ -38,7 +38,7 @@ type Book struct {
 	ModifyTime        time.Time `orm:"type(datetime);column(modify_time);auto_now" json:"modify_time"`      // 修改时间
 	ReleaseTime       time.Time `orm:"type(datetime);column(release_time);" json:"release_time"`            // 书籍发布时间，每次发布都更新一次，如果文档更新时间小于发布时间，则文档不再执行发布
 	GenerateTime      time.Time `orm:"type(datetime);column(generate_time);" json:"generate_time"`          // 下载文档生成时间
-	LastClickGenerate time.Time `orm:"type(datetime);column(last_click_generate)" json:"-"`                 // 上次点击上传文档的时间，用于显示频繁点击浪费服务器硬件资源的情况
+	LastClickGenerate time.Time `orm:"type(datetime);column(last_click_generate)" json:"-"`                 // 上次点击生成下载文档的时间，用于显示频繁点击浪费服务器硬件资源的情况
 	Version           int64     `orm:"type(bigint);column(version);default(0)" json:"version"`              // 版本号
 	Vcnt              int       `orm:"column(vcnt);default(0)" json:"vcnt"`                                 // 书籍被阅读次数
 	Star              int       `orm:"column(star);default(0)" json:"star"`                                 // 书籍被收藏次数
