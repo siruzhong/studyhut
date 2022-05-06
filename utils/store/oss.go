@@ -77,7 +77,6 @@ func (o *Oss) MoveToOss(local, save string, IsDel bool, IsGzip ...bool) error {
 	if len(IsGzip) > 0 && IsGzip[0] == true {
 		isgzip = true
 	}
-
 	bucket, err := o.GetBucket()
 	if err != nil {
 		beego.Error("OSS Bucket初始化错误：%v", err.Error())
@@ -106,11 +105,9 @@ func (o *Oss) MoveToOss(local, save string, IsDel bool, IsGzip ...bool) error {
 	if isgzip {
 		bucket.SetObjectMeta(save, oss.ContentEncoding("gzip")) //设置gzip响应头
 	}
-
 	if err == nil && IsDel {
 		err = os.Remove(local)
 	}
-
 	return err
 }
 

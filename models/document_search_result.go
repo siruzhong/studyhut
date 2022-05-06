@@ -9,11 +9,12 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
+// DocumentSearchResult 文档搜索结果
 type DocumentSearchResult struct {
 	DocumentId   int       `json:"doc_id"`
 	BookId       int       `json:"book_id"`
 	DocumentName string    `json:"doc_name"`
-	Identify     string    `json:"identify"` // Identify 文档唯一标识
+	Identify     string    `json:"identify"`
 	Description  string    `json:"description"`
 	Author       string    `json:"author"`
 	BookName     string    `json:"book_name"`
@@ -26,20 +27,21 @@ type DocumentSearchResult struct {
 type DocResult struct {
 	DocumentId   int       `json:"doc_id"`
 	DocumentName string    `json:"doc_name"`
-	Identify     string    `json:"identify"` // Identify 文档唯一标识
-	Release      string    `json:"release"`  // Release 发布后的Html格式内容.
-	Vcnt         int       `json:"vcnt"`     //书籍被浏览次数
+	Identify     string    `json:"identify"` // 文档唯一标识
+	Release      string    `json:"release"`  // 发布后的Html格式内容.
+	Vcnt         int       `json:"vcnt"`     // 书籍被浏览次数
 	CreateTime   time.Time `json:"create_time"`
 	BookId       int       `json:"book_id"`
 	BookIdentify string    `json:"book_identify"`
 	BookName     string    `json:"book_name"`
 }
 
+// NewDocumentSearchResult 新建文档搜索结果对象
 func NewDocumentSearchResult() *DocumentSearchResult {
 	return &DocumentSearchResult{}
 }
 
-//分页全局搜索.
+// FindToPager 分页全局搜索
 func (m *DocumentSearchResult) FindToPager(keyword string, pageIndex, pageSize, memberId int) (searchResult []*DocumentSearchResult, totalCount int, err error) {
 	o := orm.NewOrm()
 
@@ -93,10 +95,9 @@ WHERE (book.privately_owned = 0 OR rel1.relationship_id > 0)  AND (doc.document_
 	return
 }
 
-//书籍内搜索.
+// SearchDocument 文档搜索
 func (m *DocumentSearchResult) SearchDocument(keyword string, bookId int, page, size int) (docs []*DocumentSearchResult, cnt int, err error) {
 	o := orm.NewOrm()
-
 	fields := []string{"document_id", "document_name", "identify", "book_id"}
 	sql := "SELECT %v FROM documents WHERE book_id = " + strconv.Itoa(bookId) + " AND (document_name LIKE ? OR `release` LIKE ?) "
 	sqlCount := fmt.Sprintf(sql, "count(document_id) cnt")
@@ -107,16 +108,12 @@ func (m *DocumentSearchResult) SearchDocument(keyword string, bookId int, page, 
 		sqlCount = fmt.Sprintf(sql, "count(d.document_id) cnt")
 		sql = fmt.Sprintf(sql, "d."+strings.Join(fields, ",d.")) + " order by d.vcnt desc"
 	}
-
 	keyword = "%" + keyword + "%"
-
 	var count struct {
 		Cnt int
 	}
-
 	o.Raw(sqlCount, keyword, keyword).QueryRow(&count)
 	cnt = count.Cnt
-
 	limit := fmt.Sprintf(" limit %v offset %v", size, (page-1)*size)
 	if cnt > 0 {
 		_, err = o.Raw(sql+limit, keyword, keyword).QueryRows(&docs)
@@ -124,7 +121,7 @@ func (m *DocumentSearchResult) SearchDocument(keyword string, bookId int, page, 
 	return
 }
 
-// 根据id查询搜索结果
+// GetDocsById 根据id查询搜索结果
 func (m *DocumentSearchResult) GetDocsById(id []int, withoutCont ...bool) (docs []DocResult, err error) {
 	if len(id) == 0 {
 		return

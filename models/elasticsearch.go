@@ -183,21 +183,17 @@ func (this *ElasticSearchClient) Init() (err error) {
 
 // Search 搜索内容
 // 如果书籍id大于0，则表示搜索指定的书籍的文档。否则表示搜索书籍
-// 如果不指定书籍id，则只能搜索
 func (this *ElasticSearchClient) Search(wd string, p, listRows int, isSearchDoc bool, bookId ...int) (result ElasticSearchResult, err error) {
 	if !this.On {
 		return
 	}
-
 	wd = strings.Replace(wd, "\"", " ", -1)
 	wd = strings.Replace(wd, "\\", " ", -1)
 	bid := 0
 	if len(bookId) > 0 && bookId[0] > 0 {
 		bid = bookId[0]
 	}
-
 	var queryBody string
-
 	// 请求体
 	if bid > 0 { // 搜索指定书籍的文档，不限私有和公有
 		queryBody = `{"query": {"bool": {"filter": [{

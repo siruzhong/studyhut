@@ -243,6 +243,7 @@ func (this *BookController) SaveBook() {
 // PrivatelyOwned 设置书籍私有状态
 func (this *BookController) PrivatelyOwned() {
 	status := this.GetString("status")
+	// 验证操作者是否具有私有该书籍的权限
 	if this.forbidGeneralRole() && status == "open" {
 		this.JsonResult(6001, "您的角色非作者和管理员，无法将书籍设置为公开")
 	}
@@ -259,19 +260,19 @@ func (this *BookController) PrivatelyOwned() {
 	if err != nil {
 		this.JsonResult(6001, err.Error())
 	}
-	// 只有创始人才能变更私有状态
 	if bookResult.RoleId != constant.BookFounder {
 		this.JsonResult(6002, "权限不足")
 	}
+	// 更新书籍私有状态入库
 	if _, err = orm.NewOrm().QueryTable("books").Filter("book_id", bookResult.BookId).Update(orm.Params{
 		"privately_owned": state,
 	}); err != nil {
 		logs.Error("PrivatelyOwned => ", err)
 		this.JsonResult(6004, "保存失败")
 	}
+	// 后台启动协会程修改es中的信息
 	go func() {
 		models.CountCategory()
-
 		public := true
 		if state == 1 {
 			public = false

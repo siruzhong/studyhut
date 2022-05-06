@@ -14,30 +14,6 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
-// Sign 签到
-type Sign struct {
-	Id        int // 主键id
-	Uid       int `orm:"index"` // 签到的用户id
-	Day       int `orm:"index"` // 签到日期，如20200101
-	Reward    int // 奖励的阅读秒数
-	CreatedAt time.Time
-}
-
-// NewSign 新建签到实例
-func NewSign() *Sign {
-	return &Sign{}
-}
-
-type Rule struct {
-	BasicReward         int
-	ContinuousReward    int
-	MaxContinuousReward int
-}
-
-var (
-	_rule = &Rule{}
-)
-
 func init() {
 	if _, err := os.Stat(constant.SignCacheDir); err != nil {
 		err = os.MkdirAll(constant.SignCacheDir, os.ModePerm)
@@ -47,20 +23,66 @@ func init() {
 	}
 }
 
-// 多字段唯一键
+// Sign 签到
+type Sign struct {
+	Id        int       // 主键id
+	Uid       int       `orm:"index"` // 签到的用户id
+	Day       int       `orm:"index"` // 签到日期，如20200101
+	Reward    int       // 奖励的阅读秒数
+	CreatedAt time.Time // 创建时间
+}
+
+// TableUnique 多字段唯一键
 func (m *Sign) TableUnique() [][]string {
 	return [][]string{
 		[]string{"uid", "day"},
 	}
 }
 
-// 今天是否已签到
+// NewSign 新建签到实例
+func NewSign() *Sign {
+	return &Sign{}
+}
+
+// Rule 签到奖励规则
+type Rule struct {
+	BasicReward         int
+	ContinuousReward    int
+	MaxContinuousReward int
+}
+
+// 签到奖励规则全局对象
+var _rule = &Rule{}
+
+// GetSignRule 获取签到奖励规则
+func (m *Sign) GetSignRule() (r *Rule) {
+	return _rule
+}
+
+// UpdateSignRule 更新签到奖励规则
+func (m *Sign) UpdateSignRule() {
+	ops := []string{"SIGN_BASIC_REWARD", "SIGN_CONTINUOUS_REWARD", "SIGN_CONTINUOUS_MAX_REWARD"}
+	for _, op := range ops {
+		num, _ := strconv.Atoi(GetOptionValue(op, ""))
+		switch op {
+		case "SIGN_BASIC_REWARD":
+			_rule.BasicReward = num
+		case "SIGN_CONTINUOUS_REWARD":
+			_rule.ContinuousReward = num
+		case "SIGN_CONTINUOUS_MAX_REWARD":
+			_rule.MaxContinuousReward = num
+		}
+	}
+}
+
+// IsSignToday 今天是否已签到
 func (m *Sign) IsSignToday(uid int) bool {
 	s := &Sign{}
 	orm.NewOrm().QueryTable(m).Filter("uid", uid).Filter("day", time.Now().Format(constant.SignDayLayout)).One(s, "id")
 	return s.Id > 0
 }
 
+// LatestSignTime 上次签到时间
 func (m *Sign) LatestSignTime(uid int) (date int) {
 	s := &Sign{}
 	err := orm.NewOrm().QueryTable(m).Filter("uid", uid).OrderBy("-id").One(s)
@@ -70,7 +92,7 @@ func (m *Sign) LatestSignTime(uid int) (date int) {
 	return int(s.CreatedAt.Unix())
 }
 
-// 是否未断签
+// IsContinuousSign 是否未断签
 func (m *Sign) IsContinuousSign(uid int) bool {
 	s := &Sign{}
 	now := time.Now()
@@ -79,7 +101,7 @@ func (m *Sign) IsContinuousSign(uid int) bool {
 	return s.Id > 0
 }
 
-// 执行签到。使用事务
+// Sign 执行签到（使用事务）
 func (m *Sign) Sign(uid int) (reward int, err error) {
 	s := &Sign{}
 	o := orm.NewOrm()
@@ -92,7 +114,6 @@ func (m *Sign) Sign(uid int) (reward int, err error) {
 		return
 	}
 	isContinuousSign := m.IsContinuousSign(uid) // 昨天有没有断签
-
 	// 2. 查询用户签到了多少天
 	user := NewMember()
 	cols := []string{"member_id", "total_sign", "total_continuous_sign", "history_total_continuous_sign"}
@@ -118,9 +139,8 @@ func (m *Sign) Sign(uid int) (reward int, err error) {
 	s.Day = day
 	s.Uid = uid
 	s.CreatedAt = now
-
 	//  奖励计算
-	if isContinuousSign { //连续签到
+	if isContinuousSign { // 连续签到
 		user.TotalContinuousSign += 1
 		extra := user.TotalContinuousSign * rule.ContinuousReward
 		if extra >= rule.MaxContinuousReward {
@@ -131,15 +151,12 @@ func (m *Sign) Sign(uid int) (reward int, err error) {
 		user.TotalContinuousSign = 1
 		s.Reward = rule.BasicReward + rule.ContinuousReward
 	}
-
 	if user.TotalContinuousSign > user.HistoryTotalContinuousSign {
 		user.HistoryTotalContinuousSign = user.TotalContinuousSign
 	}
-
 	if _, err = o.Insert(s); err != nil {
 		return
 	}
-
 	_, err = o.QueryTable(user).Filter("member_id", user.MemberId).Update(orm.Params{
 		"total_sign":                    user.TotalSign,
 		"total_continuous_sign":         user.TotalContinuousSign,
@@ -161,27 +178,7 @@ func (m *Sign) Sign(uid int) (reward int, err error) {
 	return
 }
 
-// 获取签到奖励规则
-func (m *Sign) GetSignRule() (r *Rule) {
-	return _rule
-}
-
-// 更新签到奖励规则
-func (m *Sign) UpdateSignRule() {
-	ops := []string{"SIGN_BASIC_REWARD", "SIGN_CONTINUOUS_REWARD", "SIGN_CONTINUOUS_MAX_REWARD"}
-	for _, op := range ops {
-		num, _ := strconv.Atoi(GetOptionValue(op, ""))
-		switch op {
-		case "SIGN_BASIC_REWARD":
-			_rule.BasicReward = num
-		case "SIGN_CONTINUOUS_REWARD":
-			_rule.ContinuousReward = num
-		case "SIGN_CONTINUOUS_MAX_REWARD":
-			_rule.MaxContinuousReward = num
-		}
-	}
-}
-
+// Sorted 签到排行
 func (m *Sign) Sorted(limit int, orderField string, withCache ...bool) (members []Member) {
 	var b []byte
 	cache := false
@@ -200,27 +197,25 @@ func (m *Sign) Sorted(limit int, orderField string, withCache ...bool) (members 
 			}
 		}
 	}
-
 	member := NewMember()
 	o := orm.NewOrm()
 	fields := []string{"member_id", "account", "nickname", "total_continuous_sign", "total_sign", "total_reading_time", "history_total_continuous_sign"}
 	o.QueryTable(member).Filter("no_rank", 0).OrderBy("-"+orderField).Limit(limit).All(&members, fields...)
-
 	if cache && len(members) > 0 {
 		b, _ = json.Marshal(members)
 		ioutil.WriteFile(file, b, os.ModePerm)
 	}
-
 	return
 }
 
+// LatestOne 上次签到
 func (*Sign) LatestOne(uid int) (s Sign) {
 	orm.NewOrm().QueryTable(&s).Filter("uid", uid).OrderBy("-id").One(&s)
 	return
 }
 
+// SortedByPeriod 签到时间段排行
 func (m *Sign) SortedByPeriod(limit int, prd period, withCache ...bool) (members []Member) {
-
 	var b []byte
 	cache := false
 	if len(withCache) > 0 {
@@ -238,7 +233,6 @@ func (m *Sign) SortedByPeriod(limit int, prd period, withCache ...bool) (members
 			}
 		}
 	}
-
 	sqlSort := "SELECT t.uid member_id,count(t.id) total_sign,m.account,m.avatar,m.nickname FROM `sign` t left JOIN members m on t.uid=m.member_id WHERE t.day>=? and t.day<=? GROUP BY t.uid ORDER BY total_sign desc limit ?"
 	start, end := getTimeRange(time.Now(), prd)
 	orm.NewOrm().Raw(sqlSort, start, end, limit).QueryRows(&members)

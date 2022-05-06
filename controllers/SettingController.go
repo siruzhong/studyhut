@@ -153,7 +153,6 @@ func (this *SettingController) Upload() {
 		logs.Error("保存文件失败 => ", err.Error())
 		this.JsonResult(500, "保存文件失败")
 	}
-
 	url := "/" + strings.Replace(filePath, "\\", "/", -1)
 	if strings.HasPrefix(url, "//") {
 		url = string(url[1:])

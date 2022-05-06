@@ -148,8 +148,9 @@ func (m *Document) RecursiveDocument(docId int) error {
 
 // ReleaseContent 发布文档内容为HTML
 func (m *Document) ReleaseContent(bookId int, baseUrl string) {
-	// 加锁
+	// 发布前加锁
 	utils.BooksRelease.Set(bookId)
+	// 发布完成解锁
 	defer utils.BooksRelease.Delete(bookId)
 	var (
 		o           = orm.NewOrm()
@@ -171,6 +172,7 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 		docMap[item.Identify] = true
 	}
 	ModelStore := new(DocumentStore)
+	// 遍历所有文档，获取markdown文档内容，渲染成html内容写入数据库中
 	for _, item := range docs {
 		ds, err := ModelStore.GetById(item.DocumentId)
 		if err != nil {
@@ -182,75 +184,11 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 			ds.Markdown, ds.Content = item.BookStackAuto(bookId, ds.DocumentId)
 			ds.Markdown = "[TOC]\n\n" + ds.Markdown
 		} else if len(utils.GetTextFromHtml(ds.Content)) == 0 {
-			//内容为空，渲染一下文档，然后再重新获取
+			// 内容为空，渲染一下文档，然后再重新获取
 			utils.RenderDocumentById(item.DocumentId)
 			ds, _ = ModelStore.GetById(item.DocumentId)
 		}
 		item.Release = ds.Content
-		// 采集图片与稳定内容连接替换
-		//if gq, err := goquery.NewDocumentFromReader(strings.NewReader(item.Release)); err == nil {
-		//	images := gq.Find("img")
-		//	if images.Length() > 0 {
-		//		images.Each(func(i int, selection *goquery.Selection) {
-		//			if src, ok := selection.Attr("src"); ok {
-		//				lowerSrc := strings.ToLower(src)
-		//				if strings.HasPrefix(lowerSrc, "https://") || strings.HasPrefix(lowerSrc, "http://") {
-		//					tmpFile, err := utils.DownImage(src)
-		//					if err == nil {
-		//						defer os.Remove(tmpFile)
-		//						var newSrc string
-		//						switch utils.StoreType {
-		//						case constant.StoreLocal:
-		//							newSrc = "/uploads/projects/" + book.Identify + "/" + filepath.Base(tmpFile)
-		//							err = store.ModelStoreLocal.MoveToStore(tmpFile, strings.TrimPrefix(newSrc, "/"))
-		//						case constant.StoreOss:
-		//							newSrc = beego.AppConfig.String("oss::Domain") + "projects/" + book.Identify + "/" + filepath.Base(tmpFile)
-		//							err = store.ModelStoreOss.MoveToOss(tmpFile, newSrc, true)
-		//						case constant.StoreCos:
-		//							newSrc = beego.AppConfig.String("cos::Domain") + "projects/" + book.Identify + "/" + filepath.Base(tmpFile)
-		//							err = store.ModelStoreCos.MoveToCos(tmpFile, newSrc, true)
-		//						}
-		//						if err != nil {
-		//							beego.Error(err.Error())
-		//						}
-		//						selection.SetAttr("src", newSrc)
-		//						ds.Markdown = strings.Replace(ds.Markdown, src, newSrc, -1)
-		//					} else {
-		//						beego.Error(err.Error())
-		//					}
-		//				}
-		//			}
-		//		})
-		//	}
-		//	links := gq.Find("a")
-		//	if links.Length() > 0 {
-		//		links.Each(func(i int, selection *goquery.Selection) {
-		//			if href, ok := selection.Attr("href"); ok {
-		//				lowerHref := strings.ToLower(href)
-		//				if strings.HasPrefix(lowerHref, "https://") || strings.HasPrefix(lowerHref, "http://") {
-		//					// 需要区别处理存在#号的链接与不存在#号的链接，并不是存在#号的链接都是锚点，如vue开发的hash模式的url
-		//					identify := utils.MD5Sub16(strings.Trim(href, "/")) + ".md"
-		//					if _, ok := docMap[identify]; ok {
-		//						// 替换markdown中的连接，markdown的链接形式：  [链接名称](xxURL)
-		//						ds.Markdown = strings.Replace(ds.Markdown, "("+href+")", "($"+identify+")", -1)
-		//						// 直接identify就好了，比如在 /read/BookIdentify/DocIdentify.md 文档下，xx_identify.md 浏览器会转为 /read/BookIdentify/xx_identify.md
-		//						selection.SetAttr("href", identify)
-		//					} else {
-		//						if strings.Contains(href, "#") {
-		//							slice := strings.Split(href, "#")
-		//							identify = utils.MD5Sub16(strings.Trim(slice[0], "/")) + ".md"
-		//							if _, ok := docMap[identify]; ok {
-		//								ds.Markdown = strings.Replace(ds.Markdown, "("+slice[0]+"#", "($"+identify+"#", -1)
-		//								selection.SetAttr("href", slice[0]+"#"+strings.Join(slice[1:], "#"))
-		//							}
-		//						}
-		//					}
-		//				}
-		//			}
-		//		})
-		//	}
-		//	item.Release, _ = gq.Find("body").Html()
-		//}
 		ds.Content = item.Release
 		fields := []string{"markdown", "content"}
 		if ds.UpdatedAt.Unix() < 0 {
@@ -266,7 +204,6 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 			beego.Error(fmt.Sprintf("发布失败 => %+v", item), err)
 		}
 	}
-
 	// 最后再更新时间戳
 	if _, err = qs.Update(orm.Params{
 		"release_time": releaseTime,

@@ -589,7 +589,7 @@ func (m *Book) GetBooksById(id []int, fields ...string) (books []Book, err error
 	return
 }
 
-// SearchBook 搜索书籍，这里只返回book_id
+// SearchBook 搜索书籍
 func (n *Book) SearchBook(wd string, page, size int) (books []Book, cnt int, err error) {
 	sqlFmt := "select %v from books where privately_owned=0 and (book_name like ? or label like ? or description like ?) order by star desc"
 	sqlCount := fmt.Sprintf(sqlFmt, "count(book_id) cnt")

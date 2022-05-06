@@ -22,14 +22,14 @@ type GiteeAccessToken struct {
 
 // GiteeUser 码云用户数据(用户使用gitee登录的时候，直接根据gitee的id获取数据)
 type GiteeUser struct {
-	Id        int       `json:"id"`                                  //用户id
-	MemberId  int       `json:"member_id"`                           //绑定的用户id
-	UpdatedAt time.Time `json:"updated_at"`                          //用户资料更新时间
-	AvatarURL string    `json:"avatar_url" orm:"column(avatar_url)"` //用户头像链接
-	Email     string    `json:"email" orm:"size(50)"`                //电子邮箱
-	Login     string    `json:"login" orm:"size(50)"`                //用户名
-	Name      string    `json:"name" orm:"size(50)"`                 //昵称
-	HtmlURL   string    `json:"html_url" orm:"column(html_url)"`     //gitee主页
+	Id        int       `json:"id"`                                  // 用户id
+	MemberId  int       `json:"member_id"`                           // 绑定的用户id
+	UpdatedAt time.Time `json:"updated_at"`                          // 用户资料更新时间
+	AvatarURL string    `json:"avatar_url" orm:"column(avatar_url)"` // 用户头像链接
+	Email     string    `json:"email" orm:"size(50)"`                // 电子邮箱
+	Login     string    `json:"login" orm:"size(50)"`                // 用户名
+	Name      string    `json:"name" orm:"size(50)"`                 // 昵称
+	HtmlURL   string    `json:"html_url" orm:"column(html_url)"`     // 主页地址
 }
 
 // GetGiteeAccessToken 获取accessToken

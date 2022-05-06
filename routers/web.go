@@ -140,7 +140,6 @@ func webRouter() {
 	beego.Router("/read/:key/:id", &controllers.DocumentController{}, "*:Read")                                // 阅读文档
 	beego.Router("/read/:key/search", &controllers.DocumentController{}, "post:Search")                        // 文档搜索
 	beego.Router("/export/:key", &controllers.DocumentController{}, "*:Export")                                // 文档导出
-	beego.Router("/qrcode/:key.png", &controllers.DocumentController{}, "get:QrCode")                          // 生成书籍访问的二维码
 	beego.Router("/attach_files/:key/:attach_id", &controllers.DocumentController{}, "get:DownloadAttachment") // 下载附件
 	beego.Router("/crawl", &controllers.BaseController{}, "post:Crawl")                                        // 内容采集
 }

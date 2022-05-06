@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
-	"image/png"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -24,8 +23,6 @@ import (
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	"github.com/boombuler/barcode"
-	"github.com/boombuler/barcode/qr"
 )
 
 var (
@@ -996,7 +993,7 @@ func (this *DocumentController) Content() {
 	}
 	isSummary := false
 	isAuto := false
-	//替换文档中的url链接
+	// 替换文档中的url链接
 	if strings.ToLower(doc.Identify) == "summary.md" && (strings.Contains(markdown, "<bookstack-summary></bookstack-summary>") || strings.Contains(doc.Markdown, "<bookstack-summary/>")) {
 		//如果标识是summary.md，并且带有bookstack的标签，则表示更新目录
 		isSummary = true
@@ -1008,7 +1005,7 @@ func (this *DocumentController) Content() {
 		}
 	}
 
-	//爬虫采集
+	// 爬虫采集
 	access := this.Member.IsAdministrator()
 	if op, err := new(models.Option).FindByName("SPIDER"); err == nil {
 		access = access && op.OptionValue == "true"
@@ -1180,40 +1177,6 @@ func (this *DocumentController) Export() {
 		this.JsonResult(0, "获取文档下载链接成功", map[string]interface{}{"url": link})
 	}
 	this.JsonResult(1, "下载失败，您要下载的文档当前并未生成可下载文档。")
-}
-
-// QrCode 生成书籍访问的二维码
-func (this *DocumentController) QrCode() {
-	this.Prepare()
-	identify := this.GetString(":key")
-
-	book, err := models.NewBook().FindByIdentify(identify)
-
-	if err != nil || book.BookId <= 0 {
-		this.Abort("404")
-	}
-
-	uri := this.BaseUrl() + beego.URLFor("DocumentController.Index", ":key", identify)
-	code, err := qr.Encode(uri, qr.L, qr.Unicode)
-	if err != nil {
-		beego.Error(err)
-		this.Abort("404")
-	}
-	code, err = barcode.Scale(code, 150, 150)
-
-	if err != nil {
-		beego.Error(err)
-		this.Abort("404")
-	}
-	this.Ctx.ResponseWriter.Header().Set("Content-Type", "image/png")
-
-	//imgpath := filepath.Join("cache","qrcode",identify + ".png")
-
-	err = png.Encode(this.Ctx.ResponseWriter, code)
-	if err != nil {
-		beego.Error(err)
-		this.Abort("404")
-	}
 }
 
 // Search 书籍内搜索

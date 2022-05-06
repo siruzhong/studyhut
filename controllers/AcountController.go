@@ -293,14 +293,11 @@ func (this *AccountController) Bind() {
 	avatar := this.GetString("avatar") //用户头像
 	isbind, _ := this.GetInt("isbind", 0)
 	ibind := func(oauthType string, oauthId, memberId interface{}) (err error) {
-		//注册成功，绑定用户
 		switch oauthType {
 		case "gitee":
 			err = models.ModelGitee.Bind(oauthId, memberId)
 		case "github":
 			err = models.ModelGithub.Bind(oauthId, memberId)
-		case "qq":
-			err = models.ModelQQ.Bind(oauthId, memberId)
 		}
 		return
 	}
@@ -308,7 +305,7 @@ func (this *AccountController) Bind() {
 		if auth, ok := this.GetSession("auth").(string); !ok || fmt.Sprintf("%v-%v", oauthType, oauthId) != auth {
 			this.JsonResult(6005, "绑定信息有误，授权类型不符")
 		}
-	} else { //邮箱登录，如果开启了验证码，则对验证码进行校验
+	} else {
 		if v, ok := this.Option["ENABLED_CAPTCHA"]; ok && strings.EqualFold(v, "true") {
 			if !cpt.VerifyReq(this.Ctx.Request) {
 				this.JsonResult(1, "验证码不正确")

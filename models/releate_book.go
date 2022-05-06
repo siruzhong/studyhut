@@ -113,7 +113,6 @@ func listByDBWithLabel(book *Book, length int) (ids []int) {
 	if rawKeyWords == "" {
 		return
 	}
-
 	bookModel := NewBook()
 	ids, _ = bookModel.SearchBookByLabel(strings.Split(rawKeyWords, ","), length, []int{book.BookId})
 	return

@@ -1,18 +1,18 @@
 <div class="ucenter-avatar">
     <div class="panel panel-default">
-        <div class="panel-heading">个人主页</div>
+        <div class="panel-heading">个人中心</div>
         <div class="panel-body">
             <img class="thumbnail" src="{{showImg .User.Avatar "avatar"}}" alt="{{.User.Nickname}}">
             <div class="ucenter-info">
                 <h3>
                     <span>{{.User.Nickname}}</span>
-                    <small class="text-muted">(@{{.User.Account}})</small>
-                    {{if .IsSelf}}
-                    <span class="sign-rule">
-                        <small class="text-muted">|</small>
-                        <a href="/read/help/sign-rule.md" title="签到规则" target="_blank"><small>签到规则</small></a>
-                    </span>
-                    {{end}}
+                    <small class="text-muted">({{.User.Email}})</small>
+<!--                    {{if .IsSelf}}-->
+<!--                    <span class="sign-rule">-->
+<!--                        <small class="text-muted">|</small>-->
+<!--                        <a href="/read/help/sign-rule.md" title="签到规则" target="_blank"><small>签到规则</small></a>-->
+<!--                    </span>-->
+<!--                    {{end}}-->
                 </h3>
                 <div class="btns">
                     {{if .IsSelf}}
@@ -23,10 +23,10 @@
                             <a target="_blank" href="{{urlfor "BaseController.SignToday"}}" class="btn btn-success btn-sm ajax-get"><i class="fa fa-calendar-plus-o"></i> 每日签到</a>
                         {{end}}
                         {{if gt .LatestSign.Id 0}}
-                            <div class="help-block text-left">
-                                <div><small class="text-muted">最近一次签到:  </small> <span class="text-success">{{date .LatestSign.CreatedAt "Y-m-d H:i:s"}}</span></div>
-                                <div><small class="text-muted">阅读时长增加:  </small> <span class="text-red">{{.LatestSign.Reward}}</span> <small class="text-muted">秒</small></div>
-                            </div>
+<!--                            <div class="help-block text-center">-->
+                                <div><small class="text-muted">上次签到:  </small> <span class="text-success">{{date .LatestSign.CreatedAt "Y-m-d H:i:s"}}</span></div>
+<!--                                <div><small class="text-muted">阅读时长增加:  </small> <span class="text-red">{{.LatestSign.Reward}}</span> <small class="text-muted">秒</small></div>-->
+<!--                            </div>-->
                         {{end}}
                     {{else}}
                         {{if (IsFollow .User.MemberId  .Member.MemberId)}}

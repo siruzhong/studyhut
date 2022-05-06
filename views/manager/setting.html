@@ -25,20 +25,19 @@
                 </div>
                 <div class="box-body" style="padding-bottom: 200px;">
                     <form method="post" id="gloablEditForm" action="{{urlfor "ManagerController.Setting"}}">
-                            <div class="form-group">
-                                <label>网站名称</label>
-                                <input type="text" class="form-control" name="SITE_NAME" id="siteName" placeholder="网站标题" value="{{.SITE_NAME}}">
-                            </div>
-                            <div class="form-group">
-                                <label>网站备案</label>
-                                <input type="text" class="form-control" name="ICP" id="ICP" placeholder="网站备案" value="{{.ICP.OptionValue}}">
-                            </div>
                         <div class="form-group">
-                            <label>版本控制</label>
-                            <input type="number" name="ENABLE_DOCUMENT_HISTORY" class="form-control" value="{{.ENABLE_DOCUMENT_HISTORY.OptionValue}}">
-                            <div class="help-block">如果启用版本控制，请填写大于0的数字，表示每个文档的最大版本数。</div>
+                            <label>网站名称</label>
+                            <input type="text" class="form-control" name="SITE_NAME" id="siteName" placeholder="网站标题" value="{{.SITE_NAME}}">
                         </div>
-
+<!--                        <div class="form-group">-->
+<!--                            <label>网站备案</label>-->
+<!--                            <input type="text" class="form-control" name="ICP" id="ICP" placeholder="网站备案" value="{{.ICP.OptionValue}}">-->
+<!--                        </div>-->
+<!--                        <div class="form-group">-->
+<!--                            <label>版本控制</label>-->
+<!--                            <input type="number" name="ENABLE_DOCUMENT_HISTORY" class="form-control" value="{{.ENABLE_DOCUMENT_HISTORY.OptionValue}}">-->
+<!--                            <div class="help-block">如果启用版本控制，请填写大于0的数字，表示每个文档的最大版本数。</div>-->
+<!--                        </div>-->
                         <div class="form-group">
                             <label>是否显示分类索引 ( <span class="text-muted">首页一级分类太多的时候，建议显示，以便用户快速定位分类位置</span>)</label>
                             <div class="radio">
@@ -132,17 +131,17 @@
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label>开启QQ登录</label>
-                            <div class="radio">
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .LOGIN_QQ.OptionValue "true"}}checked{{end}} name="LOGIN_QQ" value="true">开启<span class="text"></span>
-                                </label>
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .LOGIN_QQ.OptionValue "false"}}checked{{end}} name="LOGIN_QQ" value="false">关闭<span class="text"></span>
-                                </label>
-                            </div>
-                        </div>
+<!--                        <div class="form-group">-->
+<!--                            <label>开启QQ登录</label>-->
+<!--                            <div class="radio">-->
+<!--                                <label class="radio-inline">-->
+<!--                                    <input type="radio" {{if eq .LOGIN_QQ.OptionValue "true"}}checked{{end}} name="LOGIN_QQ" value="true">开启<span class="text"></span>-->
+<!--                                </label>-->
+<!--                                <label class="radio-inline">-->
+<!--                                    <input type="radio" {{if eq .LOGIN_QQ.OptionValue "false"}}checked{{end}} name="LOGIN_QQ" value="false">关闭<span class="text"></span>-->
+<!--                                </label>-->
+<!--                            </div>-->
+<!--                        </div>-->
 
                         <div class="form-group">
                             <label>开启GitHub登录</label>

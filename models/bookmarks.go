@@ -48,20 +48,16 @@ func (m *Bookmark) InsertOrDelete(uid, docId int) (insert bool, err error) {
 		err = errors.New("用户id和文档id均不能为空")
 		return
 	}
-
 	o := orm.NewOrm()
-
 	var (
 		bookmark Bookmark
 		doc      = new(Document)
 	)
-
 	o.QueryTable(tableBookmark).Filter("uid", uid).Filter("doc_id", docId).One(&bookmark, "id")
 	if bookmark.Id > 0 { //删除书签
 		_, err = o.QueryTable(tableBookmark).Filter("id", bookmark.Id).Delete()
 		return
 	}
-
 	// 新增书签
 	// 查询文档id是属于哪个书籍
 	o.QueryTable(doc).Filter("document_id", docId).One(doc, "book_id")
