@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+	_ "net/http/pprof"
 	"os"
-
 	"studyhut/commands"
 	"studyhut/commands/daemon"
 	_ "studyhut/routers"
@@ -38,4 +39,8 @@ func main() {
 
 	// 启动服务
 	s.Run()
+
+	go func() {
+		http.ListenAndServe("localhost:8888", nil)
+	}()
 }

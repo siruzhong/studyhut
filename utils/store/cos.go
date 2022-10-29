@@ -58,10 +58,9 @@ func (c *Cos) IsObjectExist(object string) (err error) {
 	return
 }
 
-// MoveToCos 文件移动到Cos进行存储[如果是图片文件，不要使用gzip压缩，否则在使用阿里云OSS自带的图片处理功能无法处理图片]
+// MoveToCos 文件移动到Cos进行存储
 // @param	local		本地文件
 // @param	save		存储到Cos的文件
-// @param	IsPreview	是否是预览，是预览的话，则上传到预览的OSS，否则上传到存储的OSS。存储的OSS，只作为文档的存储，以供下载，但不提供预览等访问，为私有
 // @param	IsDel		文件上传后，是否删除本地文件
 // @param	IsGzip		是否做gzip压缩，做gzip压缩的话，需要修改oss中对象的响应头，设置gzip响应
 func (c *Cos) MoveToCos(local, save string, IsDel bool, IsGzip ...bool) error {
